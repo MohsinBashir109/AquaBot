@@ -19,6 +19,7 @@ function App() {
   return (
     <SafeAreaProvider>
       <Text>asdasdasdasdasdasd</Text>
+      <Text>asdasdasdasdasdasd</Text>
     </SafeAreaProvider>
   );
 }
