@@ -3,6 +3,7 @@ import { aquaBotwrapper, authBackGround } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';
+import { fontFamilies } from '../src/utils/fontfamilies';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type props = {
@@ -26,7 +27,7 @@ const AuthWrapper = ({ children, text, desText }: props) => {
       <Text style={styles.text}>AI Irrigation Advisor</Text>
 
       <View style={styles.children}>
-        {text && <Text style={styles.text}>{text}</Text>}
+        {text && <Text style={styles.textChildern}>{text}</Text>}
         {desText && <Text style={styles.desText}>{desText}</Text>}
         {children}
       </View>
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
   image: {
     width: widthPixel(220),
     height: heightPixel(50),
-    marginTop: heightPixel(33),
+    marginTop: heightPixel(30),
   },
   background: {
     flex: 1,
@@ -51,15 +52,22 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: fontPixel(24),
+    fontFamily: fontFamilies.bold,
     color: '#000000',
-    fontWeight: 'semibold',
+  },
+  textChildern: {
+    fontSize: fontPixel(20),
+    fontFamily: fontFamilies.semibold,
+    color: '#000000',
   },
   children: {
     flex: 1,
     width: '100%',
-    marginTop: heightPixel(60),
+    marginTop: heightPixel(50),
   },
   desText: {
-    fontSize: fontPixel(12),
+    fontSize: fontPixel(14),
+    fontFamily: fontFamilies.regular,
+    color: '#000000',
   },
 });
