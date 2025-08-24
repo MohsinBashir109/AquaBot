@@ -6,7 +6,10 @@ import { routes } from '../../../utils/routes';
 
 const index = ({ navigation }: any) => {
   return (
-    <AuthWrapper>
+    <AuthWrapper
+      text="SignUp"
+      desText="Please enter your credentials here to register."
+    >
       <TouchableOpacity
         onPress={() => {
           navigation.navigate(routes.signup);

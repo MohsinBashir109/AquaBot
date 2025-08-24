@@ -6,7 +6,7 @@ import { routes } from '../../../utils/routes';
 
 const OnBoarding = ({ navigation }: any) => {
   return (
-    <AuthWrapper>
+    <AuthWrapper text="Welcome to AquaBot " desText="">
       <TouchableOpacity
         onPress={() => {
           navigation.navigate(routes.signin);

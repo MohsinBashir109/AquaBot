@@ -6,7 +6,7 @@ import { routes } from '../../../utils/routes';
 
 const SignIn = ({ navigation }: any) => {
   return (
-    <AuthWrapper>
+    <AuthWrapper text="Login" desText="Enter your credientials.">
       <TouchableOpacity
         onPress={() => {
           navigation.navigate(routes.signup);
