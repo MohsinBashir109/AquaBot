@@ -4,20 +4,20 @@ import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import React from 'react';
 import { routes } from '../../../utils/routes';
 
-const OnBoarding = ({ navigation }: any) => {
+const index = ({ navigation }: any) => {
   return (
     <AuthWrapper>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate(routes.signin);
+          navigation.navigate(routes.signup);
         }}
       >
-        <Text>onboarding</Text>
+        <Text>signup</Text>
       </TouchableOpacity>
     </AuthWrapper>
   );
 };
 
-export default OnBoarding;
+export default index;
 
 const styles = StyleSheet.create({});

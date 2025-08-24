@@ -13,6 +13,7 @@ export const AuthNavigation = () => {
       <AuthStack.Screen name={routes.onboarding} component={Auth.OnBoarding} />
       <AuthStack.Screen name={routes.splash} component={Auth.Splash} />
       <AuthStack.Screen name={routes.signin} component={Auth.SignIn} />
+      <AuthStack.Screen name={routes.signup} component={Auth.SignUp} />
     </AuthStack.Navigator>
   );
 };

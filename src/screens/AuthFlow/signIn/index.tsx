@@ -1,12 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import React from 'react';
+import { routes } from '../../../utils/routes';
 
-const SignIn = () => {
+const SignIn = ({ navigation }: any) => {
   return (
-    <View>
-      <Text>SignIn</Text>
-    </View>
+    <AuthWrapper>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate(routes.signup);
+        }}
+      >
+        <Text>Signin</Text>
+      </TouchableOpacity>
+    </AuthWrapper>
   );
 };
 
