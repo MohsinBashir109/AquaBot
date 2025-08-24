@@ -1,11 +1,18 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import React from 'react';
+import { routes } from '../../../utils/routes';
 
-const Splash = () => {
+const Splash = ({ navigation }: any) => {
   return (
     <View>
-      <Text>Splash</Text>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate(routes.onboarding);
+        }}
+      >
+        <Text>login</Text>
+      </TouchableOpacity>
     </View>
   );
 };
