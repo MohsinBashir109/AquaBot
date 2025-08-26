@@ -3,4 +3,5 @@ export const routes = {
   splash: 'splash',
   signin: 'SignIn',
   signup: 'signUp',
+  auth: 'AuthFlow',
 };

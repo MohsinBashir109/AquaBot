@@ -7,10 +7,11 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { email, padlock } from '../../assets/icons/icons';
 import { heightPixel, widthPixel } from '../../utils/constants';
 
 import React from 'react';
+import { colors } from '../../utils/colors';
+import { useThemeContext } from '../../theme/ThemeContext';
 
 type TextInputField = {
   onPressLeftIcon?: () => void;
@@ -29,12 +30,30 @@ type TextInputField = {
 };
 
 const ThemeInput = (props: TextInputField) => {
+  const { isDark } = useThemeContext();
   return (
     <View>
-      {props.title && <Text>{props.title}</Text>}
+      {props.title && (
+        <Text
+          style={[
+            style.title,
+            { color: colors[isDark ? 'dark' : 'light'].secondaryText },
+          ]}
+        >
+          {props.title}
+        </Text>
+      )}
 
-      <View style={style.mainConatiner}>
-        <Image style={style.image} source={props.leftIcon} />
+      <View
+        style={[
+          style.mainConatiner,
+          {
+            backgroundColor: colors[isDark ? 'dark' : 'light'].background,
+            borderColor: colors[isDark ? 'dark' : 'light'].gray3,
+          },
+        ]}
+      >
+        <Image style={style.leftIcon} source={props.leftIcon} />
         <TextInput
           placeholder={props.placeholder}
           onBlur={props.onBlur}
@@ -42,12 +61,12 @@ const ThemeInput = (props: TextInputField) => {
           value={props.value}
           onChangeText={props.onChangeText}
           editable={props.editable}
-          placeholderTextColor={props.placeHolderColor}
+          placeholderTextColor={colors[isDark ? 'dark' : 'light'].gray1}
           style={[style.container, props.styleContainer]}
           secureTextEntry={props.secureTextEntry}
         />
         <TouchableOpacity onPress={props.onPressLeftIcon}>
-          <Image style={style.image} source={props.rightIcon} />
+          <Image style={style.rightIcon} source={props.rightIcon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -56,10 +75,18 @@ const ThemeInput = (props: TextInputField) => {
 
 export default ThemeInput;
 const style = StyleSheet.create({
+  leftIcon: {
+    width: widthPixel(20),
+    height: widthPixel(20),
+    resizeMode: 'contain',
+    marginHorizontal: widthPixel(3),
+    marginRight: widthPixel(5),
+  },
+  title: {},
   mainConatiner: {
     flexDirection: 'row',
     width: '100%',
-    backgroundColor: '#f3f4f6',
+
     justifyContent: 'flex-start',
     alignItems: 'center',
     borderRadius: 10,
@@ -70,10 +97,9 @@ const style = StyleSheet.create({
     height: heightPixel(50),
     color: 'green',
   },
-  image: {
-    marginHorizontal: widthPixel(10),
-    width: widthPixel(20),
-    height: heightPixel(20),
-    zIndex: 333,
+  rightIcon: {
+    width: widthPixel(24),
+    height: widthPixel(24),
+    resizeMode: 'contain',
   },
 });

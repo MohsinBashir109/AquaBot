@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { email, hide, padlock } from './../../../assets/icons/icons';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
+import Button from '../../../components/ThemeComponents/ThemeButton';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import { routes } from '../../../utils/routes';
@@ -45,38 +46,13 @@ const SignIn = ({ navigation }: any) => {
           secureTextEntry={isHidden}
           onPressLeftIcon={handleHide}
         />
-
-        {/* <ThemeInput
-          placeholder="Email"
-          leftIcon={email}
-          value={details.email}
-          onChangeText={(text: string) =>
-            setDetails({
-              ...details,
-              email: text,
-            })
-          }
-        /> */}
-        {/* <ThemeInput
-          placeholder="Password"
-          leftIcon={padlock}
-          rightIcon={hide}
-          onChangeText={(text: string) =>
-            setDetails({
-              ...details,
-              password: text,
-            })
-          }
-          rightIconPress={handleHide}
-          secureTextEntry={isHidden}
-        /> */}
-        <TouchableOpacity
+        <Button
+          title="Login"
+          bgColor="buttonBackGround"
           onPress={() => {
             navigation.navigate(routes.signup);
           }}
-        >
-          <Text>Signin</Text>
-        </TouchableOpacity>
+        />
       </AuthWrapper>
     </KeyboardAwareScrollView>
   );
@@ -85,7 +61,5 @@ const SignIn = ({ navigation }: any) => {
 export default SignIn;
 
 const styles = StyleSheet.create({
-  styleContainer: {
-    backgroundColor: '#f3f4f6',
-  },
+  styleContainer: {},
 });

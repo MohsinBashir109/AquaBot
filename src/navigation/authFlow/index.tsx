@@ -8,7 +8,7 @@ export const AuthNavigation = () => {
   return (
     <AuthStack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="splash"
+      initialRouteName={routes.splash}
     >
       <AuthStack.Screen name={routes.onboarding} component={Auth.OnBoarding} />
       <AuthStack.Screen name={routes.splash} component={Auth.Splash} />

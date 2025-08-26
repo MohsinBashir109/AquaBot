@@ -3,8 +3,11 @@ import { aquaBotwrapper, authBackGround } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';
+import ThemeText from '../src/components/ThemeComponents/ThemeText';
+import { colors } from '../src/utils/colors';
 import { fontFamilies } from '../src/utils/fontfamilies';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useThemeContext } from '../src/theme/ThemeContext';
 
 type props = {
   text?: string;
@@ -14,21 +17,38 @@ type props = {
 
 const AuthWrapper = ({ children, text, desText }: props) => {
   const insets = useSafeAreaInsets();
+  const { isDark } = useThemeContext();
   return (
     <ImageBackground
       source={authBackGround}
-      style={[styles.background, { paddingTop: insets.top }]}
+      style={[
+        styles.background,
+        {
+          paddingTop: insets.top,
+          backgroundColor: colors[isDark ? 'dark' : 'light'].background,
+        },
+      ]}
     >
       <Image
         source={aquaBotwrapper}
         resizeMode="contain"
         style={styles.image}
       />
-      <Text style={styles.text}>AI Irrigation Advisor</Text>
+      <ThemeText color="text" style={styles.text}>
+        AI Irrigation Advisor
+      </ThemeText>
 
       <View style={styles.children}>
-        {text && <Text style={styles.textChildern}>{text}</Text>}
-        {desText && <Text style={styles.desText}>{desText}</Text>}
+        {text && (
+          <ThemeText color="text" style={styles.textChildern}>
+            {text}
+          </ThemeText>
+        )}
+        {desText && (
+          <ThemeText color="text" style={styles.desText}>
+            {desText}
+          </ThemeText>
+        )}
         {children}
       </View>
     </ImageBackground>

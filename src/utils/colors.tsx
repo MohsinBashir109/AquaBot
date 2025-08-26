@@ -10,7 +10,7 @@ export const colors = {
     dark: '#0A2342',
     primary: '#2CA3A3',
     secondary: '#E6F5F5',
-    text: '#1A3A5F',
+    text: '#1a5f26ff',
     background: '#fff',
     white: '#fff',
     tint: tintColorLight,
@@ -26,6 +26,7 @@ export const colors = {
     secondaryText: '#6B7280',
     red: '#FF4444',
     error: '#FF0000',
+    buttonBackGround: '#148663',
   },
   dark: {
     dark: '#0A2342',
@@ -47,6 +48,7 @@ export const colors = {
     secondaryText: '#eef1f7ff',
     red: '#FF4444',
     error: '#FF0000',
+    buttonBackGround: '#148663',
   },
 };
 export const globalStyles = {
