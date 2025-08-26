@@ -1,6 +1,6 @@
 export const routes = {
-  onboarding: 'onBoarding',
+  onboarding: 'onboarding',
   splash: 'splash',
   signin: 'SignIn',
-  signup: 'SignUp',
+  signup: 'signUp',
 };
