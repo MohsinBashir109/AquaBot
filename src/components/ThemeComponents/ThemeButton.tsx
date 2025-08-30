@@ -98,11 +98,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: colors.light.primary,
     ...globalStyles.shadow,
+    elevation: 5,
+    // higher = more shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   buttonTitle: {
     textAlign: 'center',
     fontSize: fontPixel(16),
-    color: colors.light.white,
+
     fontFamily: fontFamilies.semibold,
   },
   icon: {

@@ -12,12 +12,6 @@ export const MainNavigator = () => {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        <StatusBar
-          translucent
-          backgroundColor={'transparent'}
-          barStyle={'light-content'}
-        />
-
         <MyStack.Navigator
           initialRouteName={routes.auth}
           screenOptions={{ headerShown: false }}

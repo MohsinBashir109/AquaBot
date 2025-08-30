@@ -5,6 +5,7 @@ import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 import React from 'react';
 import ThemeText from './ThemeText';
 import { fontFamilies } from '../../utils/fontfamilies';
+import { tickCircle } from '../../assets/icons/icons';
 import { useThemeContext } from '../../theme/ThemeContext';
 
 const ThemedCheckbox = ({
@@ -32,18 +33,21 @@ const ThemedCheckbox = ({
             checked
               ? {
                   borderColor: colors.light.gray3,
-                  backgroundColor: colors.light.primary,
+                  backgroundColor: colors.light.buttonBackGround,
                 }
-              : { borderColor: colors.light.gray3 },
+              : {
+                  borderColor: colors.light.gray3,
+                  backgroundColor: colors.light.white,
+                },
           ]}
         >
-          {checked && <Image style={styles.check} />}
+          {checked && <Image source={tickCircle} style={styles.check} />}
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={onPress}>
         <ThemeText
-          color="gray2"
+          color="secondary"
           style={[globalStyles.smallDescription, styles.label, textStyle]}
         >
           {label}
@@ -69,8 +73,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: fontPixel(14),
-    fontFamily: fontFamilies.regular,
-    marginLeft: widthPixel(10),
+    fontFamily: fontFamilies.seniregular,
+    marginLeft: widthPixel(5),
   },
   check: {
     width: heightPixel(12),

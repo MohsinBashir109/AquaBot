@@ -1,5 +1,12 @@
-import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
-import { aquaBotwrapper, authBackGround } from '../src/assets/images/images';
+import {
+  Image,
+  ImageBackground,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { aquaLogo, authBackGround } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';
@@ -29,28 +36,38 @@ const AuthWrapper = ({ children, text, desText }: props) => {
         },
       ]}
     >
-      <Image
-        source={aquaBotwrapper}
-        resizeMode="contain"
-        style={styles.image}
+      <StatusBar
+        translucent
+        backgroundColor={'transparent'}
+        barStyle={'dark-content'}
       />
-      <ThemeText color="text" style={styles.text}>
-        AI Irrigation Advisor
-      </ThemeText>
-
-      <View style={styles.children}>
-        {text && (
-          <ThemeText color="text" style={styles.textChildern}>
-            {text}
-          </ThemeText>
-        )}
-        {desText && (
-          <ThemeText color="text" style={styles.desText}>
-            {desText}
-          </ThemeText>
-        )}
-        {children}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: heightPixel(50),
+        }}
+      >
+        <View
+          style={{ alignItems: 'flex-start', justifyContent: 'flex-start' }}
+        >
+          <Image source={aquaLogo} resizeMode="contain" style={styles.image} />
+        </View>
+        <View style={{ flex: 1, marginTop: heightPixel(15) }}>
+          {text && (
+            <ThemeText color="text" style={styles.textChildern}>
+              {text}
+            </ThemeText>
+          )}
+          {desText && (
+            <ThemeText color="desText" style={styles.desText}>
+              {desText}
+            </ThemeText>
+          )}
+        </View>
       </View>
+      {children}
     </ImageBackground>
   );
 };
@@ -59,16 +76,14 @@ export default AuthWrapper;
 
 const styles = StyleSheet.create({
   image: {
-    width: widthPixel(220),
-    height: heightPixel(50),
-    marginTop: heightPixel(30),
+    width: widthPixel(80),
+    height: heightPixel(110),
   },
   background: {
     flex: 1,
     paddingHorizontal: widthPixel(20),
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'pink',
   },
   text: {
     fontSize: fontPixel(24),
@@ -77,7 +92,7 @@ const styles = StyleSheet.create({
   },
   textChildern: {
     fontSize: fontPixel(20),
-    fontFamily: fontFamilies.semibold,
+    fontFamily: fontFamilies.bold,
     color: '#000000',
   },
   children: {

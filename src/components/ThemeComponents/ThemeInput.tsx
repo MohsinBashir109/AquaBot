@@ -7,10 +7,11 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { heightPixel, widthPixel } from '../../utils/constants';
+import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 
 import React from 'react';
 import { colors } from '../../utils/colors';
+import { fontFamilies } from '../../utils/fontfamilies';
 import { useThemeContext } from '../../theme/ThemeContext';
 
 type TextInputField = {
@@ -27,12 +28,13 @@ type TextInputField = {
   secureTextEntry?: boolean;
   leftIcon?: any;
   rightIcon?: any;
+  containerStyleOuter?: any;
 };
 
 const ThemeInput = (props: TextInputField) => {
   const { isDark } = useThemeContext();
   return (
-    <View>
+    <View style={[style.containerOuter, props.containerStyleOuter]}>
       {props.title && (
         <Text
           style={[
@@ -49,11 +51,14 @@ const ThemeInput = (props: TextInputField) => {
           style.mainConatiner,
           {
             backgroundColor: colors[isDark ? 'dark' : 'light'].background,
-            borderColor: colors[isDark ? 'dark' : 'light'].gray3,
           },
         ]}
       >
-        <Image style={style.leftIcon} source={props.leftIcon} />
+        <Image
+          resizeMode="contain"
+          style={style.leftIcon}
+          source={props.leftIcon}
+        />
         <TextInput
           placeholder={props.placeholder}
           onBlur={props.onBlur}
@@ -62,11 +67,19 @@ const ThemeInput = (props: TextInputField) => {
           onChangeText={props.onChangeText}
           editable={props.editable}
           placeholderTextColor={colors[isDark ? 'dark' : 'light'].gray1}
-          style={[style.container, props.styleContainer]}
+          style={[
+            style.container,
+            props.styleContainer,
+            { color: colors[isDark ? 'dark' : 'light'].desText },
+          ]}
           secureTextEntry={props.secureTextEntry}
         />
-        <TouchableOpacity onPress={props.onPressLeftIcon}>
-          <Image style={style.rightIcon} source={props.rightIcon} />
+        <TouchableOpacity onPress={props.onPressLeftIcon} style={style.Touch}>
+          <Image
+            resizeMode="contain"
+            style={style.rightIcon}
+            source={props.rightIcon}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -75,31 +88,41 @@ const ThemeInput = (props: TextInputField) => {
 
 export default ThemeInput;
 const style = StyleSheet.create({
+  Touch: {
+    marginHorizontal: widthPixel(10),
+  },
+
+  containerOuter: {},
   leftIcon: {
     width: widthPixel(20),
     height: widthPixel(20),
-    resizeMode: 'contain',
-    marginHorizontal: widthPixel(3),
-    marginRight: widthPixel(5),
+    marginHorizontal: widthPixel(10),
   },
-  title: {},
+  title: {
+    fontFamily: fontFamilies.seniregular,
+    fontSize: fontPixel(14),
+    marginLeft: widthPixel(5),
+    marginBottom: heightPixel(5),
+  },
   mainConatiner: {
     flexDirection: 'row',
     width: '100%',
-
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    borderWidth: 1,
+    elevation: 5,
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   container: {
     flex: 1,
-    height: heightPixel(50),
-    color: 'green',
+    height: heightPixel(53),
   },
   rightIcon: {
     width: widthPixel(24),
     height: widthPixel(24),
-    resizeMode: 'contain',
   },
 });
