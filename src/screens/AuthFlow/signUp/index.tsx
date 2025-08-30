@@ -1,26 +1,193 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  email,
+  eyes,
+  google,
+  padlock,
+  userName,
+} from '../../../assets/icons/icons';
+import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
-import React from 'react';
+import Button from '../../../components/ThemeComponents/ThemeButton';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
+import ThemeText from '../../../components/ThemeComponents/ThemeText';
+import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 
 const index = ({ navigation }: any) => {
+  const [details, setDetails] = useState({
+    userName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const handleGoogleSignIn = () => {
+    navigation.navigate(routes.signup);
+  };
+
+  const [isHidden, setIsHidden] = useState({
+    password: true,
+    confirmPassword: true, // fixed typo
+  });
+
   return (
-    <AuthWrapper
-      text="SignUp"
-      desText="Please enter your credentials here to register."
-    >
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate(routes.signup);
-        }}
+    <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <AuthWrapper
+        text="SignUp"
+        desText="Please enter your credentials here to register."
       >
-        <Text>signup</Text>
-      </TouchableOpacity>
-    </AuthWrapper>
+        <ThemeInput
+          title="Username"
+          value={details.userName}
+          onChangeText={(text: string) =>
+            setDetails({ ...details, userName: text })
+          }
+          placeholder="Enter your Username"
+          leftIcon={userName}
+        />
+        <ThemeInput
+          title="Email"
+          value={details.email}
+          onChangeText={(text: string) =>
+            setDetails({ ...details, email: text })
+          }
+          placeholder="Enter your Email"
+          leftIcon={email}
+          containerStyleOuter={styles.containerStyle}
+        />
+        <ThemeInput
+          title="Password"
+          value={details.password}
+          onChangeText={(text: string) =>
+            setDetails({ ...details, password: text })
+          }
+          placeholder="Enter your PassWord"
+          leftIcon={padlock}
+          rightIcon={eyes}
+          secureTextEntry={isHidden.password}
+          onPressRightIcon={() =>
+            setIsHidden({ ...isHidden, password: !isHidden.password })
+          }
+        />
+        <ThemeInput
+          title="Confirm Password"
+          value={details.confirmPassword}
+          onChangeText={(text: string) =>
+            setDetails({ ...details, confirmPassword: text })
+          }
+          placeholder="Confirm Password"
+          leftIcon={padlock}
+          containerStyleOuter={styles.containerStyle}
+          rightIcon={eyes}
+          secureTextEntry={isHidden.confirmPassword}
+          onPressRightIcon={() =>
+            setIsHidden({
+              ...isHidden,
+              confirmPassword: !isHidden.confirmPassword,
+            })
+          }
+        />
+        <Button
+          title="Signup"
+          bgColor="primary"
+          buttonStyle={styles.buttonStyle}
+          onPress={() => {
+            navigation.navigate(routes.signin);
+          }}
+        />
+
+        <ThemeText style={styles.or} color="orColor">
+          OR
+        </ThemeText>
+        <TouchableOpacity style={styles.touchable} onPress={handleGoogleSignIn}>
+          <ThemeText style={styles.googleSignin} color="text">
+            Sign in with
+          </ThemeText>
+          <Image
+            source={google}
+            style={styles.imageGoogle}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+        <View
+          style={{
+            marginVertical: heightPixel(10),
+            flexDirection: 'row',
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+          }}
+        >
+          <ThemeText style={styles.accountText} color="text">
+            Don’t have an account?
+          </ThemeText>
+          <TouchableOpacity>
+            <ThemeText color="fogotText" style={styles.signUp}>
+              Signup
+            </ThemeText>
+          </TouchableOpacity>
+        </View>
+      </AuthWrapper>
+    </KeyboardAwareScrollView>
   );
 };
 
 export default index;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  containerStyle: {
+    marginVertical: heightPixel(10),
+  },
+  buttonStyle: {
+    marginTop: heightPixel(15),
+  },
+
+  accountText: {
+    fontFamily: fontFamilies.seniregular,
+    fontSize: fontPixel(13),
+  },
+  signUp: {
+    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(13),
+  },
+  imageGoogle: {
+    width: widthPixel(45),
+    height: heightPixel(45),
+    marginLeft: widthPixel(5),
+  },
+  touchable: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  googleSignin: {
+    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(14),
+  },
+  or: {
+    fontFamily: fontFamilies.medium,
+    fontSize: fontPixel(14),
+    marginVertical: heightPixel(20),
+  },
+  checkBoxView: { flexDirection: 'row', paddingHorizontal: widthPixel(5) },
+
+  Row: {
+    flexDirection: 'row',
+  },
+  textStyle: {
+    fontFamily: fontFamilies.medium,
+    fontSize: fontPixel(14),
+  },
+  containerStyleOuter: {},
+  containerStyleOuter2: {
+    marginVertical: heightPixel(10),
+  },
+  forgotText: {
+    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(14),
+  },
+});

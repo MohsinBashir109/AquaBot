@@ -15,7 +15,7 @@ import { fontFamilies } from '../../utils/fontfamilies';
 import { useThemeContext } from '../../theme/ThemeContext';
 
 type TextInputField = {
-  onPressLeftIcon?: () => void;
+  onPressRightIcon?: () => void;
   placeholder?: string;
   value?: any;
   placeHolderColor?: string;
@@ -74,7 +74,7 @@ const ThemeInput = (props: TextInputField) => {
           ]}
           secureTextEntry={props.secureTextEntry}
         />
-        <TouchableOpacity onPress={props.onPressLeftIcon} style={style.Touch}>
+        <TouchableOpacity onPress={props.onPressRightIcon} style={style.Touch}>
           <Image
             resizeMode="contain"
             style={style.rightIcon}

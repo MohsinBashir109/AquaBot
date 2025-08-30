@@ -48,8 +48,7 @@ const Button = (props: ButtonProps) => {
               ],
         },
         disabled && {
-          backgroundColor: isDark ? colors.dark.gray1 : colors.light.gray1,
-          opacity: 0.5,
+          backgroundColor: isDark ? colors.dark.gray1 : colors.light.white,
         },
       ]}
     >

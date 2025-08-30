@@ -61,7 +61,7 @@ const SignIn = ({ navigation }: any) => {
           placeHolderColor="green"
           placeholder="Enter your password"
           secureTextEntry={isHidden}
-          onPressLeftIcon={handleHide}
+          onPressRightIcon={handleHide}
         />
         <View style={styles.checkBoxView}>
           <ThemedCheckbox
@@ -148,17 +148,13 @@ const styles = StyleSheet.create({
   or: {
     fontFamily: fontFamilies.medium,
     fontSize: fontPixel(14),
-    marginVertical: heightPixel(25),
+    marginVertical: heightPixel(20),
   },
   checkBoxView: { flexDirection: 'row', paddingHorizontal: widthPixel(5) },
   buttonStyle: {
     marginTop: heightPixel(30),
-    width: '100%',
   },
-  buttonStyle2: {
-    width: '100%',
-    marginVertical: heightPixel(10),
-  },
+
   Row: {
     flexDirection: 'row',
   },
@@ -166,11 +162,9 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.medium,
     fontSize: fontPixel(14),
   },
-  containerStyleOuter: {
-    marginTop: heightPixel(60),
-  },
+  containerStyleOuter: {},
   containerStyleOuter2: {
-    marginVertical: heightPixel(20),
+    marginVertical: heightPixel(10),
   },
   forgotText: {
     fontFamily: fontFamilies.semibold,

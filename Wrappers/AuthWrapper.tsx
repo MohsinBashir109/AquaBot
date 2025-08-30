@@ -46,15 +46,22 @@ const AuthWrapper = ({ children, text, desText }: props) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
-          marginTop: heightPixel(50),
+          marginTop: heightPixel(40),
         }}
       >
         <View
-          style={{ alignItems: 'flex-start', justifyContent: 'flex-start' }}
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
           <Image source={aquaLogo} resizeMode="contain" style={styles.image} />
         </View>
-        <View style={{ flex: 1, marginTop: heightPixel(15) }}>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
           {text && (
             <ThemeText color="text" style={styles.textChildern}>
               {text}
@@ -78,6 +85,7 @@ const styles = StyleSheet.create({
   image: {
     width: widthPixel(80),
     height: heightPixel(110),
+    marginBottom: heightPixel(40),
   },
   background: {
     flex: 1,

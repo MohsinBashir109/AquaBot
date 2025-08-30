@@ -4,5 +4,6 @@ import google from '../icons/google.png';
 import hide from '../icons/hide.png';
 import padlock from '../icons/padlock.png';
 import tickCircle from '../icons/tickCircle.png';
+import userName from '../icons/userName.png';
 
-export { email, hide, padlock, eyes, tickCircle, google };
+export { email, hide, padlock, eyes, tickCircle, google, userName };
