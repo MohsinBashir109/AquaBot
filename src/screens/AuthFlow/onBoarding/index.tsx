@@ -3,20 +3,25 @@ import {
   ImageBackground,
   StatusBar,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { Logo, authBackGround } from '../../../assets/images/images';
-import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
+import {
+  dataOnboarding,
+  fontPixel,
+  heightPixel,
+  widthPixel,
+} from '../../../utils/constants';
 
 import Button from '../../../components/ThemeComponents/ThemeButton';
+import OnboardingCard from '../../../components/ThemeComponents/OnboardingCard';
 import React from 'react';
-import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// import OnboardingCard from '../../../components/ThemeComponents/OnboardingCard';
 
 const OnBoarding = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
@@ -43,20 +48,25 @@ const OnBoarding = ({ navigation }: any) => {
       <ThemeText style={styles.desTitle} color="secondary">
         Water less. Grow best.
       </ThemeText>
-      <Button
-        onPress={handleSignUp}
-        title="Register"
-        buttonStyle={styles.buttonStyle1}
-        titleStyle={styles.buttonStyle}
-      />
-      <Button
-        buttonStyle={styles.buttonStyle2}
-        onPress={handleSignin}
-        title="Login"
-        disabled
-        textColor="text"
-        titleStyle={styles.buttonStyle}
-      />
+      <View>
+        <OnboardingCard data={dataOnboarding} />
+      </View>
+      <View style={styles.buttonWrapper}>
+        <Button
+          onPress={handleSignUp}
+          title="Register"
+          buttonStyle={styles.buttonStyle1}
+          titleStyle={styles.buttonStyle}
+        />
+        <Button
+          buttonStyle={styles.buttonStyle2}
+          onPress={handleSignin}
+          title="Login"
+          disabled
+          textColor="text"
+          titleStyle={styles.buttonStyle}
+        />
+      </View>
     </ImageBackground>
   );
 };
@@ -85,4 +95,6 @@ const styles = StyleSheet.create({
     width: widthPixel(120),
     height: heightPixel(220),
   },
+
+  buttonWrapper: { paddingVertical: heightPixel(15) },
 });

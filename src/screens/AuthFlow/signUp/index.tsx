@@ -123,11 +123,11 @@ const index = ({ navigation }: any) => {
           }}
         >
           <ThemeText style={styles.accountText} color="text">
-            Don’t have an account?
+            Have an account?
           </ThemeText>
           <TouchableOpacity>
             <ThemeText color="fogotText" style={styles.signUp}>
-              Signup
+              Login
             </ThemeText>
           </TouchableOpacity>
         </View>

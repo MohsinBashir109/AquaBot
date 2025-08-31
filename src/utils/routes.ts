@@ -4,4 +4,5 @@ export const routes = {
   signin: 'SignIn',
   signup: 'signUp',
   auth: 'AuthFlow',
+  forgot: 'Forgot',
 };

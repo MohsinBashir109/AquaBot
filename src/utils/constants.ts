@@ -1,4 +1,13 @@
 import { Dimensions, PixelRatio } from 'react-native';
+import {
+  building,
+  feedback,
+  flower,
+  mind,
+  money,
+} from '../assets/images/images';
+
+// import { ob1, ob2, ob3, ob4, ob5 } from '../assets/images/images';
 
 export const WINDOW_WIDTH = Dimensions.get('window').width;
 export const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -32,3 +41,25 @@ export const passwordFormat =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{7,24}$/; // just one upper case alphabet/one lower case alpjhabet/number/special chars
 
 export const alphabetRegex = /^[a-zA-Z\s]*$/; // Allows only alphabets
+export const dataOnboarding = [
+  {
+    title: 'Smart AI-Powered Irrigation System',
+    image: flower,
+  },
+  {
+    title: 'Accurate Real-Time Data Insights',
+    image: mind,
+  },
+  {
+    title: 'Affordable Sensor-Free Water Management',
+    image: money,
+  },
+  {
+    title: 'Boost Crop Yield Efficiently',
+    image: building,
+  },
+  {
+    title: 'Supports Multiple Languages Offline',
+    image: feedback,
+  },
+];

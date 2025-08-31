@@ -29,6 +29,9 @@ const SignIn = ({ navigation }: any) => {
     setChecked(!checked);
   };
   const handleGoogleSignIn = () => {};
+  const handleForgotPass = () => {
+    navigation.navigate(routes.forgot);
+  };
   const [checked, setChecked] = useState(false);
   // console.log('email', details);
   const insets = useSafeAreaInsets();
@@ -71,9 +74,11 @@ const SignIn = ({ navigation }: any) => {
             onCheck={onCheckHandle}
           />
           <View style={{ flex: 1 }}></View>
-          <ThemeText style={styles.forgotText} color="fogotText">
-            Forgot Password?
-          </ThemeText>
+          <TouchableOpacity onPress={handleForgotPass}>
+            <ThemeText style={styles.forgotText} color="fogotText">
+              Forgot Password?
+            </ThemeText>
+          </TouchableOpacity>
         </View>
         <Button
           title="Login"

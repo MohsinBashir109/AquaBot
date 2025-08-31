@@ -5,16 +5,16 @@
  * @format
  */
 
-import { LogBox, StyleSheet, Text, View, useColorScheme } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-
+import { LogBox } from 'react-native';
 import { MainNavigator } from './src/navigation';
+import SplashScreen from 'react-native-splash-screen';
+import { useEffect } from 'react';
 
 LogBox.ignoreAllLogs();
 function App() {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
   return <MainNavigator />;
 }
 
