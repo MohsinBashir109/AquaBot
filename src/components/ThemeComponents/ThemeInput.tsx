@@ -29,6 +29,7 @@ type TextInputField = {
   leftIcon?: any;
   rightIcon?: any;
   containerStyleOuter?: any;
+  underLefttitle?: string;
 };
 
 const ThemeInput = (props: TextInputField) => {
@@ -82,12 +83,28 @@ const ThemeInput = (props: TextInputField) => {
           />
         </TouchableOpacity>
       </View>
+      {props.underLefttitle && (
+        <Text
+          style={[
+            style.underTitle,
+            { color: colors[isDark ? 'dark' : 'light'].primary },
+          ]}
+        >
+          {props.underLefttitle}
+        </Text>
+      )}
     </View>
   );
 };
 
 export default ThemeInput;
 const style = StyleSheet.create({
+  underTitle: {
+    marginTop: heightPixel(10),
+    fontFamily: fontFamilies.seniregular,
+    fontSize: fontPixel(14),
+    marginLeft: widthPixel(10),
+  },
   Touch: {
     marginHorizontal: widthPixel(10),
   },

@@ -15,6 +15,14 @@ export const AuthNavigation = () => {
       <AuthStack.Screen name={routes.signin} component={Auth.SignIn} />
       <AuthStack.Screen name={routes.signup} component={Auth.SignUp} />
       <AuthStack.Screen name={routes.forgot} component={Auth.Forgot} />
+      <AuthStack.Screen
+        name={routes.emailverification}
+        component={Auth.emailVerification}
+      />
+      <AuthStack.Screen
+        name={routes.resetpassword}
+        component={Auth.resetPassword}
+      />
     </AuthStack.Navigator>
   );
 };
