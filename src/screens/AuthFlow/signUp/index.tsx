@@ -15,23 +15,64 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import { fontFamilies } from '../../../utils/fontfamilies';
+import { register } from '../../../service/auth';
 import { routes } from '../../../utils/routes';
+import { showCustomFlash } from '../../../utils/flash';
 
 const index = ({ navigation }: any) => {
+  const handleLogin = () => {
+    navigation.navigate(routes.signin);
+  };
   const [details, setDetails] = useState({
     userName: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
+  const handleGoogleSignUp = () => {};
 
-  const handleGoogleSignIn = () => {
-    navigation.navigate(routes.signup);
+  const handleSignUp = async () => {
+    if (
+      !details.email ||
+      !details.password ||
+      !details.confirmPassword ||
+      !details.userName
+    ) {
+      showCustomFlash(
+        'All fields are required. Please complete them.',
+        'danger',
+      );
+
+      return;
+    }
+    if (details.confirmPassword !== details.password) {
+      showCustomFlash('Passwords do not match. Please try again.', 'danger');
+
+      return;
+    }
+    try {
+      await register(details);
+      showCustomFlash(
+        'A verification email has been sent to your inbox.',
+        'success',
+      );
+
+      setDetails({
+        userName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
+    } catch (error: any) {
+      showCustomFlash(error.message, 'danger');
+    }
+
+    navigation.replace(routes.signin);
   };
 
   const [isHidden, setIsHidden] = useState({
     password: true,
-    confirmPassword: true, // fixed typo
+    confirmPassword: true,
   });
 
   return (
@@ -95,15 +136,13 @@ const index = ({ navigation }: any) => {
           title="Signup"
           bgColor="primary"
           buttonStyle={styles.buttonStyle}
-          onPress={() => {
-            navigation.navigate(routes.signin);
-          }}
+          onPress={handleSignUp}
         />
 
         <ThemeText style={styles.or} color="orColor">
           OR
         </ThemeText>
-        <TouchableOpacity style={styles.touchable} onPress={handleGoogleSignIn}>
+        <TouchableOpacity style={styles.touchable} onPress={handleGoogleSignUp}>
           <ThemeText style={styles.googleSignin} color="text">
             Sign in with
           </ThemeText>
@@ -125,7 +164,7 @@ const index = ({ navigation }: any) => {
           <ThemeText style={styles.accountText} color="text">
             Have an account?
           </ThemeText>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleLogin}>
             <ThemeText color="fogotText" style={styles.signUp}>
               Login
             </ThemeText>

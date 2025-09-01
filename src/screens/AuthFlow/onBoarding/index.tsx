@@ -26,10 +26,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const OnBoarding = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
   const handleSignUp = () => {
-    navigation.navigate(routes.signin);
+    navigation.replace(routes.signup);
   };
   const handleSignin = () => {
-    navigation.navigate(routes.signin);
+    navigation.replace(routes.signin);
   };
   return (
     <ImageBackground
@@ -62,9 +62,9 @@ const OnBoarding = ({ navigation }: any) => {
           buttonStyle={styles.buttonStyle2}
           onPress={handleSignin}
           title="Login"
-          disabled
           textColor="text"
           titleStyle={styles.buttonStyle}
+          bgColor="white"
         />
       </View>
     </ImageBackground>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    paddingHorizontal: widthPixel(20),
+    paddingHorizontal: widthPixel(25),
   },
   imageLogo: {
     width: widthPixel(120),

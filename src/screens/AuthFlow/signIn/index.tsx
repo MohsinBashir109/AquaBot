@@ -5,15 +5,22 @@ import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
+import { FirebaseError } from 'firebase/app';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import ThemedCheckbox from '../../../components/ThemeComponents/ThemeCheckBox';
 import { fontFamilies } from '../../../utils/fontfamilies';
+import { login } from '../../../service/auth';
 import { routes } from '../../../utils/routes';
+import { showCustomFlash } from '../../../utils/flash';
+import { showMessage } from 'react-native-flash-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SignIn = ({ navigation }: any) => {
+  const handleSignUp = () => {
+    navigation.navigate(routes.signup);
+  };
   const [details, setDetails] = useState({
     email: '',
     password: '',
@@ -29,12 +36,38 @@ const SignIn = ({ navigation }: any) => {
     setChecked(!checked);
   };
   const handleGoogleSignIn = () => {};
+  const handleSignIn = async () => {
+    if (!details.email || !details.password) {
+      showCustomFlash(
+        'All fields are required. Please complete them.',
+        'danger',
+      );
+
+      return;
+    }
+    try {
+      const { emailVerified } = await login(details);
+      if (emailVerified) {
+        showCustomFlash('Email verified,You can log in', 'success');
+
+        setDetails({
+          email: '',
+          password: '',
+        });
+      } else {
+        showCustomFlash('Email is not verified', 'danger');
+      }
+    } catch (error) {
+      const err = error as FirebaseError;
+      showCustomFlash(err.message, 'danger');
+    }
+  };
   const handleForgotPass = () => {
     navigation.navigate(routes.forgot);
   };
   const [checked, setChecked] = useState(false);
   // console.log('email', details);
-  const insets = useSafeAreaInsets();
+
   return (
     <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <AuthWrapper
@@ -84,9 +117,7 @@ const SignIn = ({ navigation }: any) => {
           title="Login"
           bgColor="buttonBackGround"
           buttonStyle={styles.buttonStyle}
-          onPress={() => {
-            navigation.navigate(routes.signup);
-          }}
+          onPress={handleSignIn}
         />
         <ThemeText style={styles.or} color="orColor">
           OR
@@ -114,7 +145,7 @@ const SignIn = ({ navigation }: any) => {
           <ThemeText style={styles.accountText} color="text">
             Don’t have an account?
           </ThemeText>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleSignUp}>
             <ThemeText color="fogotText" style={styles.signUp}>
               Signup
             </ThemeText>
@@ -172,7 +203,7 @@ const styles = StyleSheet.create({
     marginVertical: heightPixel(10),
   },
   forgotText: {
-    fontFamily: fontFamilies.semibold,
+    fontFamily: fontFamilies.bold,
     fontSize: fontPixel(14),
   },
 });

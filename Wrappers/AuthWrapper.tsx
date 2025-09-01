@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    paddingHorizontal: widthPixel(20),
+    paddingHorizontal: widthPixel(25),
     justifyContent: 'flex-start',
     alignItems: 'center',
   },

@@ -40,7 +40,7 @@ const ThemeInput = (props: TextInputField) => {
         <Text
           style={[
             style.title,
-            { color: colors[isDark ? 'dark' : 'light'].secondaryText },
+            { color: colors[isDark ? 'dark' : 'light'].text },
           ]}
         >
           {props.title}
@@ -116,10 +116,11 @@ const style = StyleSheet.create({
     marginHorizontal: widthPixel(10),
   },
   title: {
-    fontFamily: fontFamilies.seniregular,
+    fontFamily: fontFamilies.bold,
     fontSize: fontPixel(14),
     marginLeft: widthPixel(5),
     marginBottom: heightPixel(5),
+    elevation: 5,
   },
   mainConatiner: {
     flexDirection: 'row',
