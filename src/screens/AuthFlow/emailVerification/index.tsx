@@ -8,7 +8,7 @@ import { VerificationField } from '../../../components/ThemeComponents/Verificat
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 
-const index = ({ navigation }: any) => {
+const Index = ({ navigation }: any) => {
   const handleSignUp = () => {
     navigation.navigate(routes.emailverification);
   };
@@ -41,7 +41,7 @@ const index = ({ navigation }: any) => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   buttonStyle1: {

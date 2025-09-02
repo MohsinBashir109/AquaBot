@@ -3,6 +3,7 @@ import { fontPixel, heightPixel, widthPixel } from '../utils/constants';
 
 import { AuthNavigation } from './authFlow';
 import FlashMessage from 'react-native-flash-message';
+import { HomeNavigation } from './homeFlow';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from '../theme/ThemeContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -20,6 +21,7 @@ export const MainNavigator = () => {
           screenOptions={{ headerShown: false }}
         >
           <MyStack.Screen name={routes.auth} component={AuthNavigation} />
+          <MyStack.Screen name={routes.home} component={HomeNavigation} />
         </MyStack.Navigator>
 
         <FlashMessage

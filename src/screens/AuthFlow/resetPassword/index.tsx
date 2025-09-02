@@ -9,7 +9,7 @@ import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 
-const index = ({ navigation }: any) => {
+const Index = ({ navigation }: any) => {
   const [details, setDetails] = useState({
     password: '',
     confirmPassword: '',
@@ -66,7 +66,7 @@ const index = ({ navigation }: any) => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   containerStyleOuter: {},

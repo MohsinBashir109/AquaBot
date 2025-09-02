@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "820550510501-t62i2q1ikge44rfhv5hbq2fa1lg4n0kb.apps.googleusercontent.com",
+          "client_id": "820550510501-081sdtrdbieo7sn4veq24h306k5hnkq7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.aquabot",
-            "certificate_hash": "538f090fb3155ce39106308aa297a524fa06426e"
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {

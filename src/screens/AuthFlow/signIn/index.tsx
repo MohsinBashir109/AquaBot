@@ -2,20 +2,19 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { email, eyes, google, padlock } from './../../../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
+import { handleSignInGoogle, login } from '../../../service/auth';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
 import { FirebaseError } from 'firebase/app';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Screen } from 'react-native-screens';
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import ThemedCheckbox from '../../../components/ThemeComponents/ThemeCheckBox';
 import { fontFamilies } from '../../../utils/fontfamilies';
-import { login } from '../../../service/auth';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
-import { showMessage } from 'react-native-flash-message';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SignIn = ({ navigation }: any) => {
   const handleSignUp = () => {
@@ -35,7 +34,17 @@ const SignIn = ({ navigation }: any) => {
   const handleCheckBoxPress = () => {
     setChecked(!checked);
   };
-  const handleGoogleSignIn = () => {};
+
+  const handleGoogleSignIn = async () => {
+    const user = await handleSignInGoogle();
+    // console.log('Google user:', user);
+    if (user) {
+      navigation.navigate(routes.home, {
+        Screen: routes.home,
+      });
+    }
+  };
+
   const handleSignIn = async () => {
     if (!details.email || !details.password) {
       showCustomFlash(
@@ -66,7 +75,6 @@ const SignIn = ({ navigation }: any) => {
     navigation.navigate(routes.forgot);
   };
   const [checked, setChecked] = useState(false);
-  // console.log('email', details);
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
