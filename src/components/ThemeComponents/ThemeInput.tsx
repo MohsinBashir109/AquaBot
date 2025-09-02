@@ -137,7 +137,7 @@ const style = StyleSheet.create({
   },
   container: {
     flex: 1,
-    height: heightPixel(53),
+    height: heightPixel(45),
   },
   rightIcon: {
     width: widthPixel(24),

@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     marginVertical: heightPixel(10),
   },
   forgotText: {
-    fontFamily: fontFamilies.bold,
-    fontSize: fontPixel(14),
+    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(13),
   },
 });

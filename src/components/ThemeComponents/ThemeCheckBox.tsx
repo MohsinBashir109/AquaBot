@@ -66,14 +66,14 @@ const styles = StyleSheet.create({
   checkbox: {
     width: heightPixel(20),
     height: heightPixel(20),
-    borderRadius: widthPixel(5),
+    borderRadius: widthPixel(10),
     borderWidth: widthPixel(1),
     justifyContent: 'center',
     alignItems: 'center',
   },
   label: {
-    fontSize: fontPixel(14),
-    fontFamily: fontFamilies.seniregular,
+    fontSize: fontPixel(13),
+    fontFamily: fontFamilies.semibold,
     marginLeft: widthPixel(5),
   },
   check: {

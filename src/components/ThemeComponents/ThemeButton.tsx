@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: heightPixel(50),
+    height: heightPixel(45),
     width: '100%',
     borderRadius: widthPixel(10),
     alignSelf: 'center',

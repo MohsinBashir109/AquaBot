@@ -9,7 +9,6 @@ import { getApps, initializeApp } from 'firebase/app';
 
 import { LogBox } from 'react-native';
 import { MainNavigator } from './src/navigation';
-import SplashScreen from 'react-native-splash-screen';
 import { firebaseConfig } from './src/firebase/config';
 import { useEffect } from 'react';
 
@@ -25,10 +24,6 @@ console.log('Firebase apps:', getApps());
 LogBox.ignoreAllLogs();
 
 function App() {
-  useEffect(() => {
-    SplashScreen.hide();
-  }, []);
-
   return <MainNavigator />;
 }
 
