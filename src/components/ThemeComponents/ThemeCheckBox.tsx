@@ -64,9 +64,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   checkbox: {
-    width: heightPixel(20),
-    height: heightPixel(20),
-    borderRadius: widthPixel(10),
+    width: heightPixel(16),
+    height: heightPixel(16),
+    borderRadius: widthPixel(8),
     borderWidth: widthPixel(1),
     justifyContent: 'center',
     alignItems: 'center',

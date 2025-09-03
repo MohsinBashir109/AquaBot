@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     opacity: 0.15,
     position: 'absolute',
 
-    top: heightPixel(250),
+    top: heightPixel(80),
     // left: widthPixel(240),
     // height: heightPixel(150),
     // width: widthPixel(150),
