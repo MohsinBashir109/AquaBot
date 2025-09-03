@@ -14,15 +14,15 @@ export const showCustomFlash = (
   showMessage({
     message,
     floating: true,
-    duration: 1800,
+    duration: 2000,
     titleStyle: { display: 'none' },
     renderCustomContent: () => <CustomFlash message={message} type={type} />,
     style: {
       marginTop: Platform.OS === 'android' ? StatusBar.currentHeight || 28 : 44,
-      backgroundColor: '#FFFFFF',
-      borderRadius: widthPixel(15),
       marginHorizontal: 12,
-      justifyContent: 'center',
+      backgroundColor: 'transparent',
+      elevation: 0,
+      shadowOpacity: 0,
     },
   });
 };

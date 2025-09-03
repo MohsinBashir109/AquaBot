@@ -8,11 +8,11 @@ import { FirebaseError } from 'firebase/app';
 import auth from '@react-native-firebase/auth';
 import { showCustomFlash } from '../utils/flash.tsx';
 
-// ✅ Configure Google Sign-In
+//  Configure Google Sign-In
 GoogleSignin.configure({
   webClientId:
     '820550510501-cen042hj386u8j1hju659ev97d3svnvm.apps.googleusercontent.com',
-  offlineAccess: true, // ensures refreshToken for server access
+  offlineAccess: true,
 });
 
 type SignUpProps = {
@@ -36,7 +36,7 @@ const errors = {
   weakPassword: 'auth/weak-password',
 };
 
-// 🔹 Register new user
+//  Register new user
 export const register = async ({ email, password, userName }: SignUpProps) => {
   try {
     const signUp = await auth().createUserWithEmailAndPassword(email, password);
@@ -73,7 +73,7 @@ export const register = async ({ email, password, userName }: SignUpProps) => {
   }
 };
 
-// 🔹 Email Login
+//  Email Login
 export const login = async ({ email, password }: LoginProps) => {
   try {
     const loginRes = await auth().signInWithEmailAndPassword(email, password);
@@ -83,7 +83,7 @@ export const login = async ({ email, password }: LoginProps) => {
       showCustomFlash('Please verify your email before logging in.', 'danger');
     }
 
-    // ✅ Get fresh token
+    //  Get fresh token
     const idToken = await user.getIdToken(true);
 
     const userData = {
@@ -121,7 +121,7 @@ export const login = async ({ email, password }: LoginProps) => {
   }
 };
 
-// 🔹 Google Login
+//  Google Login
 export const handleSignInGoogle = async () => {
   try {
     const hasPlayServices = await GoogleSignin.hasPlayServices({
@@ -149,7 +149,7 @@ export const handleSignInGoogle = async () => {
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
     const userCredential = await auth().signInWithCredential(googleCredential);
 
-    // ✅ Get fresh Firebase token
+    //  Get fresh Firebase token
     const freshIdToken = await userCredential.user.getIdToken(true);
 
     const userData = {
@@ -204,7 +204,7 @@ export const logout = async () => {
   }
 };
 
-// 🔹 Get Fresh Token (helper for API calls)
+//  Get Fresh Token (helper for API calls)
 export const getFreshIdToken = async () => {
   const currentUser = auth().currentUser;
   if (!currentUser) return null;

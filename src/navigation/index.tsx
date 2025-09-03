@@ -33,7 +33,7 @@ export const MainNavigator = ({ user, initializing }: MainNavProps) => {
         </MyStack.Navigator>
 
         <FlashMessage
-          position="top"
+          position="bottom"
           style={styles.flashContainer}
           floating
           autoHide
