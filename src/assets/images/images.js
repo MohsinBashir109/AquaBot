@@ -5,7 +5,7 @@ import aquaBotwrapper from '../images/aquaBotwrapper.png';
 import aquaLogo from '../images/aquaLogo.png';
 import authBackGround from '../images/authBackGround.png';
 import building from '../images/building.png';
-import droplet from '../images/droplet.png';
+import droplets from '../images/droplets.png';
 import feedback from '../images/feedback.png';
 import flower from '../images/flower.png';
 import mind from '../images/mind.png';
@@ -23,5 +23,5 @@ export {
   mind,
   feedback,
   building,
-  droplet,
+  droplets,
 };

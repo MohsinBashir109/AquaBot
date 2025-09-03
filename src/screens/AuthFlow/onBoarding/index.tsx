@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Logo, authBackGround } from '../../../assets/images/images';
+import { Logo, authBackGround, droplets } from '../../../assets/images/images';
 import {
   dataOnboarding,
   fontPixel,
@@ -66,6 +66,11 @@ const OnBoarding = ({ navigation }: any) => {
           titleStyle={styles.buttonStyle}
           bgColor="white"
         />
+        <Image
+          resizeMode="contain"
+          source={droplets}
+          style={styles.imageDroplets}
+        />
       </View>
     </ImageBackground>
   );
@@ -102,4 +107,12 @@ const styles = StyleSheet.create({
   },
 
   buttonWrapper: { paddingVertical: heightPixel(15) },
+  imageDroplets: {
+    opacity: 0.15,
+    position: 'absolute',
+    top: heightPixel(100),
+    height: '100%',
+    width: '100%',
+    elevation: 5,
+  },
 });

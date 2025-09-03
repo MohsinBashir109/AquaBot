@@ -3,9 +3,13 @@ import {
   ImageBackground,
   StatusBar,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import {
+  aquaLogo,
+  authBackGround,
+  droplets,
+} from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';
@@ -73,6 +77,11 @@ const AuthWrapper = ({ children, text, desText }: props) => {
           )}
         </View>
       </View>
+      <Image
+        resizeMode="contain"
+        source={droplets}
+        style={styles.imageDroplets}
+      />
       {children}
     </ImageBackground>
   );
@@ -111,5 +120,13 @@ const styles = StyleSheet.create({
     fontSize: fontPixel(14),
     fontFamily: fontFamilies.regular,
     color: '#000000',
+  },
+  imageDroplets: {
+    opacity: 0.15,
+    position: 'absolute',
+    top: heightPixel(100),
+    height: '100%',
+    width: '100%',
+    elevation: 5,
   },
 });
