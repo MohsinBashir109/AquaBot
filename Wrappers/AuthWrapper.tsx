@@ -9,6 +9,7 @@ import {
   aquaLogo,
   authBackGround,
   droplets,
+  flower,
 } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
@@ -82,6 +83,11 @@ const AuthWrapper = ({ children, text, desText }: props) => {
         source={droplets}
         style={styles.imageDroplets}
       />
+      <Image
+        resizeMode="contain"
+        source={droplets}
+        style={styles.imageDroplets2}
+      />
       {children}
     </ImageBackground>
   );
@@ -124,9 +130,24 @@ const styles = StyleSheet.create({
   imageDroplets: {
     opacity: 0.15,
     position: 'absolute',
-    top: heightPixel(100),
+
+    top: heightPixel(250),
+    // left: widthPixel(240),
+    // height: heightPixel(150),
+    // width: widthPixel(150),
     height: '100%',
     width: '100%',
+    elevation: 5,
+  },
+  imageDroplets2: {
+    opacity: 0.15,
+    position: 'absolute',
+
+    top: heightPixel(40),
+    left: widthPixel(240),
+    height: heightPixel(150),
+    width: widthPixel(150),
+
     elevation: 5,
   },
 });
