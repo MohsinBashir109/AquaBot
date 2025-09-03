@@ -1,27 +1,35 @@
-import { Platform, StatusBar, StyleSheet } from 'react-native';
-import { fontPixel, heightPixel, widthPixel } from '../utils/constants';
+import * as Auth from '../screens/AuthFlow';
+
+import { StatusBar, StyleSheet } from 'react-native';
+import { heightPixel, widthPixel } from '../utils/constants';
 
 import { AuthNavigation } from './authFlow';
 import FlashMessage from 'react-native-flash-message';
 import { HomeNavigation } from './homeFlow';
 import { NavigationContainer } from '@react-navigation/native';
+import React from 'react';
 import { ThemeProvider } from '../theme/ThemeContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { routes } from '../utils/routes';
 
 const MyStack = createNativeStackNavigator();
-
-export const MainNavigator = () => {
+type MainNavProps = {
+  user: any;
+  initializing: boolean;
+};
+export const MainNavigator = ({ user, initializing }: MainNavProps) => {
   return (
     <ThemeProvider>
       <NavigationContainer>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <MyStack.Navigator
-          initialRouteName={routes.auth}
-          screenOptions={{ headerShown: false }}
-        >
-          <MyStack.Screen name={routes.auth} component={AuthNavigation} />
-          <MyStack.Screen name={routes.home} component={HomeNavigation} />
+        <MyStack.Navigator screenOptions={{ headerShown: false }}>
+          {initializing ? (
+            <MyStack.Screen name={routes.splash} component={Auth.Splash} />
+          ) : user ? (
+            <MyStack.Screen name={routes.home} component={HomeNavigation} />
+          ) : (
+            <MyStack.Screen name={routes.auth} component={AuthNavigation} />
+          )}
         </MyStack.Navigator>
 
         <FlashMessage

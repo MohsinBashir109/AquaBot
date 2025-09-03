@@ -6,7 +6,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { aquaLogo, authBackGround } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';

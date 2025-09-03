@@ -45,7 +45,7 @@ const OnBoarding = ({ navigation }: any) => {
       <ThemeText style={styles.title} color="text">
         Welcome
       </ThemeText>
-      <ThemeText style={styles.desTitle} color="secondary">
+      <ThemeText style={styles.desTitle} color="text">
         Water less. Grow best.
       </ThemeText>
       <View>
@@ -82,10 +82,15 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(16),
   },
-  title: { fontFamily: fontFamilies.semibold, fontSize: fontPixel(32) },
+  title: {
+    fontFamily: fontFamilies.bold,
+    fontSize: fontPixel(32),
+    marginLeft: widthPixel(7),
+  },
   desTitle: {
-    fontFamily: fontFamilies.medium,
+    fontFamily: fontFamilies.bold,
     fontSize: fontPixel(16),
+    marginLeft: widthPixel(10),
   },
   background: {
     flex: 1,

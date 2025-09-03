@@ -3,23 +3,27 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FirebaseError } from 'firebase/app';
 import auth from '@react-native-firebase/auth';
 import { showCustomFlash } from '../utils/flash.tsx';
-import { useEffect } from 'react';
 
-// Configure Google Sign-In
+// ✅ Configure Google Sign-In
 GoogleSignin.configure({
   webClientId:
     '820550510501-cen042hj386u8j1hju659ev97d3svnvm.apps.googleusercontent.com',
-
-  // offlineAccess: true, // optional
+  offlineAccess: true, // ensures refreshToken for server access
 });
 
 type SignUpProps = {
   email: string;
   password: string;
   userName: string;
+};
+
+type LoginProps = {
+  email: string;
+  password: string;
 };
 
 const errors = {
@@ -32,6 +36,7 @@ const errors = {
   weakPassword: 'auth/weak-password',
 };
 
+// 🔹 Register new user
 export const register = async ({ email, password, userName }: SignUpProps) => {
   try {
     const signUp = await auth().createUserWithEmailAndPassword(email, password);
@@ -39,6 +44,7 @@ export const register = async ({ email, password, userName }: SignUpProps) => {
       displayName: userName,
     });
     await signUp.user.sendEmailVerification();
+
     showCustomFlash(
       'Verification email sent! Please check your inbox.',
       'success',
@@ -50,15 +56,12 @@ export const register = async ({ email, password, userName }: SignUpProps) => {
       case errors.emailAlreadyInUse:
         showCustomFlash('This email is already registered.', 'danger');
         break;
-
       case errors.invalidEmail:
         showCustomFlash('Invalid email address.', 'danger');
         break;
-
       case errors.weakPassword:
         showCustomFlash('Password should be at least 6 characters.', 'danger');
         break;
-
       default:
         showCustomFlash(
           'Oops! An unknown error happened. Kindly retry.',
@@ -68,15 +71,9 @@ export const register = async ({ email, password, userName }: SignUpProps) => {
 
     throw error;
   }
-  console.log(auth().currentUser?.displayName);
-  console.log(auth().currentUser?.email);
-  console.log(auth().currentUser?.emailVerified);
-};
-type LoginProps = {
-  email: string;
-  password: string;
 };
 
+// 🔹 Email Login
 export const login = async ({ email, password }: LoginProps) => {
   try {
     const loginRes = await auth().signInWithEmailAndPassword(email, password);
@@ -86,7 +83,20 @@ export const login = async ({ email, password }: LoginProps) => {
       showCustomFlash('Please verify your email before logging in.', 'danger');
     }
 
-    return { user, emailVerified: user.emailVerified };
+    // ✅ Get fresh token
+    const idToken = await user.getIdToken(true);
+
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      provider: 'email',
+      idToken,
+    };
+
+    await AsyncStorage.setItem('user', JSON.stringify(userData));
+
+    return { user, emailVerified: user.emailVerified, idToken };
   } catch (error) {
     const err = error as FirebaseError;
 
@@ -94,15 +104,12 @@ export const login = async ({ email, password }: LoginProps) => {
       case errors.wrongPassword:
         showCustomFlash('Incorrect password. Please try again.', 'danger');
         break;
-
       case errors.userNotFound:
         showCustomFlash('No account found with this email.', 'danger');
         break;
-
       case errors.invalidEmail:
         showCustomFlash('Please enter a valid email address.', 'danger');
         break;
-
       default:
         showCustomFlash(
           'Oops! An unknown error happened. Kindly retry.',
@@ -114,13 +121,12 @@ export const login = async ({ email, password }: LoginProps) => {
   }
 };
 
+// 🔹 Google Login
 export const handleSignInGoogle = async () => {
   try {
-    // Ensure Play Services are available
     const hasPlayServices = await GoogleSignin.hasPlayServices({
       showPlayServicesUpdateDialog: true,
     });
-    console.log('Play Services available:', hasPlayServices);
 
     if (!hasPlayServices) {
       showCustomFlash(
@@ -130,28 +136,40 @@ export const handleSignInGoogle = async () => {
       return null;
     }
 
-    // Sign in with Google
+    // Google Sign-In
     const userInfo = await GoogleSignin.signIn();
-    // console.log('userInfo:', userInfo);
-
     const { data } = userInfo;
     const { idToken }: any = data;
+
     if (!idToken) {
       showCustomFlash('Failed to get Google ID token.', 'danger');
       return null;
     }
-    // console.log('idToken:', idToken);
 
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
     const userCredential = await auth().signInWithCredential(googleCredential);
+
+    // ✅ Get fresh Firebase token
+    const freshIdToken = await userCredential.user.getIdToken(true);
+
+    const userData = {
+      uid: userCredential.user.uid,
+      email: userCredential.user.email,
+      displayName: userCredential.user.displayName,
+      provider: 'google',
+      idToken: freshIdToken,
+    };
+
+    await AsyncStorage.setItem('user', JSON.stringify(userData));
 
     showCustomFlash(
       `Welcome ${userCredential.user.displayName || 'User'}!`,
       'success',
     );
+
     return userCredential.user;
   } catch (error: any) {
-    console.error(' Google Sign-In error:', error);
+    console.error('Google Sign-In error:', error);
 
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       showCustomFlash('Google Sign-In was cancelled.', 'danger');
@@ -167,18 +185,38 @@ export const handleSignInGoogle = async () => {
   }
 };
 
+// 🔹 Logout
 export const logout = async () => {
   try {
     await auth().signOut();
 
-    const isGoogleSignedIn = GoogleSignin.getCurrentUser();
+    const isGoogleSignedIn = await GoogleSignin.getCurrentUser();
     if (isGoogleSignedIn) {
       await GoogleSignin.signOut();
     }
+
+    await AsyncStorage.removeItem('user');
 
     showCustomFlash('Successfully logged out!', 'success');
   } catch (error) {
     console.error('Logout error:', error);
     showCustomFlash('Something went wrong during logout.', 'danger');
   }
+};
+
+// 🔹 Get Fresh Token (helper for API calls)
+export const getFreshIdToken = async () => {
+  const currentUser = auth().currentUser;
+  if (!currentUser) return null;
+
+  const newToken = await currentUser.getIdToken(true);
+
+  const storedUser = await AsyncStorage.getItem('user');
+  if (storedUser) {
+    const parsed = JSON.parse(storedUser);
+    parsed.idToken = newToken;
+    await AsyncStorage.setItem('user', JSON.stringify(parsed));
+  }
+
+  return newToken;
 };
