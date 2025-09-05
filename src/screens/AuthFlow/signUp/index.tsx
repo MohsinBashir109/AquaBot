@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import {
   email,
@@ -8,7 +8,7 @@ import {
   userName,
 } from '../../../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
-import { handleSignUpGoogle, register } from '../../../service/auth';
+import { handleSignUpGoogle, register } from '../../../service/signUp';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
@@ -30,14 +30,11 @@ const Index = ({ navigation }: any) => {
     confirmPassword: '',
   });
   const handleGoogleSignUp = async () => {
-    const userExits = await handleSignUpGoogle();
-    // console.log('Google user:', userExits);
-    if (!userExits) {
-      navigation.replace(routes.home);
-    }
-    {
-      return;
-    }
+    const result = await handleSignUpGoogle();
+
+    if (result === 'cancelled' || result === 'exists') return;
+
+    navigation.replace(routes.home);
   };
 
   const handleSignUp = async () => {

@@ -2,21 +2,21 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { email, eyes, google, padlock } from './../../../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
-import { handleLoginGoogle, login } from '../../../service/auth';
+import { handleLoginGoogle, login } from '../../../service/login';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
-import { FirebaseError } from 'firebase/app';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Screen } from 'react-native-screens';
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import ThemedCheckbox from '../../../components/ThemeComponents/ThemeCheckBox';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
+import { useNavigation } from '@react-navigation/native';
 
-const SignIn = ({ navigation }: any) => {
+const SignIn = () => {
+  const navigation = useNavigation<any>();
   const handleSignUp = () => {
     navigation.navigate(routes.signup);
   };
@@ -57,7 +57,18 @@ const SignIn = ({ navigation }: any) => {
       return;
     }
     try {
-      await login(details);
+      const { flag, user } = await login(details);
+      if (!flag) {
+        navigation.replace(routes.home, {
+          Screens: 'home',
+        });
+      } else {
+        setDetails({
+          email: '',
+          password: '',
+        });
+        return;
+      }
     } catch (error: any) {
       console.error(' Firestore login error:', error);
     }

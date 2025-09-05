@@ -4,7 +4,7 @@ import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 
 import { LogBox } from 'react-native';
 import { MainNavigator } from './src/navigation';
-import { firebaseConfig } from './src/firebase/config';
+import { configureGoogleSignIn } from './src/service/googleConfig';
 
 // ✅ Firebase init
 // if (getApps().length === 0) {
@@ -17,5 +17,8 @@ import { firebaseConfig } from './src/firebase/config';
 LogBox.ignoreAllLogs();
 
 export default function App() {
+  useEffect(() => {
+    configureGoogleSignIn(); // ✅ Call once when app starts
+  }, []);
   return <MainNavigator />;
 }

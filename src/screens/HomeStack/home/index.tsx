@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import Button from '../../../components/ThemeComponents/ThemeButton';
 import React from 'react';
-import { logout } from '../../../service/auth';
+import { logout } from '../../../service/signUp';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
 
