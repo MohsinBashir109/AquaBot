@@ -4,8 +4,9 @@ import {
 } from '@react-native-google-signin/google-signin';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FirebaseError } from 'firebase/app';
 import auth from '@react-native-firebase/auth';
+import { email } from '../assets/icons/icons.js';
+import firestore from '@react-native-firebase/firestore';
 import { showCustomFlash } from '../utils/flash.tsx';
 
 //  Configure Google Sign-In
@@ -39,91 +40,69 @@ const errors = {
 //  Register new user
 export const register = async ({ email, password, userName }: SignUpProps) => {
   try {
-    const signUp = await auth().createUserWithEmailAndPassword(email, password);
-    await signUp.user.updateProfile({
-      displayName: userName,
-    });
-    await signUp.user.sendEmailVerification();
+    const userQuery = await firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
 
-    showCustomFlash(
-      'Verification email sent! Please check your inbox.',
-      'success',
-    );
-  } catch (error) {
-    const err = error as FirebaseError;
-
-    switch (err.code) {
-      case errors.emailAlreadyInUse:
-        showCustomFlash('This email is already registered.', 'danger');
-        break;
-      case errors.invalidEmail:
-        showCustomFlash('Invalid email address.', 'danger');
-        break;
-      case errors.weakPassword:
-        showCustomFlash('Password should be at least 6 characters.', 'danger');
-        break;
-      default:
-        showCustomFlash(
-          'Oops! An unknown error happened. Kindly retry.',
-          'danger',
-        );
+    if (!userQuery.empty) {
+      showCustomFlash('This email is already registered', 'danger');
+      return;
     }
 
+    const docRef = await firestore().collection('users').add({
+      email,
+      password,
+      userName,
+      provider: 'Email/Password',
+    });
+
+    console.log('Generated UID:', docRef.id);
+    showCustomFlash('Success! Your account has been created.', 'success');
+  } catch (error) {
+    console.error('🔥 Firestore Error:', error);
+    showCustomFlash('Oops! Something went wrong. Please try again.', 'danger');
     throw error;
   }
 };
 
-//  Email Login
+//  Login
 export const login = async ({ email, password }: LoginProps) => {
   try {
-    const loginRes = await auth().signInWithEmailAndPassword(email, password);
-    const user = loginRes.user;
+    const loginQuery = await firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
 
-    if (!user.emailVerified) {
-      showCustomFlash('Please verify your email before logging in.', 'danger');
+    if (loginQuery.empty) {
+      showCustomFlash('No user found with this email', 'danger');
+      return;
     }
 
-    //  Get fresh token
-    const idToken = await user.getIdToken(true);
+    const loginDoc = loginQuery.docs[0];
+    const loginData = loginDoc.data();
+    console.log('=====================================DATA', loginData);
 
-    const userData = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      provider: 'email',
-      idToken,
-    };
-
-    await AsyncStorage.setItem('user', JSON.stringify(userData));
-
-    return { user, emailVerified: user.emailVerified, idToken };
+    if (loginData.password !== password) {
+      showCustomFlash('Invalid password', 'danger');
+      return;
+    }
+    showCustomFlash(
+      ` Login successful. Welcome back, ${loginData.userName}!`,
+      'success',
+    );
+    console.log('Login successful for:', loginData.userName);
   } catch (error) {
-    const err = error as FirebaseError;
-
-    switch (err.code) {
-      case errors.wrongPassword:
-        showCustomFlash('Incorrect password. Please try again.', 'danger');
-        break;
-      case errors.userNotFound:
-        showCustomFlash('No account found with this email.', 'danger');
-        break;
-      case errors.invalidEmail:
-        showCustomFlash('Please enter a valid email address.', 'danger');
-        break;
-      default:
-        showCustomFlash(
-          'Oops! An unknown error happened. Kindly retry.',
-          'danger',
-        );
-    }
-
+    console.error(' Firestore login error:', error);
+    showCustomFlash('Oops! An unknown error happened. Kindly retry.', 'danger');
     throw error;
   }
 };
 
 //  Google Login
-export const handleSignInGoogle = async () => {
+export const handleSignUpGoogle = async (): Promise<boolean> => {
   try {
+    await GoogleSignin.signOut();
     const hasPlayServices = await GoogleSignin.hasPlayServices({
       showPlayServicesUpdateDialog: true,
     });
@@ -133,90 +112,103 @@ export const handleSignInGoogle = async () => {
         'Please install or update Google Play Services to continue.',
         'danger',
       );
-      return null;
+      return false;
     }
 
     // Google Sign-In
     const userInfo = await GoogleSignin.signIn();
     const { data } = userInfo;
-    const { idToken }: any = data;
+    const { user }: any = data;
+    // console.log('userInfo ===================', userInfo);
+    const { email, name } = user;
+    // console.log(
+    //   '=========================================================',
+    //   email,
+    //   name,
+    // );
 
-    if (!idToken) {
-      showCustomFlash('Failed to get Google ID token.', 'danger');
-      return null;
+    const userQuery = await firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
+    if (!userQuery.empty) {
+      showCustomFlash('This email is already registered', 'danger');
+      return true;
     }
-
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-    const userCredential = await auth().signInWithCredential(googleCredential);
-
-    //  Get fresh Firebase token
-    const freshIdToken = await userCredential.user.getIdToken(true);
-
-    const userData = {
-      uid: userCredential.user.uid,
-      email: userCredential.user.email,
-      displayName: userCredential.user.displayName,
+    await firestore().collection('users').add({
+      email: email,
+      userName: name,
+      password: null,
       provider: 'google',
-      idToken: freshIdToken,
-    };
-
-    await AsyncStorage.setItem('user', JSON.stringify(userData));
-
-    showCustomFlash(
-      `Welcome ${userCredential.user.displayName || 'User'}!`,
-      'success',
-    );
-
-    return userCredential.user;
+    });
+    showCustomFlash('Congratulations!Account created successfully.', 'success');
+    return false;
   } catch (error: any) {
-    console.error('Google Sign-In error:', error);
-
-    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-      showCustomFlash('Google Sign-In was cancelled.', 'danger');
-    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      showCustomFlash(
-        'Google Play Services not available or outdated.',
-        'danger',
-      );
-    } else {
-      showCustomFlash('Something went wrong with Google Sign-In.', 'danger');
-    }
-    return null;
+    console.error(' Google Sign-In error:', error);
+    showCustomFlash('Something went wrong with Google Sign-In.', 'danger');
   }
+  return false;
 };
 
-// 🔹 Logout
+//  Logout
+
 export const logout = async () => {
   try {
-    await auth().signOut();
+    const currentUser = await GoogleSignin.getCurrentUser();
 
-    const isGoogleSignedIn = await GoogleSignin.getCurrentUser();
-    if (isGoogleSignedIn) {
+    if (currentUser) {
       await GoogleSignin.signOut();
+      showCustomFlash(' Successfully logged out from Google!', 'success');
+    } else {
+      showCustomFlash(' No Google account is currently signed in.', 'danger');
     }
-
-    await AsyncStorage.removeItem('user');
-
-    showCustomFlash('Successfully logged out!', 'success');
   } catch (error) {
-    console.error('Logout error:', error);
-    showCustomFlash('Something went wrong during logout.', 'danger');
+    console.error('Google Logout error:', error);
+    showCustomFlash(' Something went wrong during Google logout.', 'danger');
   }
 };
 
-//  Get Fresh Token (helper for API calls)
-export const getFreshIdToken = async () => {
-  const currentUser = auth().currentUser;
-  if (!currentUser) return null;
+export const handleLoginGoogle = async (): Promise<boolean> => {
+  try {
+    await GoogleSignin.signOut();
+    const hasPlayServices = await GoogleSignin.hasPlayServices({
+      showPlayServicesUpdateDialog: true,
+    });
+    if (!hasPlayServices) {
+      showCustomFlash('Google Play Services required.', 'danger');
+      return false;
+    }
 
-  const newToken = await currentUser.getIdToken(true);
+    // Google Sign-In
+    const userInfo = await GoogleSignin.signIn();
+    const { data } = userInfo;
+    const { user }: any = data;
+    // console.log('userInfo ===================', userInfo);
+    const { email, name } = user;
+    // console.log(
+    //   '=========================================================',
+    //   email,
+    //   name,
+    // );
 
-  const storedUser = await AsyncStorage.getItem('user');
-  if (storedUser) {
-    const parsed = JSON.parse(storedUser);
-    parsed.idToken = newToken;
-    await AsyncStorage.setItem('user', JSON.stringify(parsed));
+    const userQuery = await firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
+
+    if (userQuery.empty) {
+      showCustomFlash(
+        'No account found for this email. Please sign up first.',
+        'danger',
+      );
+      return false;
+    }
+
+    showCustomFlash(`👋 Welcome back, ${name}!`, 'success');
+    return true;
+  } catch (error) {
+    console.error('Google Login error:', error);
+    showCustomFlash('Something went wrong with Google Login.', 'danger');
+    return false;
   }
-
-  return newToken;
 };

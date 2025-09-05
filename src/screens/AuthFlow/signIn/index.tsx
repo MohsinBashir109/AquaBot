@@ -2,7 +2,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { email, eyes, google, padlock } from './../../../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
-import { handleSignInGoogle, login } from '../../../service/auth';
+import { handleLoginGoogle, login } from '../../../service/auth';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
@@ -36,12 +36,14 @@ const SignIn = ({ navigation }: any) => {
   };
 
   const handleGoogleSignIn = async () => {
-    const user = await handleSignInGoogle();
-    // console.log('Google user:', user);
-    if (user) {
+    const userExits = await handleLoginGoogle();
+    // console.log('Google user:', userExits);
+    if (userExits) {
       navigation.navigate(routes.home, {
         Screen: routes.home,
       });
+    } else {
+      return;
     }
   };
 
@@ -55,20 +57,9 @@ const SignIn = ({ navigation }: any) => {
       return;
     }
     try {
-      const { emailVerified } = await login(details);
-      if (emailVerified) {
-        showCustomFlash('Email verified,You can log in', 'success');
-
-        setDetails({
-          email: '',
-          password: '',
-        });
-      } else {
-        showCustomFlash('Email is not verified', 'danger');
-      }
-    } catch (error) {
-      const err = error as FirebaseError;
-      showCustomFlash(err.message, 'danger');
+      await login(details);
+    } catch (error: any) {
+      console.error(' Firestore login error:', error);
     }
   };
   const handleForgotPass = () => {

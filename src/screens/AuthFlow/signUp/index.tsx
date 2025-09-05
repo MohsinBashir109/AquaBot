@@ -8,7 +8,7 @@ import {
   userName,
 } from '../../../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
-import { handleSignInGoogle, register } from '../../../service/auth';
+import { handleSignUpGoogle, register } from '../../../service/auth';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
@@ -30,10 +30,13 @@ const Index = ({ navigation }: any) => {
     confirmPassword: '',
   });
   const handleGoogleSignUp = async () => {
-    const user = await handleSignInGoogle();
-    // console.log('Google user:', user);
-    if (user) {
-      navigation.replace(routes.signin);
+    const userExits = await handleSignUpGoogle();
+    // console.log('Google user:', userExits);
+    if (!userExits) {
+      navigation.replace(routes.home);
+    }
+    {
+      return;
     }
   };
 
@@ -58,10 +61,6 @@ const Index = ({ navigation }: any) => {
     }
     try {
       await register(details);
-      showCustomFlash(
-        'A verification email has been sent to your inbox.',
-        'success',
-      );
 
       setDetails({
         userName: '',
@@ -72,8 +71,6 @@ const Index = ({ navigation }: any) => {
     } catch (error: any) {
       showCustomFlash(error.message, 'danger');
     }
-
-    navigation.replace(routes.signin);
   };
 
   const [isHidden, setIsHidden] = useState({

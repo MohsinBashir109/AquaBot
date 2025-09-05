@@ -13,27 +13,23 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { routes } from '../utils/routes';
 
 const MyStack = createNativeStackNavigator();
-type MainNavProps = {
-  user: any;
-  initializing: boolean;
-};
-export const MainNavigator = ({ user, initializing }: MainNavProps) => {
+
+export const MainNavigator = () => {
   return (
     <ThemeProvider>
       <NavigationContainer>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <MyStack.Navigator screenOptions={{ headerShown: false }}>
-          {initializing ? (
-            <MyStack.Screen name={routes.splash} component={Auth.Splash} />
-          ) : user ? (
-            <MyStack.Screen name={routes.home} component={HomeNavigation} />
-          ) : (
-            <MyStack.Screen name={routes.auth} component={AuthNavigation} />
-          )}
+        <MyStack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName={routes.auth}
+        >
+          <MyStack.Screen name={routes.home} component={HomeNavigation} />
+
+          <MyStack.Screen name={routes.auth} component={AuthNavigation} />
         </MyStack.Navigator>
 
         <FlashMessage
-          position="bottom"
+          position="top"
           style={styles.flashContainer}
           floating
           autoHide

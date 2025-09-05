@@ -9,7 +9,6 @@ import {
   aquaLogo,
   authBackGround,
   droplets,
-  flower,
 } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   imageDroplets: {
-    opacity: 0.15,
+    opacity: 0.1,
     position: 'absolute',
 
     top: heightPixel(80),
@@ -140,7 +139,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   imageDroplets2: {
-    opacity: 0.15,
+    opacity: 0.1,
     position: 'absolute',
 
     top: heightPixel(40),

@@ -18,7 +18,8 @@ export const showCustomFlash = (
     titleStyle: { display: 'none' },
     renderCustomContent: () => <CustomFlash message={message} type={type} />,
     style: {
-      marginTop: Platform.OS === 'android' ? StatusBar.currentHeight || 28 : 44,
+      marginTop:
+        Platform.OS === 'android' ? (StatusBar.currentHeight = 28) : 44,
       marginHorizontal: 12,
       backgroundColor: 'transparent',
       elevation: 0,
