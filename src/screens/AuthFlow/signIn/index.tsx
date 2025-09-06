@@ -36,15 +36,11 @@ const SignIn = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    const userExits = await handleLoginGoogle();
-    // console.log('Google user:', userExits);
-    if (userExits) {
-      navigation.navigate(routes.home, {
-        Screen: routes.home,
-      });
-    } else {
-      return;
-    }
+    const result = await handleLoginGoogle();
+
+    if (result === 'cancelled' || result === 'not_found') return;
+
+    navigation.replace(routes.home);
   };
 
   const handleSignIn = async () => {
@@ -57,11 +53,9 @@ const SignIn = () => {
       return;
     }
     try {
-      const { flag, user } = await login(details);
+      const { flag, user }: any = await login(details);
       if (!flag) {
-        navigation.replace(routes.home, {
-          Screens: 'home',
-        });
+        navigation.replace(routes.home);
       } else {
         setDetails({
           email: '',

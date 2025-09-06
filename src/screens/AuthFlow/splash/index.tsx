@@ -8,15 +8,34 @@ import {
   View,
 } from 'react-native';
 import { Logo, authBackGround } from '../../../assets/images/images';
+import React, { useEffect } from 'react';
 import { heightPixel, widthPixel } from '../../../utils/constants';
 
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../../../utils/colors';
 import { routes } from '../../../utils/routes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeContext } from '../../../theme/ThemeContext';
 
 const Splash = ({ navigation }: any) => {
+  useEffect(() => {
+    // Navigate after 2 seconds
+    const timeout = setTimeout(async () => {
+      const USER_KEY = 'Exists';
+      const token = await AsyncStorage.getItem(USER_KEY);
+      console.log(token);
+      if (token) {
+        //@ts-ignore
+        navigation.replace(routes?.home);
+      } else {
+        //@ts-ignore
+        navigation.replace(routes?.onboarding);
+      }
+    }, 2000);
+    // }, 100);
+
+    return () => clearTimeout(timeout);
+  }, []);
   const { isDark } = useThemeContext();
   const insets = useSafeAreaInsets();
   return (

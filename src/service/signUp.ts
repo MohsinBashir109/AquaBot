@@ -2,6 +2,7 @@ import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import { getData, removeValue, storeData } from './login.ts';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
@@ -98,6 +99,7 @@ export const handleSignUpGoogle = async (): Promise<
       'Congratulations! Account created successfully.',
       'success',
     );
+    await storeData(email);
     return 'success';
   } catch (error: any) {
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -115,13 +117,24 @@ export const handleSignUpGoogle = async (): Promise<
 export const logout = async () => {
   try {
     const currentUser = await GoogleSignin.getCurrentUser();
-
+    console.log(
+      'before================================================',
+      currentUser,
+    );
     if (currentUser) {
       await GoogleSignin.signOut();
+
       showCustomFlash(' Successfully logged out from Google!', 'success');
+      await getData();
     } else {
       showCustomFlash(' No Google account is currently signed in.', 'danger');
     }
+    await removeValue();
+    const afterUser = await GoogleSignin.getCurrentUser();
+    console.log(
+      'after ===============================================',
+      afterUser,
+    );
   } catch (error) {
     console.error('Google Logout error:', error);
     showCustomFlash(' Something went wrong during Google logout.', 'danger');
