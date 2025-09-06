@@ -1,17 +1,8 @@
-import Forgot from './forgot';
+import Forgot from './forgotpassword';
 import OnBoarding from './onBoarding';
 import SignIn from './signIn';
 import SignUp from './signUp';
 import Splash from './splash';
-import emailVerification from './emailVerification';
-import resetPassword from './resetPassword';
+import emailVerification from './passwordConfirm';
 
-export {
-  SignIn,
-  Splash,
-  OnBoarding,
-  SignUp,
-  Forgot,
-  emailVerification,
-  resetPassword,
-};
+export { SignIn, Splash, OnBoarding, SignUp, Forgot, emailVerification };

@@ -4,7 +4,6 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { getData, removeValue, storeData } from './login.ts';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { showCustomFlash } from '../utils/flash.tsx';
 
@@ -138,5 +137,46 @@ export const logout = async () => {
   } catch (error) {
     console.error('Google Logout error:', error);
     showCustomFlash(' Something went wrong during Google logout.', 'danger');
+  }
+};
+
+export const checkUserExists = async (email: string) => {
+  try {
+    const userQuery = await firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
+
+    if (userQuery.empty) {
+      return null; // no user found
+    }
+
+    // return reference so we can use it later
+    return userQuery.docs[0].ref;
+  } catch (error) {
+    console.error('Check user error:', error);
+    return null;
+  }
+};
+
+export const resetPassword = async (email: string, newPassword: string) => {
+  try {
+    const userRef = await checkUserExists(email);
+
+    if (!userRef) {
+      showCustomFlash('No user found with this email', 'danger');
+      return false;
+    }
+
+    await userRef.update({
+      password: newPassword,
+    });
+
+    showCustomFlash('Password updated successfully!', 'success');
+    return true;
+  } catch (error) {
+    console.error('Reset password error:', error);
+    showCustomFlash('Something went wrong!', 'danger');
+    return false;
   }
 };

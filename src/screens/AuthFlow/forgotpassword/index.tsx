@@ -1,27 +1,48 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 import { fontPixel, heightPixel } from '../../../utils/constants';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
-import React from 'react';
-import { VerificationField } from '../../../components/ThemeComponents/VerificationField';
+import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
+import { checkUserExists } from '../../../service/signUp';
+import { email } from '../../../assets/icons/icons';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 
 const Index = ({ navigation }: any) => {
+  const [varEmail, setEmail] = useState('');
   const handleSignUp = () => {
-    navigation.navigate(routes.emailverification);
+    handleCheckEmail();
   };
   const handleSignin = () => {
     navigation.navigate(routes.signin);
   };
+  const handleCheckEmail = async () => {
+    const userRef = await checkUserExists(varEmail);
+
+    if (!userRef) {
+      Alert.alert('No account with this email');
+      return;
+    }
+
+    navigation.navigate(routes.emailverification, { email: varEmail });
+  };
 
   return (
-    <AuthWrapper text="Verification" desText="Enter your verification code.">
-      <VerificationField
-        title="Verfication Code"
-        leftUnderTitle="Didn’t get the code?"
-        rightUnderTitle="Resend code"
+    <AuthWrapper
+      text="Forget Password"
+      desText="Please enter your email address for verification."
+    >
+      <ThemeInput
+        leftIcon={email}
+        title="Email Address"
+        value={varEmail}
+        onChangeText={text => setEmail(text)}
+        placeHolderColor="green"
+        placeholder="Enter your email"
+        containerStyleOuter={styles.containerStyleOuter}
+        underLefttitle="Please enter a valid email address."
       />
       <Button
         onPress={handleSignUp}
@@ -33,9 +54,9 @@ const Index = ({ navigation }: any) => {
         buttonStyle={styles.buttonStyle2}
         onPress={handleSignin}
         title="Back to login"
-        disabled
         textColor="text"
         titleStyle={styles.buttonStyle}
+        bgColor="white"
       />
     </AuthWrapper>
   );
@@ -44,6 +65,7 @@ const Index = ({ navigation }: any) => {
 export default Index;
 
 const styles = StyleSheet.create({
+  containerStyleOuter: {},
   buttonStyle1: {
     marginTop: heightPixel(10),
   },
