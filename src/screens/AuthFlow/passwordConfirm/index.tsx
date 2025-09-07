@@ -15,7 +15,7 @@ import { routes } from '../../../utils/routes';
 const SignIn = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { email } = route.params; // ✅ get email from Forget screen
+  const { email } = route.params;
 
   const [isHidden, setIsHidden] = useState(true);
   const [isHidden2, setIsHidden2] = useState(true);
