@@ -1,6 +1,6 @@
 import { Alert, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
-import { fontPixel, heightPixel } from '../../../utils/constants';
+import { fontPixel, gmailOnly, heightPixel } from '../../../utils/constants';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
@@ -9,10 +9,19 @@ import { checkUserExists } from '../../../service/signUp';
 import { email } from '../../../assets/icons/icons';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
+import { showCustomFlash } from '../../../utils/flash';
 
 const Index = ({ navigation }: any) => {
   const [varEmail, setEmail] = useState('');
   const handleSignUp = () => {
+    if (!varEmail) {
+      showCustomFlash('Please fill the input field', 'danger');
+      return;
+    }
+    if (!gmailOnly.test(varEmail)) {
+      showCustomFlash('Please enter a valid  Email', 'danger');
+      return;
+    }
     handleCheckEmail();
   };
   const handleSignin = () => {

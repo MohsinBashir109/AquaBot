@@ -7,7 +7,14 @@ import {
   padlock,
   userName,
 } from '../../../assets/icons/icons';
-import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
+import {
+  fontPixel,
+  gmailOnly,
+  heightPixel,
+  regexPass,
+  username,
+  widthPixel,
+} from '../../../utils/constants';
 import { handleSignUpGoogle, register } from '../../../service/signUp';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
@@ -51,6 +58,19 @@ const Index = ({ navigation }: any) => {
 
       return;
     }
+    if (!username.test(details.userName)) {
+      showCustomFlash('Please enter a valid username', 'danger');
+      return;
+    }
+    if (!gmailOnly.test(details.email)) {
+      showCustomFlash('Please enter a valid  Email', 'danger');
+      return;
+    }
+    if (!regexPass.test(details.password)) {
+      showCustomFlash('Please enter a valid Password', 'danger');
+      return;
+    }
+
     if (details.confirmPassword !== details.password) {
       showCustomFlash('Passwords do not match. Please try again.', 'danger');
 
@@ -65,6 +85,7 @@ const Index = ({ navigation }: any) => {
         password: '',
         confirmPassword: '',
       });
+      navigation.replace(routes.signin);
     } catch (error: any) {
       showCustomFlash(error.message, 'danger');
     }

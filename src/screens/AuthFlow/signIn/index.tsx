@@ -1,7 +1,13 @@
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { email, eyes, google, padlock } from './../../../assets/icons/icons';
-import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
+import {
+  fontPixel,
+  gmailOnly,
+  heightPixel,
+  regexPass,
+  widthPixel,
+} from '../../../utils/constants';
 import { handleLoginGoogle, login } from '../../../service/login';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
@@ -50,6 +56,14 @@ const SignIn = () => {
         'danger',
       );
 
+      return;
+    }
+    if (!gmailOnly.test(details.email)) {
+      showCustomFlash('Please enter a valid Email', 'danger');
+      return;
+    }
+    if (!regexPass.test(details.password)) {
+      showCustomFlash('Please enter a valid  Password', 'danger');
       return;
     }
     try {
