@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "820550510501-kik4sh3qi731u400rsp85rpds510m8jj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aquabot",
+            "certificate_hash": "b5823ac2a8f0f8bc0f0e0955f3fd8a81322d1670"
+          }
+        },
+        {
           "client_id": "820550510501-cen042hj386u8j1hju659ev97d3svnvm.apps.googleusercontent.com",
           "client_type": 3
         }

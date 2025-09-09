@@ -3,7 +3,6 @@ import { Platform, StatusBar } from 'react-native';
 import CustomFlash from '../components/ThemeComponents/CustomFlash';
 import React from 'react';
 import { showMessage } from 'react-native-flash-message';
-import { widthPixel } from './constants';
 
 type FlashType = 'success' | 'danger';
 
