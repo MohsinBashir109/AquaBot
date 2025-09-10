@@ -3,9 +3,9 @@ import * as Auth from '../screens/AuthFlow';
 import { StatusBar, StyleSheet } from 'react-native';
 import { heightPixel, widthPixel } from '../utils/constants';
 
-import { AuthNavigation } from './authFlow';
+import { AuthNavigation } from './AuthFlow';
 import FlashMessage from 'react-native-flash-message';
-import { HomeNavigation } from './homeFlow';
+import { HomeNavigation } from './HomeFlow';
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { ThemeProvider } from '../theme/ThemeContext';

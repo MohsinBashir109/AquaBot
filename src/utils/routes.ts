@@ -1,4 +1,5 @@
-import { emailVerification, resetPassword } from '../screens/AuthFlow';
+import { emailVerification } from '../screens/AuthFlow';
+import { guidelines } from '../screens/HomeStack';
 
 export const routes = {
   // auth
@@ -11,5 +12,9 @@ export const routes = {
   emailverification: 'emailVerification',
   resetpassword: 'resetPassword',
   //Home
-  home: 'HomeStack',
+  home: 'Home',
+  guidelines: 'GovernmentGuidelines',
+  chatbot: 'ChatBot',
+  profile: 'Profile',
+  settings: 'Settings',
 };

@@ -6,7 +6,7 @@ import { logout } from '../../../service/signUp';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
 
-const index = ({ navigation }: any) => {
+const Index = ({ navigation }: any) => {
   const handleLogout = async () => {
     await logout();
     showCustomFlash('logged Out', 'success');
@@ -22,7 +22,7 @@ const index = ({ navigation }: any) => {
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   container: {
