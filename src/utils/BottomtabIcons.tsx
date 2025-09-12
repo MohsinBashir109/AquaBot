@@ -1,5 +1,16 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { email, eyes, google, hide, tickCircle } from '../assets/icons/icons';
+import {
+  chatbot,
+  email,
+  eyes,
+  google,
+  guide,
+  hide,
+  home,
+  profile,
+  settings,
+  tickCircle,
+} from '../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from './constants';
 
 import { colors } from './colors';
@@ -17,15 +28,15 @@ export const GetBottomTabIcons = ({
   const getIcon = () => {
     switch (screenName) {
       case 'Home':
-        return email;
+        return home;
       case 'ChatBot':
-        return eyes;
+        return chatbot;
       case 'Profile':
-        return google;
+        return profile;
       case 'Settings':
-        return hide;
+        return settings;
       case 'Guidelines':
-        return tickCircle;
+        return guide;
     }
   };
   return (
