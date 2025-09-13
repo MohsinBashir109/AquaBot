@@ -25,18 +25,17 @@ const TabNavigation = () => {
         tabBarItemStyle: {
           justifyContent: 'center',
           alignItems: 'center',
-          height: heightPixel(60),
+          height: heightPixel(80),
         },
         tabBarStyle: {
           backgroundColor: colors[isDark ? 'dark' : 'light'].white,
           flexDirection: 'row',
           height:
             Platform.OS === 'android'
-              ? heightPixel(60) + insets.bottom
+              ? heightPixel(80) + insets.bottom
               : heightPixel(50) + insets.bottom,
           alignItems: 'center',
           paddingTop: Platform.OS === 'ios' ? heightPixel(20) : 0,
-          //  paddingBottom:  insets?.bottom ,
         },
       }}
     >
