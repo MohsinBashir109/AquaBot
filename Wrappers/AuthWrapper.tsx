@@ -12,6 +12,7 @@ import {
 } from '../src/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import React from 'react';
 import ThemeText from '../src/components/ThemeComponents/ThemeText';
 import { colors } from '../src/utils/colors';

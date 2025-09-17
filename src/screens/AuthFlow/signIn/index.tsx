@@ -87,7 +87,12 @@ const SignIn = () => {
   const [checked, setChecked] = useState(false);
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="handled"
+      extraScrollHeight={0}
+      enableAutomaticScroll={false}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
       <AuthWrapper
         text="Login"
         desText="Enter your email and password for Login."
