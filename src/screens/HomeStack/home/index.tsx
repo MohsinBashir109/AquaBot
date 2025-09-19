@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import Button from '../../../components/ThemeComponents/ThemeButton';
+import HomeWrapper from '../../../../Wrappers/HomeWrapper';
 import React from 'react';
 import { logout } from '../../../service/signUp';
 import { routes } from '../../../utils/routes';
@@ -15,10 +16,10 @@ const Index = ({ navigation }: any) => {
     });
   };
   return (
-    <View style={styles.container}>
+    <HomeWrapper>
       <Text>index</Text>
       <Button onPress={handleLogout} title="logout" />
-    </View>
+    </HomeWrapper>
   );
 };
 

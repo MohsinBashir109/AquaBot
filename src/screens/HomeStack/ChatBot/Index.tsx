@@ -1,12 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import HomeWrapper from '../../../../Wrappers/HomeWrapper';
 import React from 'react';
 
 const Index = () => {
   return (
-    <View>
-      <Text>Indesx</Text>
-    </View>
+    <HomeWrapper>
+      <View></View>
+    </HomeWrapper>
   );
 };
 
