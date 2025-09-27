@@ -1,10 +1,4 @@
-import {
-  Image,
-  ImageBackground,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Image, ImageBackground, StatusBar, StyleSheet } from 'react-native';
 import {
   aquaLogo,
   authBackGround,
@@ -13,7 +7,6 @@ import {
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';
-import ThemeText from '../src/components/ThemeComponents/ThemeText';
 import { colors } from '../src/utils/colors';
 import { fontFamilies } from '../src/utils/fontfamilies';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

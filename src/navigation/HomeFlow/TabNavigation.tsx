@@ -1,91 +1,181 @@
 import * as Home from '../../screens/HomeStack';
 
-import { GetBottomTabIcons } from '../../utils/BottomtabIcons';
-import { Platform } from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {
+  chatbot,
+  guide,
+  home,
+  profile,
+  settings,
+} from '../../assets/icons/icons';
+import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
+
+import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
 import React from 'react';
 import { colors } from '../../utils/colors';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { heightPixel } from '../../utils/constants';
+import { fontFamilies } from '../../utils/fontfamilies';
 import { routes } from '../../utils/routes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeContext } from '../../theme/ThemeContext';
 
-const Tab = createBottomTabNavigator();
+const TabNavigation = ({ navigation }: any) => {
+  const tabArray = [
+    {
+      route: routes.home,
+      icon: home,
+      component: Home.home,
+      type: 'LEFT',
+    },
+    {
+      route: routes.guidelines,
+      icon: guide,
+      component: Home.guidelines,
+      type: 'LEFT',
+    },
+    {
+      route: routes.chatbot,
+      icon: chatbot,
+      component: Home.chatBot,
+      type: 'CIRCLE',
+    },
+    {
+      route: routes.settings,
+      icon: settings,
+      component: Home.settings,
+      type: 'RIGHT',
+    },
+    {
+      route: routes.profile,
+      icon: profile,
+      component: Home.profile,
+      type: 'RIGHT',
+    },
+  ];
 
-const TabNavigation = () => {
   const { isDark } = useThemeContext();
-
   const insets = useSafeAreaInsets();
+
+  const renderTabBar = ({ routeName, selectedTab, navigate }: any) => {
+    const currentTab = tabArray.find(tab => tab.route === routeName);
+
+    return (
+      <TouchableOpacity
+        onPress={() => navigate(routeName)}
+        style={styles.tabbarItem}
+      >
+        <Image
+          source={currentTab?.icon}
+          resizeMode="contain"
+          style={
+            selectedTab === routeName
+              ? styles.selectedIconStyle
+              : styles.iconStyle
+          }
+        />
+        <Text
+          style={[
+            styles.textstyle,
+            selectedTab === routeName && styles.selectedTextStyle,
+          ]}
+        >
+          {routeName}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <Tab.Navigator
+    <CurvedBottomBar.Navigator
+      // style={{ backgroundColor: 'yellow', width: '100%' }}
       screenOptions={{
         headerShown: false,
-        tabBarHideOnKeyboard: true,
-        tabBarShowLabel: false,
-        tabBarItemStyle: {
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: heightPixel(80),
-        },
-        tabBarStyle: {
-          backgroundColor: colors[isDark ? 'dark' : 'light'].white,
-          flexDirection: 'row',
-          height:
-            Platform.OS === 'android'
-              ? heightPixel(80) + insets.bottom
-              : heightPixel(50) + insets.bottom,
-          alignItems: 'center',
-          paddingTop: Platform.OS === 'ios' ? heightPixel(20) : 0,
-        },
       }}
+      type="up"
+      height={
+        Platform.OS === 'android'
+          ? heightPixel(80) + insets.bottom
+          : heightPixel(60) + insets.bottom
+      }
+      shadowStyle={styles.shawdow}
+      circleWidth={60}
+      bgColor={colors[isDark ? 'dark' : 'light'].white}
+      borderTopLeftRight
+      initialRouteName={routes.home}
+      renderCircle={({ routeName, navigate }: any) => (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => navigate(routes.chatbot)} // ✅ navigate chatbot
+        >
+          <View style={styles.btnCircleUp}>
+            <Image source={chatbot} style={styles.iconStyle} />
+          </View>
+        </TouchableOpacity>
+      )}
+      tabBar={renderTabBar}
     >
-      <Tab.Screen
-        name={routes.home}
-        component={Home.home}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <GetBottomTabIcons focused={focused} screenName="Home" />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name={routes.guidelines}
-        component={Home.guidelines}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <GetBottomTabIcons focused={focused} screenName="Guidelines" />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name={routes.settings}
-        component={Home.settings}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <GetBottomTabIcons focused={focused} screenName="Settings" />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name={routes.chatbot}
-        component={Home.chatBot}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <GetBottomTabIcons focused={focused} screenName="ChatBot" />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name={routes.profile}
-        component={Home.profile}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <GetBottomTabIcons focused={focused} screenName="Profile" />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      {tabArray.map((item, index) => (
+        <CurvedBottomBar.Screen
+          key={index}
+          name={item.route}
+          position={item.type}
+          component={item.component}
+        />
+      ))}
+    </CurvedBottomBar.Navigator>
   );
 };
 
 export default TabNavigation;
+
+const styles = StyleSheet.create({
+  btnCircleUp: {
+    width: widthPixel(45),
+    height: widthPixel(45),
+    borderRadius: widthPixel(30),
+    alignItems: 'center',
+    // backgroundColor: '#DFCDE3',
+    justifyContent: 'center',
+    bottom: heightPixel(10),
+  },
+  iconStyle: {
+    width: heightPixel(27),
+    height: heightPixel(27),
+    resizeMode: 'contain',
+  },
+  selectedIconStyle: {
+    width: heightPixel(32),
+    height: heightPixel(32),
+    resizeMode: 'contain',
+  },
+  tabbarItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // backgroundColor: 'pink',
+  },
+  textstyle: {
+    fontSize: fontPixel(10),
+    fontFamily: fontFamilies.semibold,
+    marginTop: heightPixel(5),
+  },
+  selectedTextStyle: {
+    color: 'black',
+    fontWeight: '800',
+  },
+  shawdow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+});

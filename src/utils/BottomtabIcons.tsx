@@ -6,30 +6,33 @@ import { colors } from './colors';
 import { fontFamilies } from './fontfamilies';
 import { useThemeContext } from '../theme/ThemeContext';
 
-export const GetBottomTabIcons = ({
-  focused,
-  screenName,
-}: {
+type Props = {
   focused: boolean;
   screenName: string;
-}) => {
+};
+
+export const GetBottomTabIcons = ({ focused, screenName }: Props) => {
   const { isDark } = useThemeContext();
+
   const getIcon = () => {
     switch (screenName) {
       case 'Home':
         return home;
-      case 'ChatBot':
-        return chatbot;
-      case 'Profile':
-        return profile;
-      case 'Settings':
-        return settings;
       case 'Guidelines':
         return guide;
+      case 'ChatBot':
+        return chatbot;
+      case 'Settings':
+        return settings;
+      case 'Profile':
+        return profile;
+      default:
+        return home; // fallback icon
     }
   };
+
   return (
-    <View style={[styles.simpleIcon]}>
+    <View style={styles.simpleIcon}>
       <View
         style={[
           styles.circle,
@@ -43,18 +46,18 @@ export const GetBottomTabIcons = ({
         <Image
           source={getIcon()}
           style={[
+            styles.iconStyle,
             {
               tintColor: focused
                 ? colors[isDark ? 'dark' : 'light'].primary
                 : colors[isDark ? 'dark' : 'light'].gray1,
             },
-            styles.iconStyle,
           ]}
         />
       </View>
       <Text
         style={[
-          styles?.textstyle,
+          styles.textstyle,
           {
             color: focused
               ? colors[isDark ? 'dark' : 'light'].primary
@@ -63,7 +66,6 @@ export const GetBottomTabIcons = ({
         ]}
       >
         {screenName}
-        {/* {t(`BottomTabs.${screenName}`)} */}
       </Text>
     </View>
   );
@@ -84,16 +86,13 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginBottom: heightPixel(5),
   },
-
   textstyle: {
     width: widthPixel(75),
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(12),
     textAlign: 'center',
   },
-
   simpleIcon: {
-    // backgroundColor: 'pink',
     height: heightPixel(35),
     alignItems: 'center',
     marginTop: heightPixel(15),
