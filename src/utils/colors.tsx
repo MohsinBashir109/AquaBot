@@ -32,6 +32,7 @@ export const colors = {
     fogotText: '#067CCF',
     orColor: '#6B7280BD',
     transparent: 'transparent',
+    bottomTab: '#74EAFF',
   },
   dark: {
     dark: '#0A2342',
@@ -59,6 +60,7 @@ export const colors = {
     fogotText: '#067CCF',
     orColor: '#6B7280BD',
     transparent: 'transparent',
+    bottomTab: '#74EAFF',
   },
 };
 export const globalStyles = {

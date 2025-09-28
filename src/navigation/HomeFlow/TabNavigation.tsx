@@ -67,6 +67,7 @@ const TabNavigation = ({ navigation }: any) => {
 
     return (
       <TouchableOpacity
+        activeOpacity={0.7}
         onPress={() => navigate(routeName)}
         style={styles.tabbarItem}
       >
@@ -93,20 +94,28 @@ const TabNavigation = ({ navigation }: any) => {
 
   return (
     <CurvedBottomBar.Navigator
-      // style={{ backgroundColor: 'yellow', width: '100%' }}
+      screenListeners={{}}
+      id="TabNavigator"
+      style={{ flex: 1 }}
+      width={'100%'}
+      borderWidth={0}
+      borderColor="transparent"
+      circlePosition="CENTER"
+      borderTopLeftRight={false}
+      shadowStyle={{}}
+      defaultScreenOptions={{}}
+      backBehavior="initialRoute"
       screenOptions={{
         headerShown: false,
       }}
-      type="up"
+      type="UP"
       height={
         Platform.OS === 'android'
           ? heightPixel(80) + insets.bottom
           : heightPixel(60) + insets.bottom
       }
-      shadowStyle={styles.shawdow}
       circleWidth={60}
-      bgColor={colors[isDark ? 'dark' : 'light'].white}
-      borderTopLeftRight
+      bgColor={colors[isDark ? 'dark' : 'light'].bottomTab}
       initialRouteName={routes.home}
       renderCircle={({ routeName, navigate }: any) => (
         <TouchableOpacity
@@ -140,42 +149,32 @@ const styles = StyleSheet.create({
     height: widthPixel(45),
     borderRadius: widthPixel(30),
     alignItems: 'center',
-    // backgroundColor: '#DFCDE3',
+    backgroundColor: '#30A7FB',
     justifyContent: 'center',
     bottom: heightPixel(10),
   },
   iconStyle: {
-    width: heightPixel(27),
-    height: heightPixel(27),
+    width: heightPixel(20),
+    height: heightPixel(20),
     resizeMode: 'contain',
   },
   selectedIconStyle: {
-    width: heightPixel(32),
-    height: heightPixel(32),
+    width: heightPixel(25),
+    height: heightPixel(25),
     resizeMode: 'contain',
   },
   tabbarItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: 'pink',
   },
   textstyle: {
     fontSize: fontPixel(10),
-    fontFamily: fontFamilies.semibold,
+    fontFamily: fontFamilies.bold,
     marginTop: heightPixel(5),
   },
   selectedTextStyle: {
-    color: 'black',
-    fontWeight: '800',
-  },
-  shawdow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    color: '#30A7FB',
+    fontFamily: fontFamilies.bold,
   },
 });
