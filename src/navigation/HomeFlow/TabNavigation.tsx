@@ -19,6 +19,7 @@ import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 
 import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
 import React from 'react';
+import ThemeText from '../../components/ThemeComponents/ThemeText';
 import { colors } from '../../utils/colors';
 import { fontFamilies } from '../../utils/fontfamilies';
 import { routes } from '../../utils/routes';
@@ -62,6 +63,11 @@ const TabNavigation = ({ navigation }: any) => {
   const { isDark } = useThemeContext();
   const insets = useSafeAreaInsets();
 
+  const safeNumber =
+    Platform.OS == 'android'
+      ? heightPixel(80) + insets.bottom
+      : heightPixel(60) + insets.bottom;
+  console.log('insets.bottom:', safeNumber);
   const renderTabBar = ({ routeName, selectedTab, navigate }: any) => {
     const currentTab = tabArray.find(tab => tab.route === routeName);
 
@@ -76,15 +82,28 @@ const TabNavigation = ({ navigation }: any) => {
           resizeMode="contain"
           style={
             selectedTab === routeName
-              ? styles.selectedIconStyle
-              : styles.iconStyle
+              ? [
+                  styles.selectedIconStyle,
+                  { tintColor: colors[isDark ? 'dark' : 'light'].white },
+                ]
+              : [
+                  styles.iconStyle,
+                  { tintColor: colors[isDark ? 'dark' : 'light'].gray1 },
+                ]
           }
         />
         <Text
-          style={[
-            styles.textstyle,
-            selectedTab === routeName && styles.selectedTextStyle,
-          ]}
+          style={
+            selectedTab === routeName
+              ? [
+                  styles.selectedTextStyle,
+                  { color: colors[isDark ? 'dark' : 'light'].white },
+                ]
+              : [
+                  styles.textstyle,
+                  { color: colors[isDark ? 'dark' : 'light'].gray1 },
+                ]
+          }
         >
           {routeName}
         </Text>
@@ -97,9 +116,9 @@ const TabNavigation = ({ navigation }: any) => {
       screenListeners={{}}
       id="TabNavigator"
       style={{ flex: 1 }}
-      width={'100%'}
-      borderWidth={0}
-      borderColor="transparent"
+      width={0}
+      borderWidth={1}
+      borderColor="green"
       circlePosition="CENTER"
       borderTopLeftRight={false}
       shadowStyle={{}}
@@ -109,21 +128,30 @@ const TabNavigation = ({ navigation }: any) => {
         headerShown: false,
       }}
       type="UP"
-      height={
-        Platform.OS === 'android'
-          ? heightPixel(80) + insets.bottom
-          : heightPixel(60) + insets.bottom
-      }
+      height={safeNumber}
       circleWidth={60}
       bgColor={colors[isDark ? 'dark' : 'light'].bottomTab}
       initialRouteName={routes.home}
-      renderCircle={({ routeName, navigate }: any) => (
+      renderCircle={({ routeName, navigate, selectedTab }: any) => (
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigate(routes.chatbot)} // ✅ navigate chatbot
+          onPress={() => navigate(routes.chatbot)}
         >
           <View style={styles.btnCircleUp}>
-            <Image source={chatbot} style={styles.iconStyle} />
+            <Image
+              source={chatbot}
+              style={
+                selectedTab === routeName
+                  ? [
+                      styles.selectedIconStyle,
+                      { tintColor: colors[isDark ? 'dark' : 'light'].white },
+                    ]
+                  : [
+                      styles.iconStyle,
+                      { tintColor: colors[isDark ? 'dark' : 'light'].gray1 },
+                    ]
+              }
+            />
           </View>
         </TouchableOpacity>
       )}
@@ -149,9 +177,9 @@ const styles = StyleSheet.create({
     height: widthPixel(45),
     borderRadius: widthPixel(30),
     alignItems: 'center',
-    backgroundColor: '#30A7FB',
+    // backgroundColor: '#30A7FB',
     justifyContent: 'center',
-    bottom: heightPixel(10),
+    bottom: heightPixel(20),
   },
   iconStyle: {
     width: heightPixel(20),
@@ -169,12 +197,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textstyle: {
-    fontSize: fontPixel(10),
+    fontSize: fontPixel(12),
     fontFamily: fontFamilies.bold,
     marginTop: heightPixel(5),
   },
   selectedTextStyle: {
-    color: '#30A7FB',
     fontFamily: fontFamilies.bold,
+    fontSize: fontPixel(12),
   },
 });
