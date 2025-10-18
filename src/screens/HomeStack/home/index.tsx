@@ -1,34 +1,39 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 import Button from '../../../components/ThemeComponents/ThemeButton';
 import HomeWrapper from '../../../../Wrappers/HomeWrapper';
 import React from 'react';
-import { logout } from '../../../service/signUp';
-import { routes } from '../../../utils/routes';
+import { useAuth } from '../../../context/AuthContext';
 import { showCustomFlash } from '../../../utils/flash';
 
-const Index = ({ navigation }: any) => {
+const Index = () => {
+  const { logout } = useAuth();
+
   const handleLogout = async () => {
-    await logout();
-    showCustomFlash('logged Out', 'success');
-    navigation.replace(routes.auth, {
-      Screen: routes.signin,
-    });
+    try {
+      await logout();
+      showCustomFlash('Logged out successfully!', 'success');
+      // Navigation will be handled automatically by AuthContext
+    } catch (error) {
+      console.error('Logout error:', error);
+      showCustomFlash('Logout failed. Please try again.', 'danger');
+    }
   };
+
   return (
-    <HomeWrapper>
-      <Text>index</Text>
-      <Button onPress={handleLogout} title="logout" />
-    </HomeWrapper>
+    <View style={styles.container}>
+      <HomeWrapper>
+        <Text>Welcome to AquaBot Home!</Text>
+        <Button onPress={handleLogout} title="logout" />
+      </HomeWrapper>
+    </View>
   );
 };
-
-export default Index;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
+
+export default Index;
