@@ -1,13 +1,14 @@
+import React from 'react';
+import { routes } from '../../utils/routes';
 import * as Home from '../../screens/HomeStack';
 
-import {
-  Image,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, View, Text, Image, Platform } from 'react-native';
+
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
+import { colors } from '../../utils/colors';
+import { fontFamilies } from '../../utils/fontfamilies';
+
 import {
   chatbot,
   guide,
@@ -15,194 +16,276 @@ import {
   profile,
   settings,
 } from '../../assets/icons/icons';
-import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
-
-import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
-import React from 'react';
-import ThemeText from '../../components/ThemeComponents/ThemeText';
-import { colors } from '../../utils/colors';
-import { fontFamilies } from '../../utils/fontfamilies';
-import { routes } from '../../utils/routes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeContext } from '../../theme/ThemeContext';
+import LinearGradient from 'react-native-linear-gradient';
 
-const TabNavigation = ({ navigation }: any) => {
-  const tabArray = [
-    {
-      route: routes.home,
-      icon: home,
-      component: Home.home,
-      type: 'LEFT',
-    },
-    {
-      route: routes.guidelines,
-      icon: guide,
-      component: Home.guidelines,
-      type: 'LEFT',
-    },
-    {
-      route: routes.chatbot,
-      icon: chatbot,
-      component: Home.chatBot,
-      type: 'CIRCLE',
-    },
-    {
-      route: routes.settings,
-      icon: settings,
-      component: Home.settings,
-      type: 'RIGHT',
-    },
-    {
-      route: routes.profile,
-      icon: profile,
-      component: Home.profile,
-      type: 'RIGHT',
-    },
-  ];
+const Tab = createBottomTabNavigator();
 
+export const TabNavigation = () => {
   const { isDark } = useThemeContext();
   const insets = useSafeAreaInsets();
 
-  const safeNumber =
-    Platform.OS == 'android'
-      ? heightPixel(80) + insets.bottom
-      : heightPixel(60) + insets.bottom;
-  console.log('insets.bottom:', safeNumber);
-  const renderTabBar = ({ routeName, selectedTab, navigate }: any) => {
-    const currentTab = tabArray.find(tab => tab.route === routeName);
-
-    return (
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => navigate(routeName)}
-        style={styles.tabbarItem}
-      >
-        <Image
-          source={currentTab?.icon}
-          resizeMode="contain"
-          style={
-            selectedTab === routeName
-              ? [
-                  styles.selectedIconStyle,
-                  { tintColor: colors[isDark ? 'dark' : 'light'].white },
-                ]
-              : [
-                  styles.iconStyle,
-                  { tintColor: colors[isDark ? 'dark' : 'light'].gray1 },
-                ]
-          }
-        />
-        <Text
-          style={
-            selectedTab === routeName
-              ? [
-                  styles.selectedTextStyle,
-                  { color: colors[isDark ? 'dark' : 'light'].white },
-                ]
-              : [
-                  styles.textstyle,
-                  { color: colors[isDark ? 'dark' : 'light'].gray1 },
-                ]
-          }
-        >
-          {routeName}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
-    <CurvedBottomBar.Navigator
-      screenListeners={{}}
-      id="TabNavigator"
-      style={{ flex: 1 }}
-      width={0}
-      borderWidth={1}
-      borderColor="green"
-      circlePosition="CENTER"
-      borderTopLeftRight={false}
-      shadowStyle={{}}
-      defaultScreenOptions={{}}
-      backBehavior="initialRoute"
-      screenOptions={{
-        headerShown: false,
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors[isDark ? 'dark' : 'light'].background,
       }}
-      type="UP"
-      height={safeNumber}
-      circleWidth={60}
-      bgColor={colors[isDark ? 'dark' : 'light'].bottomTab}
-      initialRouteName={routes.home}
-      renderCircle={({ routeName, navigate, selectedTab }: any) => (
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigate(routes.chatbot)}
-        >
-          <View style={styles.btnCircleUp}>
-            <Image
-              source={chatbot}
-              style={
-                selectedTab === routeName
-                  ? [
-                      styles.selectedIconStyle,
-                      { tintColor: colors[isDark ? 'dark' : 'light'].white },
-                    ]
-                  : [
-                      styles.iconStyle,
-                      { tintColor: colors[isDark ? 'dark' : 'light'].gray1 },
-                    ]
-              }
-            />
-          </View>
-        </TouchableOpacity>
-      )}
-      tabBar={renderTabBar}
     >
-      {tabArray.map((item, index) => (
-        <CurvedBottomBar.Screen
-          key={index}
-          name={item.route}
-          position={item.type}
-          component={item.component}
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarHideOnKeyboard: true,
+          tabBarShowLabel: false,
+          tabBarItemStyle: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: heightPixel(60),
+          },
+          tabBarStyle: {
+            flexDirection: 'row',
+            height:
+              Platform.OS === 'android'
+                ? heightPixel(60) + insets.bottom
+                : heightPixel(50) + insets.bottom,
+            alignItems: 'center',
+            paddingTop: Platform.OS === 'ios' ? heightPixel(20) : 0,
+          },
+        }}
+        initialRouteName={routes.home}
+      >
+        <Tab.Screen
+          name={routes.home}
+          component={Home.home}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  focused ? styles.selectedIconView : styles.simpleIcon,
+                  { height: heightPixel(27) },
+                ]}
+              >
+                {focused ? (
+                  <LinearGradient
+                    locations={[0, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    colors={['#90DDF6', '#3D84F6']}
+                    style={styles.gradient}
+                  >
+                    <Image source={home} style={styles.iconSelected} />
+                  </LinearGradient>
+                ) : (
+                  <Image source={home} style={styles.iconStyle} />
+                )}
+                <Text
+                  style={[
+                    styles.textstyle,
+                    focused && styles.selectedTextStyle,
+                  ]}
+                >
+                  Home
+                </Text>
+              </View>
+            ),
+          }}
         />
-      ))}
-    </CurvedBottomBar.Navigator>
+        <Tab.Screen
+          name={routes.guidelines}
+          component={Home.guidelines}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  focused ? styles.selectedIconView : styles.simpleIcon,
+                  { height: heightPixel(27) },
+                ]}
+              >
+                {focused ? (
+                  <LinearGradient
+                    locations={[0, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    colors={['#90DDF6', '#3D84F6']}
+                    style={styles.gradient}
+                  >
+                    <Image source={guide} style={styles.iconSelected} />
+                  </LinearGradient>
+                ) : (
+                  <Image source={guide} style={styles.iconStyle} />
+                )}
+                <Text
+                  style={[
+                    styles.textstyle,
+                    focused && styles.selectedTextStyle,
+                  ]}
+                >
+                  Guide
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <Tab.Screen
+          name={routes.chatbot}
+          component={Home.chatBot}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  focused ? styles.selectedIconView : styles.simpleIcon,
+                  { height: heightPixel(27) },
+                ]}
+              >
+                {focused ? (
+                  <LinearGradient
+                    locations={[0, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    colors={['#90DDF6', '#3D84F6']}
+                    style={styles.gradient}
+                  >
+                    <Image source={chatbot} style={styles.iconSelected} />
+                  </LinearGradient>
+                ) : (
+                  <Image source={chatbot} style={styles.iconStyle} />
+                )}
+                <Text
+                  style={[
+                    styles.textstyle,
+                    focused && styles.selectedTextStyle,
+                  ]}
+                >
+                  AI Chat
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <Tab.Screen
+          name={routes.settings}
+          component={Home.settings}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  focused ? styles.selectedIconView : styles.simpleIcon,
+                  { height: heightPixel(27) },
+                ]}
+              >
+                {focused ? (
+                  <LinearGradient
+                    locations={[0, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    colors={['#90DDF6', '#3D84F6']}
+                    style={styles.gradient}
+                  >
+                    <Image source={settings} style={styles.iconSelected} />
+                  </LinearGradient>
+                ) : (
+                  <Image source={settings} style={styles.iconStyle} />
+                )}
+                <Text
+                  style={[
+                    styles.textstyle,
+                    focused && styles.selectedTextStyle,
+                  ]}
+                >
+                  Settings
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <Tab.Screen
+          name={routes.profile}
+          component={Home.profile}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  focused ? styles.selectedIconView : styles.simpleIcon,
+                  { height: heightPixel(27) },
+                ]}
+              >
+                {focused ? (
+                  <LinearGradient
+                    locations={[0, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    colors={['#90DDF6', '#3D84F6']}
+                    style={styles.gradient}
+                  >
+                    <Image source={profile} style={styles.iconSelected} />
+                  </LinearGradient>
+                ) : (
+                  <Image source={profile} style={styles.iconStyle} />
+                )}
+                <Text
+                  style={[
+                    styles.textstyle,
+                    focused && styles.selectedTextStyle,
+                  ]}
+                >
+                  Profile
+                </Text>
+              </View>
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </View>
   );
 };
 
 export default TabNavigation;
 
 const styles = StyleSheet.create({
-  btnCircleUp: {
-    width: widthPixel(45),
-    height: widthPixel(45),
-    borderRadius: widthPixel(30),
-    alignItems: 'center',
-    // backgroundColor: '#30A7FB',
-    justifyContent: 'center',
-    bottom: heightPixel(20),
-  },
   iconStyle: {
-    width: heightPixel(20),
+    width: widthPixel(20),
     height: heightPixel(20),
     resizeMode: 'contain',
+    marginBottom: heightPixel(5),
+    tintColor: colors.light.gray3,
   },
-  selectedIconStyle: {
-    width: heightPixel(25),
-    height: heightPixel(25),
-    resizeMode: 'contain',
-  },
-  tabbarItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textstyle: {
-    fontSize: fontPixel(12),
-    fontFamily: fontFamilies.bold,
-    marginTop: heightPixel(5),
+  gradient: {
+    borderRadius: heightPixel(25),
+    marginBottom: heightPixel(5),
+    elevation: 3,
+    shadowColor: colors.light.dark,
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   selectedTextStyle: {
-    fontFamily: fontFamilies.bold,
-    fontSize: fontPixel(12),
+    color: colors.light.primary,
+    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(9),
+  },
+  textstyle: {
+    fontSize: fontPixel(9),
+    fontFamily: fontFamilies.medium,
+    width: widthPixel(75),
+    textAlign: 'center',
+    color: colors.light.gray3,
+  },
+  iconSelected: {
+    width: widthPixel(20),
+    height: heightPixel(20),
+    resizeMode: 'contain',
+    tintColor: 'white',
+    margin: heightPixel(12),
+  },
+  simpleIcon: {
+    alignItems: 'center',
+    marginTop: heightPixel(15),
+  },
+  selectedIconView: {
+    alignItems: 'center',
+    borderRadius: heightPixel(5),
+    borderColor: colors.light.primary,
+    marginBottom: heightPixel(20),
   },
 });
