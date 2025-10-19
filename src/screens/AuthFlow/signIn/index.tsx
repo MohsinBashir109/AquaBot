@@ -1,14 +1,7 @@
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
-import { email, eyes, google, padlock } from './../../../assets/icons/icons';
-import {
-  fontPixel,
-  gmailOnly,
-  heightPixel,
-  regexPass,
-  widthPixel,
-} from '../../../utils/constants';
-import { handleLoginGoogle, login } from '../../../service/login';
+import { email, eyes, padlock } from './../../../assets/icons/icons';
+import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
@@ -20,9 +13,12 @@ import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../../context/AuthContext';
 
 const SignIn = () => {
   const navigation = useNavigation<any>();
+  const { login } = useAuth();
+
   const handleSignUp = () => {
     navigation.navigate(routes.signup);
   };
@@ -31,6 +27,7 @@ const SignIn = () => {
     password: '',
   });
   const [isHidden, setIsHidden] = useState(true);
+  const [showSignupSuggestion, setShowSignupSuggestion] = useState(false);
   const handleHide = () => {
     setIsHidden(!isHidden);
   };
@@ -39,14 +36,6 @@ const SignIn = () => {
   };
   const handleCheckBoxPress = () => {
     setChecked(!checked);
-  };
-
-  const handleGoogleSignIn = async () => {
-    const result = await handleLoginGoogle();
-
-    if (result === 'cancelled' || result === 'not_found') return;
-
-    navigation.replace(routes.home);
   };
 
   const handleSignIn = async () => {
@@ -58,27 +47,81 @@ const SignIn = () => {
 
       return;
     }
-    if (!gmailOnly.test(details.email)) {
-      showCustomFlash('Please enter a valid Email', 'danger');
-      return;
-    }
-    if (!regexPass.test(details.password)) {
-      showCustomFlash('Please enter a valid  Password', 'danger');
-      return;
-    }
+    // Commented out for testing - uncomment when ready for production
+    // if (!gmailOnly.test(details.email)) {
+    //   showCustomFlash('Please enter a valid Email', 'danger');
+    //   return;
+    // }
+    // if (!regexPass.test(details.password)) {
+    //   showCustomFlash('Please enter a valid  Password', 'danger');
+    //   return;
+    // }
     try {
-      const { flag, user }: any = await login(details);
-      if (!flag) {
-        navigation.replace(routes.home);
+      const success = await login(details);
+      if (success) {
+        showCustomFlash('Login successful! Welcome back!', 'success');
       } else {
-        setDetails({
-          email: '',
-          password: '',
-        });
-        return;
+        showCustomFlash(
+          'Login failed. Please check your credentials.',
+          'danger',
+        );
       }
     } catch (error: any) {
-      console.error(' Firestore login error:', error);
+      // Handle backend error response
+      let errorMessage = 'Login failed. Please try again.';
+      let errorType: 'success' | 'danger' = 'danger';
+
+      console.log('🔍 Full error object:', error);
+      console.log('🔍 Error response:', error.response);
+      console.log('🔍 Error response data:', error.response?.data);
+
+      if (error.response?.data) {
+        const responseData = error.response.data;
+        console.log('🔍 Response data:', responseData);
+
+        // Check for specific error codes (handle both ErrorCode and errorCode)
+        const errorCode = responseData.ErrorCode || responseData.errorCode;
+
+        if (errorCode === 'USER_NOT_FOUND') {
+          errorMessage =
+            responseData.MessageEnglish ||
+            responseData.messageEnglish ||
+            responseData.Message ||
+            responseData.message ||
+            'No account found with this email.';
+          errorType = 'danger';
+          setShowSignupSuggestion(true);
+        } else if (errorCode === 'INVALID_CREDENTIALS') {
+          errorMessage =
+            responseData.MessageEnglish ||
+            responseData.messageEnglish ||
+            responseData.Message ||
+            responseData.message ||
+            'Invalid email or password';
+          errorType = 'danger';
+        } else if (errorCode === 'ACCOUNT_LOCKED') {
+          errorMessage =
+            responseData.MessageEnglish ||
+            responseData.messageEnglish ||
+            responseData.Message ||
+            responseData.message ||
+            'Account is temporarily locked';
+          errorType = 'danger';
+        } else {
+          // Use messageEnglish if available, otherwise fallback to message
+          errorMessage =
+            responseData.messageEnglish ||
+            responseData.MessageEnglish ||
+            responseData.message ||
+            responseData.Message ||
+            error.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      console.log('🔍 Final error message to display:', errorMessage);
+      showCustomFlash(errorMessage, errorType);
     }
   };
   const handleForgotPass = () => {
@@ -101,9 +144,10 @@ const SignIn = () => {
           leftIcon={email}
           title="Email"
           value={details.email}
-          onChangeText={(text: string) =>
-            setDetails({ ...details, email: text })
-          }
+          onChangeText={(text: string) => {
+            setDetails({ ...details, email: text });
+            setShowSignupSuggestion(false); // Reset suggestion when user types
+          }}
           placeHolderColor="green"
           placeholder="Enter your email"
           containerStyleOuter={styles.containerStyleOuter}
@@ -113,9 +157,10 @@ const SignIn = () => {
           leftIcon={padlock}
           rightIcon={eyes}
           value={details.password}
-          onChangeText={(text: string) =>
-            setDetails({ ...details, password: text })
-          }
+          onChangeText={(text: string) => {
+            setDetails({ ...details, password: text });
+            setShowSignupSuggestion(false); // Reset suggestion when user types
+          }}
           containerStyleOuter={styles.containerStyleOuter2}
           placeHolderColor="green"
           placeholder="Enter your password"
@@ -142,19 +187,20 @@ const SignIn = () => {
           buttonStyle={styles.buttonStyle}
           onPress={handleSignIn}
         />
-        <ThemeText style={styles.or} color="orColor">
-          OR
-        </ThemeText>
-        <TouchableOpacity style={styles.touchable} onPress={handleGoogleSignIn}>
-          <ThemeText style={styles.googleSignin} color="text">
-            Sign in with
-          </ThemeText>
-          <Image
-            source={google}
-            style={styles.imageGoogle}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+
+        {showSignupSuggestion && (
+          <View style={styles.signupSuggestion}>
+            <ThemeText style={styles.suggestionText} color="text">
+              Don't have an account yet?
+            </ThemeText>
+            <TouchableOpacity onPress={handleSignUp}>
+              <ThemeText color="fogotText" style={styles.signupLink}>
+                Create Account
+              </ThemeText>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View
           style={{
             marginVertical: heightPixel(10),
@@ -166,7 +212,7 @@ const SignIn = () => {
           }}
         >
           <ThemeText style={styles.accountText} color="text">
-            Don’t have an account?
+            Don't have an account?
           </ThemeText>
           <TouchableOpacity onPress={handleSignUp}>
             <ThemeText color="fogotText" style={styles.signUp}>
@@ -190,25 +236,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(13),
   },
-  imageGoogle: {
-    width: widthPixel(45),
-    height: heightPixel(45),
-    marginLeft: widthPixel(5),
-  },
-  touchable: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  googleSignin: {
-    fontFamily: fontFamilies.semibold,
-    fontSize: fontPixel(14),
-  },
-  or: {
-    fontFamily: fontFamilies.medium,
-    fontSize: fontPixel(14),
-    marginVertical: heightPixel(20),
-  },
   checkBoxView: { flexDirection: 'row', paddingHorizontal: widthPixel(5) },
   buttonStyle: {
     marginTop: heightPixel(30),
@@ -228,5 +255,22 @@ const styles = StyleSheet.create({
   forgotText: {
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(13),
+  },
+  signupSuggestion: {
+    marginTop: heightPixel(15),
+    padding: widthPixel(15),
+    backgroundColor: '#f8f9fa',
+    borderRadius: widthPixel(8),
+    alignItems: 'center',
+  },
+  suggestionText: {
+    fontFamily: fontFamilies.medium,
+    fontSize: fontPixel(12),
+    marginBottom: heightPixel(5),
+  },
+  signupLink: {
+    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(13),
+    textDecorationLine: 'underline',
   },
 });

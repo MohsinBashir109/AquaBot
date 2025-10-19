@@ -1,7 +1,7 @@
 import chatBot from './ChatBot/Index';
-import guidelines from './GovernmentGuidelines/Index';
-import home from './Home/Index';
+import analyze from './GovernmentGuidelines/Index';
+import home from './Home/index';
 import profile from './Profile/Index';
-import settings from './Profile/Index';
+import settings from './Settings/Index';
 
-export { home, chatBot, guidelines, profile, settings };
+export { home, chatBot, analyze, profile, settings };

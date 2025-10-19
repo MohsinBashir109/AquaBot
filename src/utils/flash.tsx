@@ -4,7 +4,7 @@ import CustomFlash from '../components/ThemeComponents/CustomFlash';
 import React from 'react';
 import { showMessage } from 'react-native-flash-message';
 
-type FlashType = 'success' | 'danger';
+type FlashType = 'success' | 'danger' | 'warning';
 
 export const showCustomFlash = (
   message: string,

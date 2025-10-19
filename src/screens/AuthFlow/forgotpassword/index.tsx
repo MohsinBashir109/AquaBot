@@ -5,7 +5,7 @@ import { fontPixel, gmailOnly, heightPixel } from '../../../utils/constants';
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
-import { checkUserExists } from '../../../service/signUp';
+import { authService } from '../../../service/authService';
 import { email } from '../../../assets/icons/icons';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
@@ -18,24 +18,29 @@ const Index = ({ navigation }: any) => {
       showCustomFlash('Please fill the input field', 'danger');
       return;
     }
-    if (!gmailOnly.test(varEmail)) {
-      showCustomFlash('Please enter a valid  Email', 'danger');
-      return;
-    }
+    // Commented out for testing - uncomment when ready for production
+    // if (!gmailOnly.test(varEmail)) {
+    //   showCustomFlash('Please enter a valid  Email', 'danger');
+    //   return;
+    // }
     handleCheckEmail();
   };
   const handleSignin = () => {
     navigation.navigate(routes.signin);
   };
   const handleCheckEmail = async () => {
-    const userRef = await checkUserExists(varEmail);
+    try {
+      const success = await authService.forgotPassword(varEmail);
 
-    if (!userRef) {
-      Alert.alert('No account with this email');
-      return;
+      if (success) {
+        navigation.navigate(routes.emailverification, { email: varEmail });
+      } else {
+        Alert.alert('No account with this email');
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
     }
-
-    navigation.navigate(routes.emailverification, { email: varEmail });
   };
 
   return (

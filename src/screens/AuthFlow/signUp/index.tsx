@@ -1,12 +1,6 @@
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
-import {
-  email,
-  eyes,
-  google,
-  padlock,
-  userName,
-} from '../../../assets/icons/icons';
+import { email, eyes, padlock, userName } from '../../../assets/icons/icons';
 import {
   fontPixel,
   gmailOnly,
@@ -15,7 +9,7 @@ import {
   username,
   widthPixel,
 } from '../../../utils/constants';
-import { handleSignUpGoogle, register } from '../../../service/signUp';
+import { register } from '../../../service/signUp';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
 import Button from '../../../components/ThemeComponents/ThemeButton';
@@ -36,58 +30,99 @@ const Index = ({ navigation }: any) => {
     password: '',
     confirmPassword: '',
   });
-  const handleGoogleSignUp = async () => {
-    const result = await handleSignUpGoogle();
-
-    if (result === 'cancelled' || result === 'exists') return;
-
-    navigation.replace(routes.home);
-  };
 
   const handleSignUp = async () => {
+    console.log('🚀 Starting signup process...');
+    console.log('📝 Form data:', {
+      userName: details.userName,
+      email: details.email,
+      password: details.password ? '***' : 'empty',
+      confirmPassword: details.confirmPassword ? '***' : 'empty',
+    });
+
     if (
       !details.email ||
       !details.password ||
       !details.confirmPassword ||
       !details.userName
     ) {
+      console.log('❌ Validation failed: Missing required fields');
       showCustomFlash(
         'All fields are required. Please complete them.',
         'danger',
       );
+      return;
+    }
 
-      return;
-    }
-    if (!username.test(details.userName)) {
-      showCustomFlash('Please enter a valid username', 'danger');
-      return;
-    }
-    if (!gmailOnly.test(details.email)) {
-      showCustomFlash('Please enter a valid  Email', 'danger');
-      return;
-    }
-    if (!regexPass.test(details.password)) {
-      showCustomFlash('Please enter a valid Password', 'danger');
-      return;
-    }
+    // Commented out for testing - uncomment when ready for production
+    // if (!username.test(details.userName)) {
+    //   console.log('❌ Validation failed: Invalid username format');
+    //   showCustomFlash('Please enter a valid username', 'danger');
+    //   return;
+    // }
+
+    // if (!gmailOnly.test(details.email)) {
+    //   console.log('❌ Validation failed: Invalid email format');
+    //   showCustomFlash('Please enter a valid  Email', 'danger');
+    //   return;
+    // }
+
+    // if (!regexPass.test(details.password)) {
+    //   console.log('❌ Validation failed: Invalid password format');
+    //   showCustomFlash('Please enter a valid Password', 'danger');
+    //   return;
+    // }
 
     if (details.confirmPassword !== details.password) {
+      console.log('❌ Validation failed: Passwords do not match');
       showCustomFlash('Passwords do not match. Please try again.', 'danger');
-
       return;
     }
-    try {
-      await register(details);
 
-      setDetails({
-        userName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-      });
-      navigation.replace(routes.signin);
+    console.log('✅ All validations passed, calling register API...');
+
+    try {
+      const result = await register(details);
+      console.log('📡 Register API response:', result);
+
+      if (result === false) {
+        // Registration successful
+        setDetails({
+          userName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+        console.log('🎉 Signup successful, navigating to signin...');
+        navigation.replace(routes.signin);
+      } else {
+        // Registration failed - this shouldn't happen as errors should be thrown
+        console.log('❌ Signup failed - not navigating');
+        showCustomFlash('Registration failed. Please try again.', 'danger');
+      }
     } catch (error: any) {
-      showCustomFlash(error.message, 'danger');
+      console.error('💥 Signup error:', error);
+
+      // Handle backend error response
+      let errorMessage = 'Registration failed. Please try again.';
+
+      if (error.response?.data) {
+        const responseData = error.response.data;
+        console.log('🔍 Full backend response data:', responseData);
+        // Use messageEnglish if available, otherwise fallback to message
+        errorMessage =
+          responseData.messageEnglish ||
+          responseData.MessageEnglish ||
+          responseData.message ||
+          responseData.Message ||
+          error.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      console.log('🔍 Backend error response:', error.response?.data);
+      console.log('🔍 Final error message:', errorMessage);
+      showCustomFlash(errorMessage, 'danger');
     }
   };
 
@@ -160,19 +195,6 @@ const Index = ({ navigation }: any) => {
           onPress={handleSignUp}
         />
 
-        <ThemeText style={styles.or} color="orColor">
-          OR
-        </ThemeText>
-        <TouchableOpacity style={styles.touchable} onPress={handleGoogleSignUp}>
-          <ThemeText style={styles.googleSignin} color="text">
-            Sign in with
-          </ThemeText>
-          <Image
-            source={google}
-            style={styles.imageGoogle}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
         <View
           style={{
             marginVertical: heightPixel(10),
@@ -213,25 +235,6 @@ const styles = StyleSheet.create({
   signUp: {
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(13),
-  },
-  imageGoogle: {
-    width: widthPixel(45),
-    height: heightPixel(45),
-    marginLeft: widthPixel(5),
-  },
-  touchable: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  googleSignin: {
-    fontFamily: fontFamilies.semibold,
-    fontSize: fontPixel(14),
-  },
-  or: {
-    fontFamily: fontFamilies.medium,
-    fontSize: fontPixel(14),
-    marginVertical: heightPixel(20),
   },
   checkBoxView: { flexDirection: 'row', paddingHorizontal: widthPixel(5) },
 

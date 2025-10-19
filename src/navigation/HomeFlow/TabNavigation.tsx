@@ -92,8 +92,8 @@ export const TabNavigation = () => {
           }}
         />
         <Tab.Screen
-          name={routes.guidelines}
-          component={Home.guidelines}
+          name={routes.analyze}
+          component={Home.analyze}
           options={{
             tabBarIcon: ({ focused }) => (
               <View
@@ -121,7 +121,7 @@ export const TabNavigation = () => {
                     focused && styles.selectedTextStyle,
                   ]}
                 >
-                  Guide
+                  Analyze
                 </Text>
               </View>
             ),
