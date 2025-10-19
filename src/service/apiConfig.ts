@@ -6,6 +6,7 @@ export const API_CONFIG = {
     LOGIN: '/Auth/login',
     FORGOT_PASSWORD: '/Auth/forgot-password',
     RESET_PASSWORD: '/Auth/reset-password',
+    IMAGE_ANALYSIS: '/ImageAnalysis/analyze-and-plan',
   },
   TIMEOUT: 10000, // 10 seconds
 };

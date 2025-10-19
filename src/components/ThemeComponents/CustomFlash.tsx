@@ -6,24 +6,28 @@ import { fontFamilies } from '../../utils/fontfamilies';
 
 type FlashProps = {
   message: string;
-  type?: 'success' | 'danger';
+  type?: 'success' | 'danger' | 'warning';
 };
 
 const CustomFlash = ({ message, type = 'success' }: FlashProps) => {
-  const isSuccess = type === 'success';
+  const getStyle = () => {
+    switch (type) {
+      case 'success':
+        return { container: styles.success, text: styles.successText };
+      case 'danger':
+        return { container: styles.danger, text: styles.dangerText };
+      case 'warning':
+        return { container: styles.warning, text: styles.warningText };
+      default:
+        return { container: styles.success, text: styles.successText };
+    }
+  };
+
+  const style = getStyle();
 
   return (
-    <View
-      style={[styles.container, isSuccess ? styles.success : styles.danger]}
-    >
-      <Text
-        style={[
-          styles.text,
-          isSuccess ? styles.successText : styles.dangerText,
-        ]}
-      >
-        {message}
-      </Text>
+    <View style={[styles.container, style.container]}>
+      <Text style={[styles.text, style.text]}>{message}</Text>
     </View>
   );
 };
@@ -65,5 +69,13 @@ const styles = StyleSheet.create({
   },
   dangerText: {
     color: '#b71c1c',
+  },
+  warning: {
+    backgroundColor: '#fff4e6',
+    borderColor: '#FFA500',
+    borderWidth: 1,
+  },
+  warningText: {
+    color: '#cc8400',
   },
 });
