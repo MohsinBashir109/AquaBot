@@ -19,8 +19,10 @@ import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
+import { useLanguage } from '../../../context/LanguageContext';
 
 const Index = ({ navigation }: any) => {
+  const { t } = useLanguage();
   const handleLogin = () => {
     navigation.navigate(routes.signin);
   };
@@ -38,10 +40,7 @@ const Index = ({ navigation }: any) => {
       !details.confirmPassword ||
       !details.userName
     ) {
-      showCustomFlash(
-        'All fields are required. Please complete them.',
-        'danger',
-      );
+      showCustomFlash(t('auth.allFieldsRequired'), 'danger');
       return;
     }
 
@@ -62,7 +61,7 @@ const Index = ({ navigation }: any) => {
     // }
 
     if (details.confirmPassword !== details.password) {
-      showCustomFlash('Passwords do not match. Please try again.', 'danger');
+      showCustomFlash(t('auth.passwordsDoNotMatch'), 'danger');
       return;
     }
 
@@ -97,35 +96,35 @@ const Index = ({ navigation }: any) => {
   return (
     <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <AuthWrapper
-        text="SignUp"
-        desText="Please enter your credentials here to register."
+        text={t('auth.signupTitle')}
+        desText={t('auth.signupDesc')}
       >
         <ThemeInput
-          title="Username"
+          title={t('auth.username')}
           value={details.userName}
           onChangeText={(text: string) =>
             setDetails({ ...details, userName: text })
           }
-          placeholder="Enter your Username"
+          placeholder={t('auth.usernamePlaceholder')}
           leftIcon={userName}
         />
         <ThemeInput
-          title="Email"
+          title={t('auth.email')}
           value={details.email}
           onChangeText={(text: string) =>
             setDetails({ ...details, email: text })
           }
-          placeholder="Enter your Email"
+          placeholder={t('auth.emailPlaceholder')}
           leftIcon={email}
           containerStyleOuter={styles.containerStyle}
         />
         <ThemeInput
-          title="Password"
+          title={t('auth.password')}
           value={details.password}
           onChangeText={(text: string) =>
             setDetails({ ...details, password: text })
           }
-          placeholder="Enter your PassWord"
+          placeholder={t('auth.passwordPlaceholder')}
           leftIcon={padlock}
           rightIcon={eyes}
           secureTextEntry={isHidden.password}
@@ -134,12 +133,12 @@ const Index = ({ navigation }: any) => {
           }
         />
         <ThemeInput
-          title="Confirm Password"
+          title={t('auth.confirmPassword')}
           value={details.confirmPassword}
           onChangeText={(text: string) =>
             setDetails({ ...details, confirmPassword: text })
           }
-          placeholder="Confirm Password"
+          placeholder={t('auth.confirmPasswordPlaceholder')}
           leftIcon={padlock}
           containerStyleOuter={styles.containerStyle}
           rightIcon={eyes}
@@ -152,7 +151,7 @@ const Index = ({ navigation }: any) => {
           }
         />
         <Button
-          title="Signup"
+          title={t('auth.signup')}
           bgColor="primary"
           buttonStyle={styles.buttonStyle}
           onPress={handleSignUp}
@@ -168,11 +167,11 @@ const Index = ({ navigation }: any) => {
           }}
         >
           <ThemeText style={styles.accountText} color="text">
-            Have an account?
+            {t('auth.dontHaveAccount')}
           </ThemeText>
           <TouchableOpacity onPress={handleLogin}>
             <ThemeText color="fogotText" style={styles.signUp}>
-              Login
+              {t('auth.login')}
             </ThemeText>
           </TouchableOpacity>
         </View>

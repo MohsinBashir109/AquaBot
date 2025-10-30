@@ -1,0 +1,91 @@
+{
+  "common": {
+    "language": "زبان",
+    "english": "انگریزی",
+    "urdu": "اردو",
+    "darkMode": "ڈارک موڈ",
+    "lightMode": "لائٹ موڈ"
+  },
+  "auth": {
+    "login": "لاگ اِن",
+    "loginDesc": "لاگ اِن کے لیے اپنا ای میل اور پاس ورڈ درج کریں۔",
+    "email": "ای میل",
+    "emailPlaceholder": "اپنا ای میل درج کریں",
+    "password": "پاس ورڈ",
+    "passwordPlaceholder": "اپنا پاس ورڈ درج کریں",
+    "rememberMe": "مجھے یاد رکھیں",
+    "forgotPassword": "پاس ورڈ بھول گئے؟",
+    "signup": "سائن اَپ",
+    "signupTitle": "سائن اَپ",
+    "signupDesc": "رجسٹریشن کے لیے یہاں اپنی تفصیلات درج کریں۔",
+    "confirmPassword": "تصدیقی پاس ورڈ",
+    "confirmPasswordPlaceholder": "تصدیقی پاس ورڈ",
+    "username": "یوزر نیم",
+    "usernamePlaceholder": "اپنا یوزر نیم درج کریں",
+    "allFieldsRequired": "تمام خانے لازمی ہیں۔ براہ کرم مکمل کریں۔",
+    "passwordsDoNotMatch": "پاس ورڈ مطابقت نہیں رکھتے، دوبارہ کوشش کریں۔",
+    "dontHaveAccount": "کیا آپ کا اکاؤنٹ نہیں ہے؟",
+    "createAccount": "اکاؤنٹ بنائیں",
+    "loginSuccessful": "لاگ اِن کامیاب! خوش آمدید!",
+    "loginFailed": "لاگ اِن ناکام۔ مہربانی کر کے اپنی معلومات چیک کریں۔",
+    "registrationSuccessful": "رجسٹریشن کامیاب!",
+    "registrationFailed": "رجسٹریشن ناکام۔ دوبارہ کوشش کریں۔",
+    "usernameTaken": "یوزر نیم '{name}' پہلے سے موجود ہے۔",
+    "emailExists": "یہ ای میل پہلے سے موجود ہے۔"
+  },
+  "onboarding": {
+    "welcome": "خوش آمدید",
+    "tagline": "کم پانی۔ بہترین پیداوار۔",
+    "register": "رجسٹر کریں",
+    "login": "لاگ اِن",
+    "chooseLanguage": "زبان",
+    "features": {
+      "smartIrrigation": "سمارٹ اے آئی پر مبنی آبپاشی نظام",
+      "realTimeInsights": "درست اور فوری ڈیٹا بصیرت",
+      "sensorFree": "سستے، سینسر فری پانی کے انتظام",
+      "boostYield": "فصل کی پیداوار میں مؤثر اضافہ",
+      "multiLang": "متعدد زبانوں کی آف لائن معاونت"
+    }
+  },
+  "drawer": {
+    "home": "ہوم",
+    "profile": "پروفائل",
+    "messages": "پیغامات",
+    "moments": "لمحات",
+    "settings": "ترتیبات",
+    "tellAFriend": "دوست کو بتائیں",
+    "signOut": "سائن آؤٹ"
+  },
+  "home": {
+    "quickStats": "فوری اعداد و شمار",
+    "noPlans": "ابھی تک کوئی آبپاشی منصوبے نہیں",
+    "welcomeBack": "خوش آمدید،",
+    "todaysTasks": "آج کے کام",
+    "noWatering": "آج پانی دینے کی ضرورت نہیں!",
+    "nextTask": "اگلا کام: {date}",
+    "weatherUnavailable": "موسم کا ڈیٹا دستیاب نہیں",
+    "refresh": "ریفریش",
+    "weather": "موسم",
+    "humidity": "نمی",
+    "activePlans": "فعال منصوبے",
+    "todayBuckets": "آج (بالٹیاں)",
+    "pendingTasks": "زیر التواء کام",
+    "completionRate": "تکمیل کی شرح"
+  },
+  "analyze": {
+    "title": "کھیت کا تجزیہ",
+    "subtitle": "AI کی مدد سے آبپاشی کی تجاویز کے لیے اپنے کھیت کی تصویر اپلوڈ کریں",
+    "tapToSelect": "تصویر منتخب کرنے کے لیے ٹیپ کریں",
+    "cameraOrGallery": "کیمرہ یا گیلری",
+    "cropName": "فصل کا نام (اختیاری)",
+    "cropPlaceholder": "مثلاً گندم، چاول، مکئی",
+    "fieldName": "کھیت کا نام (اختیاری)",
+    "fieldNamePlaceholder": "مثلاً شمالی کھیت",
+    "fieldArea": "کھیت کا رقبہ (مربع میٹر) (اختیاری)",
+    "fieldAreaPlaceholder": "مثلاً 1500",
+    "analyzeButton": "کھیت کا تجزیہ کریں",
+    "selectImageFirst": "براہ کرم پہلے تصویر منتخب کریں",
+    "analyzing": "آپ کے کھیت کا تجزیہ ہو رہا ہے...",
+    "analysisFailed": "تجزیہ ناکام۔ دوبارہ کوشش کریں۔"
+  }
+}

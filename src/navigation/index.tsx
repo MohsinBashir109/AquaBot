@@ -7,6 +7,7 @@ import { HomeNavigation } from './HomeFlow';
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { ThemeProvider } from '../theme/ThemeContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { routes } from '../utils/routes';
 import { AuthProvider, useAuth } from '../context/AuthContext';
@@ -55,9 +56,11 @@ const AppNavigator = () => {
 export const MainNavigator = () => {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <AppNavigator />
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppNavigator />
+        </AuthProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 };

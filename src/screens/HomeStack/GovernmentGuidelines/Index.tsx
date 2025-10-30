@@ -24,10 +24,12 @@ import { AnalyzeAndPlanResponse } from '../../../types/imageAnalysis.types';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { showCustomFlash } from '../../../utils/flash';
 import { UserHeader } from '../../../components/Header';
+import { useLanguage } from '../../../context/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
 
 const Index = () => {
   const { isDark } = useThemeContext();
+  const { t } = useLanguage();
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -345,10 +347,10 @@ const Index = () => {
         contentContainerStyle={styles.scrollContent}
       >
         <ThemeText color="text" style={styles.title}>
-          Field Analysis
+          {t('analyze.title')}
         </ThemeText>
         <ThemeText color="desText" style={styles.subtitle}>
-          Upload a photo of your field for AI-powered irrigation recommendations
+          {t('analyze.subtitle')}
         </ThemeText>
 
         {/* Image Selection */}
@@ -370,10 +372,10 @@ const Index = () => {
                 📷
               </ThemeText>
               <ThemeText color="text" style={styles.placeholderText}>
-                Tap to select image
+                {t('analyze.tapToSelect')}
               </ThemeText>
               <ThemeText color="desText" style={styles.placeholderSubtext}>
-                Camera or Gallery
+                {t('analyze.cameraOrGallery')}
               </ThemeText>
             </View>
           )}
@@ -382,7 +384,7 @@ const Index = () => {
         {/* Optional Form Fields */}
         <View style={styles.formContainer}>
           <ThemeText color="text" style={styles.formLabel}>
-            Crop Name (Optional)
+            {t('analyze.cropName')}
           </ThemeText>
           <TextInput
             style={[
@@ -394,14 +396,14 @@ const Index = () => {
                 borderColor: colors[isDark ? 'dark' : 'light'].gray3,
               },
             ]}
-            placeholder="e.g., Wheat, Rice, Corn"
+            placeholder={t('analyze.cropPlaceholder')}
             placeholderTextColor={colors[isDark ? 'dark' : 'light'].gray2}
             value={cropName}
             onChangeText={setCropName}
           />
 
           <ThemeText color="text" style={styles.formLabel}>
-            Field Name (Optional)
+            {t('analyze.fieldName')}
           </ThemeText>
           <TextInput
             style={[
@@ -413,14 +415,14 @@ const Index = () => {
                 borderColor: colors[isDark ? 'dark' : 'light'].gray3,
               },
             ]}
-            placeholder="e.g., North Field"
+            placeholder={t('analyze.fieldNamePlaceholder')}
             placeholderTextColor={colors[isDark ? 'dark' : 'light'].gray2}
             value={fieldName}
             onChangeText={setFieldName}
           />
 
           <ThemeText color="text" style={styles.formLabel}>
-            Field Area in m² (Optional)
+            {t('analyze.fieldArea')}
           </ThemeText>
           <TextInput
             style={[
@@ -432,7 +434,7 @@ const Index = () => {
                 borderColor: colors[isDark ? 'dark' : 'light'].gray3,
               },
             ]}
-            placeholder="e.g., 1500"
+            placeholder={t('analyze.fieldAreaPlaceholder')}
             placeholderTextColor={colors[isDark ? 'dark' : 'light'].gray2}
             value={fieldArea}
             onChangeText={setFieldArea}
@@ -442,7 +444,7 @@ const Index = () => {
 
         {/* Analyze Button */}
         <Button
-          title={loading ? 'Analyzing...' : 'Analyze Field'}
+          title={loading ? 'Analyzing...' : t('analyze.analyzeButton')}
           onPress={handleAnalyze}
           buttonStyle={styles.analyzeButton}
           bgColor="primary"

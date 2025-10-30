@@ -16,6 +16,7 @@ import {
 import Button from '../../../components/ThemeComponents/ThemeButton';
 import OnboardingCard from '../../../components/ThemeComponents/OnboardingCard';
 import React from 'react';
+import { useLanguage } from '../../../context/LanguageContext';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
@@ -25,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const OnBoarding = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
+  const { t, locale, setLocale } = useLanguage();
   const handleSignUp = () => {
     navigation.replace(routes.signup);
   };
@@ -43,25 +45,58 @@ const OnBoarding = ({ navigation }: any) => {
       />
       <Image source={Logo} style={styles.imageLogo} />
       <ThemeText style={styles.title} color="text">
-        Welcome
+        {t('onboarding.welcome')}
       </ThemeText>
       <ThemeText style={styles.desTitle} color="text">
-        Water less. Grow best.
+        {t('onboarding.tagline')}
       </ThemeText>
+
+      {/* Language Radio */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: heightPixel(6) }}>
+        <ThemeText color="text" style={{ marginRight: widthPixel(8) }}>
+          {t('onboarding.chooseLanguage')}
+        </ThemeText>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: widthPixel(12) }}>
+            <View
+              onTouchEnd={() => setLocale('en')}
+              style={{
+                width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10),
+                borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6)
+              }}
+            >
+              <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'en' ? '#2E7CF6' : 'transparent' }} />
+            </View>
+            <ThemeText color="text" onPress={() => setLocale('en')}>EN</ThemeText>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View
+              onTouchEnd={() => setLocale('ur')}
+              style={{
+                width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10),
+                borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6)
+              }}
+            >
+              <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'ur' ? '#2E7CF6' : 'transparent' }} />
+            </View>
+            <ThemeText color="text" onPress={() => setLocale('ur')}>اردو</ThemeText>
+          </View>
+        </View>
+      </View>
       <View>
         <OnboardingCard data={dataOnboarding} />
       </View>
       <View style={styles.buttonWrapper}>
         <Button
           onPress={handleSignUp}
-          title="Register"
+          title={t('onboarding.register')}
           buttonStyle={styles.buttonStyle1}
           titleStyle={styles.buttonStyle}
         />
         <Button
           buttonStyle={styles.buttonStyle2}
           onPress={handleSignin}
-          title="Login"
+          title={t('onboarding.login')}
           textColor="text"
           titleStyle={styles.buttonStyle}
           bgColor="white"

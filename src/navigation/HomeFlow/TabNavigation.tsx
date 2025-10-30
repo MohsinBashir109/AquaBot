@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { routes } from '../../utils/routes';
 import * as Home from '../../screens/HomeStack';
 
@@ -25,6 +26,7 @@ const Tab = createBottomTabNavigator();
 export const TabNavigation = () => {
   const { isDark } = useThemeContext();
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
 
   return (
     <View
@@ -85,7 +87,7 @@ export const TabNavigation = () => {
                     focused && styles.selectedTextStyle,
                   ]}
                 >
-                  Home
+                  {t('drawer.home')}
                 </Text>
               </View>
             ),
@@ -121,7 +123,7 @@ export const TabNavigation = () => {
                     focused && styles.selectedTextStyle,
                   ]}
                 >
-                  Analyze
+                  {t('drawer.moments')}
                 </Text>
               </View>
             ),
@@ -157,7 +159,7 @@ export const TabNavigation = () => {
                     focused && styles.selectedTextStyle,
                   ]}
                 >
-                  AI Chat
+                  {t('drawer.messages')}
                 </Text>
               </View>
             ),
@@ -193,7 +195,7 @@ export const TabNavigation = () => {
                     focused && styles.selectedTextStyle,
                   ]}
                 >
-                  Settings
+                  {t('drawer.settings')}
                 </Text>
               </View>
             ),
@@ -229,7 +231,7 @@ export const TabNavigation = () => {
                     focused && styles.selectedTextStyle,
                   ]}
                 >
-                  Profile
+                  {t('drawer.profile')}
                 </Text>
               </View>
             ),

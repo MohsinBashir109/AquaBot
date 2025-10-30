@@ -12,6 +12,7 @@ import { colors } from '../../utils/colors';
 import { useThemeContext } from '../../theme/ThemeContext';
 import { WeatherResponse } from '../../types/dashboard.types';
 import LinearGradient from 'react-native-linear-gradient';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface WeatherWidgetProps {
   data: WeatherResponse | null;
@@ -27,6 +28,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
   loading = false,
 }) => {
   const { isDark } = useThemeContext();
+  const { t } = useLanguage();
   const themeColors = colors[isDark ? 'dark' : 'light'];
 
   const getWeatherIcon = (weatherMain: string) => {
@@ -68,10 +70,10 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
         >
-          <Text style={styles.errorText}>Weather data unavailable</Text>
+          <Text style={styles.errorText}>{t('home.weatherUnavailable')}</Text>
           {onRefresh && (
             <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
-              <Text style={styles.refreshText}>⟳ Refresh</Text>
+              <Text style={styles.refreshText}>⟳ {t('home.refresh')}</Text>
             </TouchableOpacity>
           )}
         </LinearGradient>
@@ -92,7 +94,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.title}>WEATHER</Text>
+            <Text style={styles.title}>{t('home.weather')}</Text>
             <Text style={styles.location}>{city}, Pakistan</Text>
           </View>
           {onRefresh && (
@@ -115,7 +117,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
 
           <View style={styles.detailsContainer}>
             <Text style={styles.detailText}>
-              Humidity: {data.main.humidity}%
+              {t('home.humidity')}: {data.main.humidity}%
             </Text>
             <Text style={styles.tempRange}>
               {Math.round(data.main.tempMin)}°C -{' '}
