@@ -8,6 +8,14 @@ import {
   ResetPasswordRequest,
 } from './apiConfig';
 import { showCustomFlash } from '../utils/flash';
+import { authService } from './authService';
+import {
+  TodayTasksResponse,
+  IrrigationPlanDetailsDto,
+  WeatherResponse,
+  AnalysisHistoryItem,
+  CompleteTaskRequest,
+} from '../types/dashboard.types';
 
 class ApiService {
   private baseURL: string;
@@ -27,30 +35,42 @@ class ApiService {
   async testConnection(): Promise<boolean> {
     try {
       console.log('🔍 Testing connection to backend...');
-      console.log('🌐 Testing URL:', `${this.baseURL}/auth/register`);
+      console.log('🌐 Testing URL:', `${this.baseURL}/Auth/register`);
 
-      // Create a timeout promise
+      // Create a timeout promise with shorter timeout for connection test
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Connection timeout')), 5000);
+        setTimeout(() => reject(new Error('Connection timeout')), 3000);
       });
 
-      // Try a simple OPTIONS request to test connectivity
-      const fetchPromise = fetch(`${this.baseURL}/auth/register`, {
-        method: 'OPTIONS',
+      // Try a simple GET request to test connectivity (more reliable than OPTIONS)
+      const fetchPromise = fetch(`${this.baseURL}/Auth/register`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const response = (await Promise.race([
         fetchPromise,
         timeoutPromise,
       ])) as Response;
+
+      // Accept any response status (even 404/405) as long as we get a response
       console.log('✅ Backend is reachable!', response.status);
       return true;
     } catch (error: any) {
       console.error('❌ Backend connection failed:', error.message);
+      console.log('🔧 Troubleshooting steps:');
       console.log(
-        '🔧 Make sure your .NET backend is running on localhost:5065',
+        '1. Make sure your .NET backend is running on localhost:5065',
       );
-      console.log('🔧 And configured to accept external connections');
+      console.log(
+        '2. Check if the backend is configured to accept external connections',
+      );
+      console.log('3. Verify CORS settings allow requests from the emulator');
+      console.log(
+        '4. Try running: dotnet run in your backend project directory',
+      );
       return false;
     }
   }
@@ -82,9 +102,12 @@ class ApiService {
         timeout: this.timeout,
       });
 
-      // Create a timeout promise
+      // Create a timeout promise with better error handling
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), this.timeout);
+        setTimeout(() => {
+          console.log(`⏰ Request timeout after ${this.timeout}ms`);
+          reject(new Error('Request timeout'));
+        }, this.timeout);
       });
 
       // Make the fetch request
@@ -353,6 +376,147 @@ class ApiService {
     } catch (error: any) {
       console.error('💥 apiService.resetPassword error:', error);
       showCustomFlash(error.message || 'Failed to reset password.', 'danger');
+      throw error;
+    }
+  }
+
+  // Dashboard API Methods
+
+  // Get user profile
+  async getUserProfile(): Promise<ApiResponse<any>> {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      return await this.makeRequest('/auth/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error: any) {
+      console.error('💥 apiService.getUserProfile error:', error);
+      throw error;
+    }
+  }
+
+  // Get today's tasks
+  async getTodayTasks(): Promise<ApiResponse<TodayTasksResponse>> {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      return await this.makeRequest<TodayTasksResponse>(
+        '/imageanalysis/today',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    } catch (error: any) {
+      console.error('💥 apiService.getTodayTasks error:', error);
+      throw error;
+    }
+  }
+
+  // Get weather data
+  async getWeather(city: string): Promise<ApiResponse<WeatherResponse>> {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      return await this.makeRequest<WeatherResponse>(`/weather/${city}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error: any) {
+      console.error('💥 apiService.getWeather error:', error);
+      throw error;
+    }
+  }
+
+  // Get irrigation plans
+  async getMyIrrigationPlans(): Promise<
+    ApiResponse<IrrigationPlanDetailsDto[]>
+  > {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      return await this.makeRequest<IrrigationPlanDetailsDto[]>(
+        '/irrigationplan/my-plans',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    } catch (error: any) {
+      console.error('💥 apiService.getMyIrrigationPlans error:', error);
+      throw error;
+    }
+  }
+
+  // Get analysis history
+  async getAnalysisHistory(): Promise<ApiResponse<AnalysisHistoryItem[]>> {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      return await this.makeRequest<AnalysisHistoryItem[]>(
+        '/imageanalysis/history',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    } catch (error: any) {
+      console.error('💥 apiService.getAnalysisHistory error:', error);
+      throw error;
+    }
+  }
+
+  // Complete task
+  async completeTask(data: CompleteTaskRequest): Promise<ApiResponse> {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await this.makeRequest('/irrigationplan/complete', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.success) {
+        showCustomFlash('Task completed successfully!', 'success');
+      }
+
+      return response;
+    } catch (error: any) {
+      console.error('💥 apiService.completeTask error:', error);
+      showCustomFlash('Failed to complete task', 'danger');
       throw error;
     }
   }

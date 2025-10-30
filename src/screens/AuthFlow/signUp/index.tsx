@@ -32,21 +32,12 @@ const Index = ({ navigation }: any) => {
   });
 
   const handleSignUp = async () => {
-    console.log('🚀 Starting signup process...');
-    console.log('📝 Form data:', {
-      userName: details.userName,
-      email: details.email,
-      password: details.password ? '***' : 'empty',
-      confirmPassword: details.confirmPassword ? '***' : 'empty',
-    });
-
     if (
       !details.email ||
       !details.password ||
       !details.confirmPassword ||
       !details.userName
     ) {
-      console.log('❌ Validation failed: Missing required fields');
       showCustomFlash(
         'All fields are required. Please complete them.',
         'danger',
@@ -56,34 +47,27 @@ const Index = ({ navigation }: any) => {
 
     // Commented out for testing - uncomment when ready for production
     // if (!username.test(details.userName)) {
-    //   console.log('❌ Validation failed: Invalid username format');
     //   showCustomFlash('Please enter a valid username', 'danger');
     //   return;
     // }
 
     // if (!gmailOnly.test(details.email)) {
-    //   console.log('❌ Validation failed: Invalid email format');
     //   showCustomFlash('Please enter a valid  Email', 'danger');
     //   return;
     // }
 
     // if (!regexPass.test(details.password)) {
-    //   console.log('❌ Validation failed: Invalid password format');
     //   showCustomFlash('Please enter a valid Password', 'danger');
     //   return;
     // }
 
     if (details.confirmPassword !== details.password) {
-      console.log('❌ Validation failed: Passwords do not match');
       showCustomFlash('Passwords do not match. Please try again.', 'danger');
       return;
     }
 
-    console.log('✅ All validations passed, calling register API...');
-
     try {
       const result = await register(details);
-      console.log('📡 Register API response:', result);
 
       if (result === false) {
         // Registration successful
@@ -93,36 +77,15 @@ const Index = ({ navigation }: any) => {
           password: '',
           confirmPassword: '',
         });
-        console.log('🎉 Signup successful, navigating to signin...');
         navigation.replace(routes.signin);
       } else {
         // Registration failed - this shouldn't happen as errors should be thrown
-        console.log('❌ Signup failed - not navigating');
         showCustomFlash('Registration failed. Please try again.', 'danger');
       }
     } catch (error: any) {
-      console.error('💥 Signup error:', error);
-
-      // Handle backend error response
-      let errorMessage = 'Registration failed. Please try again.';
-
-      if (error.response?.data) {
-        const responseData = error.response.data;
-        console.log('🔍 Full backend response data:', responseData);
-        // Use messageEnglish if available, otherwise fallback to message
-        errorMessage =
-          responseData.messageEnglish ||
-          responseData.MessageEnglish ||
-          responseData.message ||
-          responseData.Message ||
-          error.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      console.log('🔍 Backend error response:', error.response?.data);
-      console.log('🔍 Final error message:', errorMessage);
-      showCustomFlash(errorMessage, 'danger');
+      // Do not show a flash message here! signUp.ts handles all registration errors
+      // Optionally log the error for debugging:
+      // console.error('Registration error:', error);
     }
   };
 

@@ -1,84 +1,191 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  StatusBar,
+} from 'react-native';
 import { useAppSelector } from '../../store/hooks';
 import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 import { fontFamilies } from '../../utils/fontfamilies';
 import { colors } from '../../utils/colors';
 import { useThemeContext } from '../../theme/ThemeContext';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 interface UserHeaderProps {
-  onProfilePress?: () => void;
-  onLocationPress?: () => void;
+  onSettingsPress?: () => void;
+  onBackPress?: () => void;
+  screenTitle?: string;
+  showBackButton?: boolean;
+  showDrawerButton?: boolean;
 }
 
 const UserHeader: React.FC<UserHeaderProps> = ({
-  onProfilePress,
-  onLocationPress,
+  onSettingsPress,
+  onBackPress,
+  screenTitle,
+  showBackButton = false,
+  showDrawerButton = false,
 }) => {
   const { user } = useAppSelector(state => state.user);
   const { isDark } = useThemeContext();
-
-  // Debug Redux data
-  console.log('🎨 UserHeader - Redux user data:', user);
-  console.log('🎨 UserHeader - Redux user type:', typeof user);
-  console.log(
-    '🎨 UserHeader - Redux user keys:',
-    user ? Object.keys(user) : 'null',
-  );
+  const route = useRoute();
+  const navigation = useNavigation();
 
   const themeColors = colors[isDark ? 'dark' : 'light'];
+
+  // Debug logging
+  console.log('UserHeader Debug:', {
+    showDrawerButton,
+    showBackButton,
+    onSettingsPress: !!onSettingsPress,
+    user: !!user,
+    themeColors: themeColors.text,
+    isDark,
+  });
+
+  console.log('UserHeader rendering with showDrawerButton:', showDrawerButton);
 
   if (!user) {
     return null;
   }
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const handleDrawerToggle = () => {
+    console.log('Drawer toggle pressed');
+    console.log('Navigation object:', navigation);
+    console.log('Navigation state:', navigation.getState());
+
+    try {
+      // @ts-ignore - drawer navigation methods
+      console.log('Attempting to open drawer...');
+      navigation.openDrawer();
+      console.log('Drawer opened successfully');
+    } catch (error) {
+      console.error('Error opening drawer:', error);
+      console.log('Available navigation methods:', Object.keys(navigation));
+    }
+  };
+
   return (
     <View
-      style={[styles.container, { backgroundColor: themeColors.background }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: themeColors.transparent,
+          paddingTop: heightPixel(5), // Reduced top padding
+        },
+      ]}
     >
-      <View style={styles.userInfo}>
-        <View style={styles.avatarContainer}>
-          <View
-            style={[styles.avatar, { backgroundColor: themeColors.primary }]}
-          >
-            <Text style={[styles.avatarText, { color: 'white' }]}>
-              {user.userName.charAt(0).toUpperCase()}
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor="transparent"
+        translucent={true}
+      />
+
+      {/* User Profile Header */}
+      <View style={styles.userHeaderRow}>
+        <View style={styles.userInfoSection}>
+          {showBackButton && onBackPress && (
+            <TouchableOpacity
+              onPress={onBackPress}
+              style={[styles.backButton, { backgroundColor: 'transparent' }]}
+            >
+              <Text style={[styles.backIcon, { color: themeColors.icon }]}>
+                ←
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          <View style={styles.avatarContainer}>
+            <View
+              style={[
+                styles.userAvatar,
+                {
+                  backgroundColor: themeColors.primary,
+                  shadowColor: themeColors.primary,
+                },
+              ]}
+            >
+              <Text style={[styles.avatarText, { color: 'white' }]}>
+                {getInitials(user.userName)}
+              </Text>
+            </View>
+            <View
+              style={[styles.statusIndicator, { backgroundColor: '#4CAF50' }]}
+            />
+          </View>
+
+          <View style={styles.userDetails}>
+            <Text
+              style={[
+                styles.greetingText,
+                { color: themeColors.secondaryText },
+              ]}
+            >
+              Welcome back,
+            </Text>
+            <Text style={[styles.userName, { color: themeColors.text }]}>
+              {user.userName}
             </Text>
           </View>
         </View>
 
-        <View style={styles.userDetails}>
+        <View style={styles.actionsSection}>
+          {console.log(
+            'Rendering actions section, showDrawerButton:',
+            showDrawerButton,
+          )}
+          {/* Always show drawer button for testing */}
           <TouchableOpacity
-            onPress={onProfilePress}
-            style={styles.nameContainer}
+            onPress={handleDrawerToggle}
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: 'transparent',
+              },
+            ]}
           >
-            <Text style={[styles.userName, { color: themeColors.text }]}>
-              {user.userName}
-            </Text>
-            <Text style={[styles.editIcon, { color: themeColors.gray3 }]}>
-              ✏️
+            <Text style={[styles.actionIcon, { color: themeColors.text }]}>
+              ≡
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={onLocationPress}
-            style={styles.locationContainer}
-          >
-            <Text style={[styles.locationIcon, { color: themeColors.gray3 }]}>
-              📍
-            </Text>
-            <Text style={[styles.location, { color: themeColors.gray3 }]}>
-              {user.farmLocation || 'Location not set'}
-            </Text>
-          </TouchableOpacity>
+          {showDrawerButton && (
+            <TouchableOpacity
+              onPress={handleDrawerToggle}
+              style={[
+                styles.actionButton,
+                {
+                  backgroundColor: 'transparent',
+                },
+              ]}
+            >
+              <Text style={[styles.actionIcon, { color: themeColors.text }]}>
+                ≡
+              </Text>
+            </TouchableOpacity>
+          )}
+          {onSettingsPress && !showDrawerButton && (
+            <TouchableOpacity
+              onPress={onSettingsPress}
+              style={[styles.actionButton, { backgroundColor: 'transparent' }]}
+            >
+              <Text style={[styles.actionIcon, { color: themeColors.icon }]}>
+                ⚙️
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </View>
-
-      <View style={styles.statusContainer}>
-        <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
-        <Text style={[styles.statusText, { color: themeColors.gray3 }]}>
-          Online
-        </Text>
       </View>
     </View>
   );
@@ -86,82 +193,93 @@ const UserHeader: React.FC<UserHeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: widthPixel(0), // Remove horizontal padding as HomeWrapper already provides it
+    paddingBottom: heightPixel(15),
+    width: '100%',
+  },
+  userHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: widthPixel(20),
-    paddingVertical: heightPixel(15),
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    paddingVertical: heightPixel(8),
   },
-  userInfo: {
+  userInfoSection: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
+  backButton: {
+    width: widthPixel(40),
+    height: widthPixel(40),
+    borderRadius: widthPixel(20),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: widthPixel(10),
+  },
+  backIcon: {
+    fontSize: fontPixel(20),
+    fontFamily: fontFamilies.bold,
+  },
   avatarContainer: {
+    position: 'relative',
     marginRight: widthPixel(12),
   },
-  avatar: {
+  userAvatar: {
     width: widthPixel(45),
     height: widthPixel(45),
     borderRadius: widthPixel(22.5),
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
   },
   avatarText: {
-    fontSize: fontPixel(18),
-    fontFamily: fontFamilies.semibold,
+    fontSize: fontPixel(16),
+    fontFamily: fontFamilies.bold,
+  },
+  statusIndicator: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: widthPixel(12),
+    height: widthPixel(12),
+    borderRadius: widthPixel(6),
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   userDetails: {
     flex: 1,
   },
-  nameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  greetingText: {
+    fontSize: fontPixel(12),
+    fontFamily: fontFamilies.regular,
     marginBottom: heightPixel(2),
   },
   userName: {
     fontSize: fontPixel(16),
-    fontFamily: fontFamilies.semibold,
-    marginRight: widthPixel(5),
+    fontFamily: fontFamilies.bold,
+    lineHeight: fontPixel(20),
   },
-  editIcon: {
-    fontSize: fontPixel(12),
-  },
-  locationContainer: {
+  actionsSection: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: widthPixel(8),
   },
-  locationIcon: {
-    fontSize: fontPixel(12),
-    marginRight: widthPixel(4),
-  },
-  location: {
-    fontSize: fontPixel(12),
-    fontFamily: fontFamilies.medium,
-  },
-  statusContainer: {
-    flexDirection: 'row',
+  actionButton: {
+    width: widthPixel(40),
+    height: widthPixel(40),
+    borderRadius: widthPixel(20),
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  statusDot: {
-    width: widthPixel(8),
-    height: widthPixel(8),
-    borderRadius: widthPixel(4),
-    marginRight: widthPixel(5),
-  },
-  statusText: {
-    fontSize: fontPixel(10),
-    fontFamily: fontFamilies.medium,
+  actionIcon: {
+    fontSize: fontPixel(20),
   },
 });
 
