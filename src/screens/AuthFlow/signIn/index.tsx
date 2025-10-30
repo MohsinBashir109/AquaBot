@@ -71,13 +71,8 @@ const SignIn = () => {
       let errorMessage = 'Login failed. Please try again.';
       let errorType: 'success' | 'danger' = 'danger';
 
-      console.log('🔍 Full error object:', error);
-      console.log('🔍 Error response:', error.response);
-      console.log('🔍 Error response data:', error.response?.data);
-
       if (error.response?.data) {
         const responseData = error.response.data;
-        console.log('🔍 Response data:', responseData);
 
         // Check for specific error codes (handle both ErrorCode and errorCode)
         const errorCode = responseData.ErrorCode || responseData.errorCode;
@@ -120,7 +115,6 @@ const SignIn = () => {
         errorMessage = error.message;
       }
 
-      console.log('🔍 Final error message to display:', errorMessage);
       showCustomFlash(errorMessage, errorType);
     }
   };

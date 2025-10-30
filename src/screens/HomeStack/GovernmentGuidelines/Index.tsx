@@ -23,9 +23,12 @@ import { imageAnalysisService } from '../../../service/imageAnalysisService';
 import { AnalyzeAndPlanResponse } from '../../../types/imageAnalysis.types';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { showCustomFlash } from '../../../utils/flash';
+import { UserHeader } from '../../../components/Header';
+import { useNavigation } from '@react-navigation/native';
 
 const Index = () => {
   const { isDark } = useThemeContext();
+  const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] =
@@ -177,19 +180,39 @@ const Index = () => {
         selectionLimit: 1,
       },
       response => {
+        console.log('📱 [ImagePicker] Response received:', {
+          didCancel: response.didCancel,
+          errorCode: response.errorCode,
+          errorMessage: response.errorMessage,
+          hasAssets: response.assets && response.assets.length > 0,
+          assetCount: response.assets?.length || 0,
+        });
+
         if (response.didCancel) {
-          console.log('User cancelled image picker');
+          console.log('❌ [ImagePicker] User cancelled image picker');
         } else if (response.errorCode) {
-          console.error(
-            'Gallery Error:',
-            response.errorCode,
-            response.errorMessage,
-          );
+          console.error('💥 [ImagePicker] Error occurred:', {
+            errorCode: response.errorCode,
+            errorMessage: response.errorMessage,
+          });
           Alert.alert('Error', response.errorMessage || 'Failed to pick image');
         } else if (response.assets && response.assets[0]) {
-          console.log('Image selected:', response.assets[0]);
-          setSelectedImage(response.assets[0]);
+          const selectedAsset = response.assets[0];
+          console.log('✅ [ImagePicker] Image selected successfully:', {
+            uri: selectedAsset.uri,
+            type: selectedAsset.type,
+            fileName: selectedAsset.fileName,
+            fileSize: selectedAsset.fileSize,
+            width: selectedAsset.width,
+            height: selectedAsset.height,
+          });
+          setSelectedImage(selectedAsset);
           setAnalysisResult(null);
+          console.log(
+            '🔄 [ImagePicker] UI state updated - analysis result cleared',
+          );
+        } else {
+          console.log('⚠️ [ImagePicker] No assets in response');
         }
       },
     );
@@ -202,39 +225,95 @@ const Index = () => {
     }
 
     setLoading(true);
+
     try {
       const formData = new FormData();
 
       // Add image
-      formData.append('Image', {
+      const imageData = {
         uri:
           Platform.OS === 'android'
             ? selectedImage.uri
             : selectedImage.uri.replace('file://', ''),
         type: selectedImage.type || 'image/jpeg',
         name: selectedImage.fileName || 'field-image.jpg',
-      } as any);
+      };
+
+      formData.append('Image', imageData as any);
 
       // Add optional fields
-      if (cropName) formData.append('CropName', cropName);
-      if (fieldArea) formData.append('FieldAreaM2', fieldArea);
-      if (fieldName) formData.append('FieldName', fieldName);
+      if (cropName) {
+        formData.append('CropName', cropName);
+      }
+      if (fieldArea) {
+        formData.append('FieldAreaM2', fieldArea);
+      }
+      if (fieldName) {
+        formData.append('FieldName', fieldName);
+      }
+
+      console.log('🚀 [ImageAnalysis] Starting analysis...');
+      console.log(
+        '⏰ [ImageAnalysis] API call started at:',
+        new Date().toISOString(),
+      );
 
       const result = await imageAnalysisService.analyzeAndPlan(formData);
+
+      console.log(
+        '⏰ [ImageAnalysis] API call completed at:',
+        new Date().toISOString(),
+      );
+
+      // Log the complete response received in UI
+      console.log('📱 [ImageAnalysis] UI received response:', {
+        success: result.success,
+        message: result.message,
+        analysisId: result.analysisId,
+        confidence: result.confidence,
+        hasImmediateAction: !!result.immediateAction,
+        hasFieldInfo: !!result.fieldInfo,
+        hasIrrigationSchedule: !!result.irrigationSchedule,
+      });
+
+      // Log detailed UI response data
+      console.log('🎯 [ImageAnalysis] UI Response Data:');
+      console.log('- Success:', result.success);
+      console.log('- Message:', result.message);
+      console.log('- Analysis ID:', result.analysisId);
+      console.log('- Confidence:', result.confidence);
+
+      if (result.immediateAction) {
+        console.log('- Immediate Action Data:', result.immediateAction);
+      }
+
+      if (result.fieldInfo) {
+        console.log('- Field Info Data:', result.fieldInfo);
+      }
+
+      if (result.irrigationSchedule) {
+        console.log('- Irrigation Schedule Data:', result.irrigationSchedule);
+      }
 
       if (result.success) {
         setAnalysisResult(result);
         showCustomFlash(result.message, 'success');
+        console.log('✅ [ImageAnalysis] Analysis completed successfully');
       } else {
         showCustomFlash('Analysis failed. Please try again.', 'danger');
       }
     } catch (error: any) {
-      console.error('Analysis error:', error);
+      // Only show user-friendly error message, detailed logging is handled in service layer
+      console.log('❌ [ImageAnalysis] Analysis failed:', error.message);
+
       showCustomFlash(
         error.message || 'Failed to analyze image. Please try again.',
         'danger',
       );
     } finally {
+      console.log(
+        '🏁 [ImageAnalysis] Analysis process completed, setting loading to false',
+      );
       setLoading(false);
     }
   };
@@ -252,8 +331,14 @@ const Index = () => {
     }
   };
 
+  // Header handlers
+  const handleSettingsPress = () => {
+    navigation.navigate('Settings' as never);
+  };
+
   return (
     <HomeWrapper>
+      <UserHeader showDrawerButton={true} showBackButton={false} />
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
