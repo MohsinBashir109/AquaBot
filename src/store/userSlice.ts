@@ -6,6 +6,7 @@ export interface User {
   email: string;
   farmLocation: string;
   token?: string;
+  avatarUrl?: string;
 }
 
 interface UserState {
@@ -42,9 +43,19 @@ const userSlice = createSlice({
         state.user.farmLocation = action.payload;
       }
     },
+    updateUserAvatar: (state, action: PayloadAction<string | undefined>) => {
+      if (state.user) {
+        state.user.avatarUrl = action.payload;
+      }
+    },
   },
 });
 
-export const { setUser, clearUser, setLoading, updateUserLocation } =
-  userSlice.actions;
+export const {
+  setUser,
+  clearUser,
+  setLoading,
+  updateUserLocation,
+  updateUserAvatar,
+} = userSlice.actions;
 export default userSlice.reducer;

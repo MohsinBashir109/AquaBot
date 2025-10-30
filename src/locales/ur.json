@@ -4,7 +4,8 @@
     "english": "انگریزی",
     "urdu": "اردو",
     "darkMode": "ڈارک موڈ",
-    "lightMode": "لائٹ موڈ"
+    "lightMode": "لائٹ موڈ",
+    "comingSoon": "{feature} جلد آرہا ہے"
   },
   "auth": {
     "login": "لاگ اِن",
@@ -55,6 +56,35 @@
     "settings": "ترتیبات",
     "tellAFriend": "دوست کو بتائیں",
     "signOut": "سائن آؤٹ"
+  },
+  "settings": {
+    "title": "ترتیبات",
+    "accountProfile": "اکاؤنٹ اور پروفائل",
+    "zonesSchedules": "زونز اور شیڈول",
+    "plantPreferences": "پودوں کی ترجیحات",
+    "appSettings": "ایپ سیٹنگز",
+    "notifications": "اطلاعات",
+    "language": "زبان",
+    "updatePassword": "پاس ورڈ تبدیل کریں",
+    "helpCenter": "مدد مرکز",
+    "logout": "لاگ آؤٹ"
+  },
+  "profile": {
+    "title": "پروفائل",
+    "subtitle": "اپنا اکاؤنٹ اور ترجیحات منظم کریں",
+    "comingSoonTitle": "پروفائل فیچرز جلد آرہے ہیں!",
+    "comingSoonSubtext": "ہم جامع پروفائل مینجمنٹ فیچرز پر کام کر رہے ہیں۔",
+    "editProfile": "پروفائل ترمیم کریں",
+    "defaultName": "صارف",
+    "snapshot": "میرا باغ اسنیپ شاٹ",
+    "zones": "زونز",
+    "plants": "پودے",
+    "waterSaved": "بچا ہوا پانی",
+    "accountDetails": "اکاؤنٹ کی تفصیلات",
+    "email": "ای میل",
+    "location": "مقام",
+    "changePassword": "پاس ورڈ تبدیل کریں",
+    "logout": "لاگ آؤٹ"
   },
   "home": {
     "quickStats": "فوری اعداد و شمار",

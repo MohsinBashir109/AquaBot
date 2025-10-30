@@ -1,7 +1,7 @@
 /**
  * @format
  */
-globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
+global.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 
 import App from './App';
 import { AppRegistry } from 'react-native';

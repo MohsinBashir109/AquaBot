@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
@@ -32,7 +33,7 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const route = useRoute();
   const { user } = useAppSelector(state => state.user);
   const { logout } = useAuth();
-  const { isDark, toggleTheme } = useThemeContext();
+  const { isDark } = useThemeContext();
   const { locale, setLocale, t } = useLanguage();
   const insets = useSafeAreaInsets();
   const themeColors = colors[isDark ? 'dark' : 'light'];
@@ -216,10 +217,24 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
       >
         <View style={styles.userInfo}>
           <View style={styles.avatarContainer}>
-            <View style={[styles.avatar, { backgroundColor: 'white' }]}>
-              <Text style={[styles.avatarText, { color: themeColors.primary }]}>
-                {getInitials(user?.userName || 'User')}
-              </Text>
+            <View
+              style={[
+                styles.avatar,
+                { backgroundColor: 'white', overflow: 'hidden' },
+              ]}
+            >
+              {user?.avatarUrl ? (
+                <Image
+                  source={{ uri: user.avatarUrl }}
+                  style={{ width: '100%', height: '100%' }}
+                />
+              ) : (
+                <Text
+                  style={[styles.avatarText, { color: themeColors.primary }]}
+                >
+                  {getInitials(user?.userName || 'User')}
+                </Text>
+              )}
             </View>
           </View>
           <View style={styles.userDetails}>
@@ -273,21 +288,7 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
           })}
         </View>
 
-        {/* Theme Toggle */}
-        <View style={styles.themeContainer}>
-          <TouchableOpacity
-            style={[styles.themeToggle, { backgroundColor: 'transparent' }]}
-            onPress={toggleTheme}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.themeIcon, { color: '#6B7280' }]}>
-              {isDark ? '☀️' : '🌙'}
-            </Text>
-            <Text style={[styles.themeText, { color: '#374151' }]}>
-              {isDark ? t('common.lightMode') : t('common.darkMode')}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* Theme toggle moved to Settings screen */}
 
         {/* Language Switch */}
         <View style={styles.themeContainer}>
