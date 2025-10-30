@@ -1,0 +1,91 @@
+{
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "urdu": "Urdu",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "auth": {
+    "login": "Login",
+    "loginDesc": "Enter your email and password for Login.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember Me",
+    "forgotPassword": "Forgot Password?",
+    "signup": "Signup",
+    "signupTitle": "SignUp",
+    "signupDesc": "Please enter your credentials here to register.",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm Password",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your Username",
+    "allFieldsRequired": "All fields are required. Please complete them.",
+    "passwordsDoNotMatch": "Passwords do not match. Please try again.",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Create Account",
+    "loginSuccessful": "Login successful! Welcome back!",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "registrationSuccessful": "Registration successful!",
+    "registrationFailed": "Registration failed. Please try again.",
+    "usernameTaken": "User with the username '{name}' already exists.",
+    "emailExists": "User with this email already exists."
+  },
+  "onboarding": {
+    "welcome": "Welcome",
+    "tagline": "Water less. Grow best.",
+    "register": "Register",
+    "login": "Login",
+    "chooseLanguage": "Language",
+    "features": {
+      "smartIrrigation": "Smart AI-Powered Irrigation System",
+      "realTimeInsights": "Accurate Real-Time Data Insights",
+      "sensorFree": "Affordable Sensor-Free Water Management",
+      "boostYield": "Boost Crop Yield Efficiently",
+      "multiLang": "Supports Multiple Languages Offline"
+    }
+  },
+  "drawer": {
+    "home": "Home",
+    "profile": "Profile",
+    "messages": "Messages",
+    "moments": "Moments",
+    "settings": "Settings",
+    "tellAFriend": "Tell a friend",
+    "signOut": "Sign Out"
+  },
+  "home": {
+    "quickStats": "QUICK STATS",
+    "noPlans": "No irrigation plans yet",
+    "welcomeBack": "Welcome back,",
+    "todaysTasks": "TODAY'S TASKS",
+    "noWatering": "No watering today! ✅",
+    "nextTask": "Next task: {date}",
+    "weatherUnavailable": "Weather data unavailable",
+    "refresh": "Refresh",
+    "weather": "WEATHER",
+    "humidity": "Humidity",
+    "activePlans": "Active Plans",
+    "todayBuckets": "Today (Buckets)",
+    "pendingTasks": "Pending Tasks",
+    "completionRate": "Completion Rate"
+  },
+  "analyze": {
+    "title": "Field Analysis",
+    "subtitle": "Upload a photo of your field for AI-powered irrigation recommendations",
+    "tapToSelect": "Tap to select image",
+    "cameraOrGallery": "Camera or Gallery",
+    "cropName": "Crop Name (Optional)",
+    "cropPlaceholder": "e.g., Wheat, Rice, Corn",
+    "fieldName": "Field Name (Optional)",
+    "fieldNamePlaceholder": "e.g., North Field",
+    "fieldArea": "Field Area in m² (Optional)",
+    "fieldAreaPlaceholder": "e.g., 1500",
+    "analyzeButton": "Analyze Field",
+    "selectImageFirst": "Please select an image first",
+    "analyzing": "Analyzing your field...",
+    "analysisFailed": "Analysis failed. Please try again."
+  }
+}

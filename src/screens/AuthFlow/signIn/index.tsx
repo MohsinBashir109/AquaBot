@@ -14,10 +14,12 @@ import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../../context/AuthContext';
+import { useLanguage } from '../../../context/LanguageContext';
 
 const SignIn = () => {
   const navigation = useNavigation<any>();
   const { login } = useAuth();
+  const { t, locale, setLocale } = useLanguage();
 
   const handleSignUp = () => {
     navigation.navigate(routes.signup);
@@ -40,10 +42,7 @@ const SignIn = () => {
 
   const handleSignIn = async () => {
     if (!details.email || !details.password) {
-      showCustomFlash(
-        'All fields are required. Please complete them.',
-        'danger',
-      );
+      showCustomFlash(t('auth.allFieldsRequired'), 'danger');
 
       return;
     }
@@ -59,16 +58,13 @@ const SignIn = () => {
     try {
       const success = await login(details);
       if (success) {
-        showCustomFlash('Login successful! Welcome back!', 'success');
+        showCustomFlash(t('auth.loginSuccessful'), 'success');
       } else {
-        showCustomFlash(
-          'Login failed. Please check your credentials.',
-          'danger',
-        );
+        showCustomFlash(t('auth.loginFailed'), 'danger');
       }
     } catch (error: any) {
       // Handle backend error response
-      let errorMessage = 'Login failed. Please try again.';
+      let errorMessage = t('auth.loginFailed');
       let errorType: 'success' | 'danger' = 'danger';
 
       if (error.response?.data) {
@@ -131,23 +127,43 @@ const SignIn = () => {
       contentContainerStyle={{ flexGrow: 1 }}
     >
       <AuthWrapper
-        text="Login"
-        desText="Enter your email and password for Login."
+        text={t('auth.login')}
+        desText={t('auth.loginDesc')}
       >
+        {/* Language Radio */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: heightPixel(6) }}>
+          <ThemeText color="text" style={{ marginRight: widthPixel(8) }}>
+            {t('onboarding.chooseLanguage')}
+          </ThemeText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: widthPixel(12) }}>
+              <View onTouchEnd={() => setLocale('en')} style={{ width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10), borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6) }}>
+                <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'en' ? '#2E7CF6' : 'transparent' }} />
+              </View>
+              <ThemeText color="text" onPress={() => setLocale('en')}>EN</ThemeText>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View onTouchEnd={() => setLocale('ur')} style={{ width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10), borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6) }}>
+                <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'ur' ? '#2E7CF6' : 'transparent' }} />
+              </View>
+              <ThemeText color="text" onPress={() => setLocale('ur')}>اردو</ThemeText>
+            </View>
+          </View>
+        </View>
         <ThemeInput
           leftIcon={email}
-          title="Email"
+          title={t('auth.email')}
           value={details.email}
           onChangeText={(text: string) => {
             setDetails({ ...details, email: text });
             setShowSignupSuggestion(false); // Reset suggestion when user types
           }}
           placeHolderColor="green"
-          placeholder="Enter your email"
+          placeholder={t('auth.emailPlaceholder')}
           containerStyleOuter={styles.containerStyleOuter}
         />
         <ThemeInput
-          title="Password"
+          title={t('auth.password')}
           leftIcon={padlock}
           rightIcon={eyes}
           value={details.password}
@@ -157,7 +173,7 @@ const SignIn = () => {
           }}
           containerStyleOuter={styles.containerStyleOuter2}
           placeHolderColor="green"
-          placeholder="Enter your password"
+          placeholder={t('auth.passwordPlaceholder')}
           secureTextEntry={isHidden}
           onPressRightIcon={handleHide}
         />
@@ -165,18 +181,18 @@ const SignIn = () => {
           <ThemedCheckbox
             checked={checked}
             onPress={handleCheckBoxPress}
-            label="Remember Me"
+            label={t('auth.rememberMe')}
             onCheck={onCheckHandle}
           />
           <View style={{ flex: 1 }}></View>
           <TouchableOpacity onPress={handleForgotPass}>
             <ThemeText style={styles.forgotText} color="fogotText">
-              Forgot Password?
+              {t('auth.forgotPassword')}
             </ThemeText>
           </TouchableOpacity>
         </View>
         <Button
-          title="Login"
+          title={t('auth.login')}
           bgColor="buttonBackGround"
           buttonStyle={styles.buttonStyle}
           onPress={handleSignIn}
@@ -185,11 +201,11 @@ const SignIn = () => {
         {showSignupSuggestion && (
           <View style={styles.signupSuggestion}>
             <ThemeText style={styles.suggestionText} color="text">
-              Don't have an account yet?
+              {t('auth.dontHaveAccount')}
             </ThemeText>
             <TouchableOpacity onPress={handleSignUp}>
               <ThemeText color="fogotText" style={styles.signupLink}>
-                Create Account
+                {t('auth.createAccount')}
               </ThemeText>
             </TouchableOpacity>
           </View>
@@ -206,11 +222,11 @@ const SignIn = () => {
           }}
         >
           <ThemeText style={styles.accountText} color="text">
-            Don't have an account?
+            {t('auth.dontHaveAccount')}
           </ThemeText>
           <TouchableOpacity onPress={handleSignUp}>
             <ThemeText color="fogotText" style={styles.signUp}>
-              Signup
+              {t('auth.signup')}
             </ThemeText>
           </TouchableOpacity>
         </View>

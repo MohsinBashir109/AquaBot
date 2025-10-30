@@ -11,6 +11,7 @@ import HomeWrapper from '../../../../Wrappers/HomeWrapper';
 import React, { useState, useEffect, useCallback } from 'react';
 import { UserHeader } from '../../../components/Header';
 import { useNavigation } from '@react-navigation/native';
+import { useLanguage } from '../../../context/LanguageContext';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { colors } from '../../../utils/colors';
@@ -140,6 +141,7 @@ const Index = () => {
     );
   }
 
+  const { t } = useLanguage();
   return (
     <View
       style={[styles.container, { backgroundColor: themeColors.background }]}
@@ -164,12 +166,12 @@ const Index = () => {
           {/* Quick Stats */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
-              QUICK STATS
+              {t('home.quickStats') || 'QUICK STATS'}
             </Text>
             <View style={styles.statsRow}>
               <View style={styles.statCardWrapper}>
                 <StatCard
-                  title="Active Plans"
+                  title={t('home.activePlans')}
                   value={activePlansCount}
                   icon="📊"
                   color="#3B82F6"
@@ -177,7 +179,7 @@ const Index = () => {
               </View>
               <View style={styles.statCardWrapper}>
                 <StatCard
-                  title="Today (Buckets)"
+                  title={t('home.todayBuckets')}
                   value={`${totalWaterBuckets}d`}
                   icon="💧"
                   color="#F59E0B"
@@ -185,7 +187,7 @@ const Index = () => {
               </View>
               <View style={styles.statCardWrapper}>
                 <StatCard
-                  title="Pending Tasks"
+                  title={t('home.pendingTasks')}
                   value={pendingTasks}
                   icon="⏳"
                   color="#60A5FA"
@@ -193,7 +195,7 @@ const Index = () => {
               </View>
               <View style={styles.statCardWrapper}>
                 <StatCard
-                  title="Completion Rate"
+                  title={t('home.completionRate')}
                   value={`${Math.round(completionRate)}%`}
                   icon="📈"
                   color="#60A5FA"
@@ -212,7 +214,7 @@ const Index = () => {
           {/* Irrigation Plans */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
-              QUICK STATS
+              {t('home.quickStats') || 'QUICK STATS'}
             </Text>
             {plans.length === 0 ? (
               <View style={styles.emptyState}>
@@ -222,7 +224,7 @@ const Index = () => {
                     { color: themeColors.secondaryText },
                   ]}
                 >
-                  No irrigation plans yet
+                  {t('home.noPlans') || 'No irrigation plans yet'}
                 </Text>
               </View>
             ) : (

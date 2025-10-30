@@ -12,6 +12,7 @@ import { fontFamilies } from '../../utils/fontfamilies';
 import { colors } from '../../utils/colors';
 import { useThemeContext } from '../../theme/ThemeContext';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface UserHeaderProps {
   onSettingsPress?: () => void;
@@ -32,6 +33,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({
   const { isDark } = useThemeContext();
   const route = useRoute();
   const navigation = useNavigation();
+  const { t } = useLanguage();
 
   const themeColors = colors[isDark ? 'dark' : 'light'];
 
@@ -132,7 +134,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({
                 { color: themeColors.secondaryText },
               ]}
             >
-              Welcome back,
+              {t('home.welcomeBack')}
             </Text>
             <Text style={[styles.userName, { color: themeColors.text }]}>
               {user.userName}

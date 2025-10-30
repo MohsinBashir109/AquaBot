@@ -138,6 +138,7 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     height: heightPixel(45),
+    textAlign: 'left',
   },
   rightIcon: {
     width: widthPixel(24),

@@ -5,14 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Image,
   StatusBar,
 } from 'react-native';
-import {
-  useNavigation,
-  DrawerContentComponentProps,
-  useRoute,
-} from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { useAppSelector } from '../../store/hooks';
 import { useAuth } from '../../context/AuthContext';
 import { useThemeContext } from '../../theme/ThemeContext';
@@ -21,6 +17,8 @@ import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 import { fontFamilies } from '../../utils/fontfamilies';
 import { showCustomFlash } from '../../utils/flash';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLanguage } from '../../context/LanguageContext';
+import { Switch } from 'react-native';
 
 interface DrawerItem {
   id: string;
@@ -31,37 +29,32 @@ interface DrawerItem {
 }
 
 const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
-  const navigation = useNavigation();
   const route = useRoute();
   const { user } = useAppSelector(state => state.user);
   const { logout } = useAuth();
   const { isDark, toggleTheme } = useThemeContext();
+  const { locale, setLocale, t } = useLanguage();
   const insets = useSafeAreaInsets();
   const themeColors = colors[isDark ? 'dark' : 'light'];
 
   // Debug Redux data
-  console.log('CustomDrawer - Redux user data:', user);
-  console.log('CustomDrawer - User name:', user?.userName);
-  console.log('CustomDrawer - User email:', user?.email);
-  console.log('CustomDrawer - Drawer props:', props);
-  console.log('CustomDrawer - Current route:', route.name);
+  console.log('CustomDrawer - Current route:', (route as any).name);
 
   // Function to check if a screen is currently active
   const isActiveScreen = (screenName: string) => {
     // Get the current navigation state to find the active tab
     const state = props.navigation.getState();
-    console.log('Navigation state:', state);
 
     // Navigate through the state to find the active tab
     let activeTab = '';
     if (state.routes && state.routes.length > 0) {
       const mainTabsRoute = state.routes.find(
-        route => route.name === 'MainTabs',
+        (r: any) => r.name === 'MainTabs',
       );
       if (mainTabsRoute && mainTabsRoute.state) {
         const tabState = mainTabsRoute.state;
         if (tabState.routes && tabState.routes.length > 0) {
-          activeTab = tabState.routes[tabState.index || 0].name;
+          activeTab = (tabState.routes[tabState.index || 0] as any).name;
         }
       }
     }
@@ -105,31 +98,31 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const drawerItems: DrawerItem[] = [
     {
       id: 'home',
-      title: 'Home',
+      title: t('drawer.home'),
       icon: '🏠',
       screen: 'Home',
     },
     {
       id: 'profile',
-      title: 'Profile',
+      title: t('drawer.profile'),
       icon: '👤',
       screen: 'Profile',
     },
     {
       id: 'chatbot',
-      title: 'Messages',
+      title: t('drawer.messages'),
       icon: '💬',
       screen: 'ChatBot',
     },
     {
       id: 'guidelines',
-      title: 'Moments',
+      title: t('drawer.moments'),
       icon: '⏰',
       screen: 'GovernmentGuidelines',
     },
     {
       id: 'settings',
-      title: 'Settings',
+      title: t('drawer.settings'),
       icon: '⚙️',
       screen: 'Settings',
     },
@@ -138,13 +131,13 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
   const bottomItems: DrawerItem[] = [
     {
       id: 'tell-friend',
-      title: 'Tell a friend',
+      title: t('drawer.tellAFriend'),
       icon: '📤',
       screen: '',
     },
     {
       id: 'sign-out',
-      title: 'Sign Out',
+      title: t('drawer.signOut'),
       icon: '🚪',
       screen: '',
       onPress: handleLogout,
@@ -203,7 +196,7 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
         },
       ]}
     >
-      {console.log('CustomDrawer rendering with user:', user)}
+      {/* Render */}
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
@@ -243,7 +236,7 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
       {/* Navigation Items */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.itemsContainer}>
-          {drawerItems.map((item, index) => {
+          {drawerItems.map(item => {
             const isActive = isActiveScreen(item.screen);
             return (
               <TouchableOpacity
@@ -291,14 +284,40 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
               {isDark ? '☀️' : '🌙'}
             </Text>
             <Text style={[styles.themeText, { color: '#374151' }]}>
-              {isDark ? 'Light Mode' : 'Dark Mode'}
+              {isDark ? t('common.lightMode') : t('common.darkMode')}
             </Text>
           </TouchableOpacity>
         </View>
 
+        {/* Language Switch */}
+        <View style={styles.themeContainer}>
+          <View
+            style={[
+              styles.themeToggle,
+              {
+                backgroundColor: 'transparent',
+                justifyContent: 'space-between',
+              },
+            ]}
+          >
+            <Text style={[styles.themeText, { color: '#374151' }]}>
+              {t('common.language')}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ marginRight: 8 }}>
+                {locale === 'ur' ? t('common.urdu') : t('common.english')}
+              </Text>
+              <Switch
+                value={locale === 'ur'}
+                onValueChange={v => setLocale(v ? 'ur' : 'en')}
+              />
+            </View>
+          </View>
+        </View>
+
         {/* Bottom Items - Tell a friend and Sign Out */}
         <View style={styles.bottomItemsContainer}>
-          {bottomItems.map((item, index) => (
+          {bottomItems.map(item => (
             <TouchableOpacity
               key={item.id}
               style={[styles.drawerItem, { backgroundColor: 'transparent' }]}

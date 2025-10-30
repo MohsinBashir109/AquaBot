@@ -53,23 +53,23 @@ export const username = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/;
 
 export const dataOnboarding = [
   {
-    title: 'Smart AI-Powered Irrigation System',
+    title: 'onboarding.features.smartIrrigation',
     image: flower,
   },
   {
-    title: 'Accurate Real-Time Data Insights',
+    title: 'onboarding.features.realTimeInsights',
     image: mind,
   },
   {
-    title: 'Affordable Sensor-Free Water Management',
+    title: 'onboarding.features.sensorFree',
     image: money,
   },
   {
-    title: 'Boost Crop Yield Efficiently',
+    title: 'onboarding.features.boostYield',
     image: building,
   },
   {
-    title: 'Supports Multiple Languages Offline',
+    title: 'onboarding.features.multiLang',
     image: feedback,
   },
 ];

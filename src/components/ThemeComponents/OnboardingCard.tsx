@@ -10,6 +10,7 @@ import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 import React from 'react';
 import ThemeText from './ThemeText';
 import { fontFamilies } from '../../utils/fontfamilies';
+import { useLanguage } from '../../context/LanguageContext';
 
 type OnboardingItem = {
   image: ImageSourcePropType;
@@ -20,21 +21,24 @@ type OnboardingProps = {
   data: OnboardingItem[];
 };
 
-const OnboardingCard = ({ data }: OnboardingProps) => (
-  <ScrollView
-    contentContainerStyle={styles.contentContainerStyle}
-    scrollEnabled={false}
-  >
-    {data.map((item, index) => (
-      <View key={index} style={styles.itemContainer}>
-        <Image source={item.image} resizeMode="contain" style={styles.icon} />
-        <ThemeText style={styles.textStyle} color="text">
-          {item.title}
-        </ThemeText>
-      </View>
-    ))}
-  </ScrollView>
-);
+const OnboardingCard = ({ data }: OnboardingProps) => {
+  const { t } = useLanguage();
+  return (
+    <ScrollView
+      contentContainerStyle={styles.contentContainerStyle}
+      scrollEnabled={false}
+    >
+      {data.map((item, index) => (
+        <View key={index} style={styles.itemContainer}>
+          <Image source={item.image} resizeMode="contain" style={styles.icon} />
+          <ThemeText style={styles.textStyle} color="text">
+            {t(item.title)}
+          </ThemeText>
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
 
 export default OnboardingCard;
 
