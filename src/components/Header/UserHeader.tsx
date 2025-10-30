@@ -5,13 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useAppSelector } from '../../store/hooks';
 import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 import { fontFamilies } from '../../utils/fontfamilies';
 import { colors } from '../../utils/colors';
 import { useThemeContext } from '../../theme/ThemeContext';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface UserHeaderProps {
@@ -25,29 +26,18 @@ interface UserHeaderProps {
 const UserHeader: React.FC<UserHeaderProps> = ({
   onSettingsPress,
   onBackPress,
-  screenTitle,
+  screenTitle: _screenTitle,
   showBackButton = false,
   showDrawerButton = false,
 }) => {
   const { user } = useAppSelector(state => state.user);
   const { isDark } = useThemeContext();
-  const route = useRoute();
   const navigation = useNavigation();
   const { t } = useLanguage();
 
   const themeColors = colors[isDark ? 'dark' : 'light'];
 
-  // Debug logging
-  console.log('UserHeader Debug:', {
-    showDrawerButton,
-    showBackButton,
-    onSettingsPress: !!onSettingsPress,
-    user: !!user,
-    themeColors: themeColors.text,
-    isDark,
-  });
-
-  console.log('UserHeader rendering with showDrawerButton:', showDrawerButton);
+  // Debug logging removed in production UI
 
   if (!user) {
     return null;
@@ -68,9 +58,8 @@ const UserHeader: React.FC<UserHeaderProps> = ({
     console.log('Navigation state:', navigation.getState());
 
     try {
-      // @ts-ignore - drawer navigation methods
       console.log('Attempting to open drawer...');
-      navigation.openDrawer();
+      (navigation as any).openDrawer();
       console.log('Drawer opened successfully');
     } catch (error) {
       console.error('Error opening drawer:', error);
@@ -118,9 +107,20 @@ const UserHeader: React.FC<UserHeaderProps> = ({
                 },
               ]}
             >
-              <Text style={[styles.avatarText, { color: 'white' }]}>
-                {getInitials(user.userName)}
-              </Text>
+              {user.avatarUrl ? (
+                <Image
+                  source={{ uri: user.avatarUrl }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: widthPixel(22.5),
+                  }}
+                />
+              ) : (
+                <Text style={[styles.avatarText, { color: 'white' }]}>
+                  {getInitials(user.userName)}
+                </Text>
+              )}
             </View>
             <View
               style={[styles.statusIndicator, { backgroundColor: '#4CAF50' }]}
@@ -143,10 +143,6 @@ const UserHeader: React.FC<UserHeaderProps> = ({
         </View>
 
         <View style={styles.actionsSection}>
-          {console.log(
-            'Rendering actions section, showDrawerButton:',
-            showDrawerButton,
-          )}
           {/* Always show drawer button for testing */}
           <TouchableOpacity
             onPress={handleDrawerToggle}

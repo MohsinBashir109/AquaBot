@@ -4,7 +4,8 @@
     "english": "English",
     "urdu": "Urdu",
     "darkMode": "Dark Mode",
-    "lightMode": "Light Mode"
+    "lightMode": "Light Mode",
+    "comingSoon": "{feature} is coming soon"
   },
   "auth": {
     "login": "Login",
@@ -55,6 +56,35 @@
     "settings": "Settings",
     "tellAFriend": "Tell a friend",
     "signOut": "Sign Out"
+  },
+  "settings": {
+    "title": "Settings",
+    "accountProfile": "Account & Profile",
+    "zonesSchedules": "Zones & Schedules",
+    "plantPreferences": "Plant Preferences",
+    "appSettings": "App Settings",
+    "notifications": "Notifications",
+    "language": "Language",
+    "updatePassword": "Update Password",
+    "helpCenter": "Help Center",
+    "logout": "Log Out"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account and preferences",
+    "comingSoonTitle": "Profile features coming soon!",
+    "comingSoonSubtext": "We're working on bringing you comprehensive profile management features.",
+    "editProfile": "Edit Profile",
+    "defaultName": "User",
+    "snapshot": "My Garden Snapshot",
+    "zones": "Zones",
+    "plants": "Plants",
+    "waterSaved": "Water Saved",
+    "accountDetails": "Account Details",
+    "email": "Email",
+    "location": "Location",
+    "changePassword": "Change Password",
+    "logout": "Log Out"
   },
   "home": {
     "quickStats": "QUICK STATS",
