@@ -5,14 +5,16 @@ export const API_CONFIG = {
   // BASE_URL: 'http://DESKTOP-0DDVPED:5065/api', // Physical device with hostname
   BASE_URL: 'http://10.0.2.2:5065/api', // Android emulator
   TIMEOUT: 10000, // 10 seconds timeout
+  // Enable verbose logging for debugging (set to false in production)
+  ENABLE_VERBOSE_LOGGING: __DEV__, // Automatically true in development, false in production
   ENDPOINTS: {
     // Authentication
-    REGISTER: '/Auth/register',
-    LOGIN: '/Auth/login',
-    FORGOT_PASSWORD: '/Auth/forgot-password',
-    RESET_PASSWORD: '/Auth/reset-password',
-    VERIFY_EMAIL: '/Auth/verify-email',
-    RESEND_VERIFICATION: '/Auth/resend-verification',
+    REGISTER: '/auth/register',
+    LOGIN: '/auth/login',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
+    VERIFY_EMAIL: '/auth/verify-email',
+    RESEND_VERIFICATION: '/auth/resend-verification',
 
     // Image Analysis
     IMAGE_ANALYSIS: '/ImageAnalysis/analyze-and-plan',
@@ -31,10 +33,6 @@ export const API_CONFIG = {
     // VOICE_ASSISTANT: '/Assistant/voice',
   },
 };
-
-// Debug log to verify config is loaded correctly
-console.log('🔧 API_CONFIG loaded:', API_CONFIG);
-console.log('🔧 BASE_URL:', API_CONFIG.BASE_URL);
 
 // API Response Types
 export interface ApiResponse<T = any> {
@@ -83,5 +81,7 @@ export interface ForgotPasswordRequest {
 
 export interface ResetPasswordRequest {
   email: string;
+  code: string;
   newPassword: string;
+  confirmPassword: string;
 }

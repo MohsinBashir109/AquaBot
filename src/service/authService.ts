@@ -11,11 +11,8 @@ class AuthService {
   // Register new user
   async register(userData: RegisterRequest): Promise<boolean> {
     try {
-      const isConnected = await apiService.testConnection();
-      if (!isConnected) {
-        return true; // Error occurred
-      }
-
+      // Removed testConnection call - it was causing automatic API calls
+      // The actual API call will handle connectivity issues properly
       const response = await apiService.register(userData);
 
       // Check for both success and Success properties (backend might use either)
@@ -132,9 +129,19 @@ class AuthService {
   }
 
   // Reset password
-  async resetPassword(email: string, newPassword: string): Promise<boolean> {
+  async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+    confirmPassword: string,
+  ): Promise<boolean> {
     try {
-      const response = await apiService.resetPassword({ email, newPassword });
+      const response = await apiService.resetPassword({
+        email,
+        code,
+        newPassword,
+        confirmPassword,
+      });
       return response.success || false;
     } catch (error) {
       console.error('Reset password error:', error);

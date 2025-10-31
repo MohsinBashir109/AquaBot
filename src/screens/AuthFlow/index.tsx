@@ -4,5 +4,6 @@ import SignIn from './signIn';
 import SignUp from './signUp';
 import Splash from './splash';
 import emailVerification from './passwordConfirm';
+import PasswordConfirm from './passwordConfirm';
 
-export { SignIn, Splash, OnBoarding, SignUp, Forgot, emailVerification };
+export { SignIn, Splash, OnBoarding, SignUp, Forgot, emailVerification, PasswordConfirm };

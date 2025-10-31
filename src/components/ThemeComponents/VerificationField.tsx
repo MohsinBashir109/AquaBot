@@ -39,7 +39,15 @@ type VerificationInputField = {
 };
 
 export const VerificationField = (prop: VerificationInputField) => {
-  const [value, setValue] = useState('');
+  // Use controlled value if provided, otherwise use internal state
+  const [internalValue, setInternalValue] = useState('');
+  const value = prop.value !== undefined ? prop.value : internalValue;
+  const setValue = prop.onChangeText
+    ? (text: string) => {
+        prop.onChangeText!(text);
+      }
+    : setInternalValue;
+
   const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,

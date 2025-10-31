@@ -19,6 +19,10 @@ export const AuthNavigation = () => {
         name={routes.emailverification}
         component={Auth.emailVerification}
       />
+      <AuthStack.Screen
+        name={routes.resetpassword}
+        component={Auth.PasswordConfirm}
+      />
     </AuthStack.Navigator>
   );
 };
