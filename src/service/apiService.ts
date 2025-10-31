@@ -24,25 +24,20 @@ class ApiService {
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL;
     this.timeout = API_CONFIG.TIMEOUT;
-    console.log('🔧 ApiService initialized with:', {
-      baseURL: this.baseURL,
-      timeout: this.timeout,
-    });
-    console.log('🔧 API_CONFIG.BASE_URL from config:', API_CONFIG.BASE_URL);
   }
 
-  // Test connectivity to backend
+  // Test connectivity to backend (DEPRECATED - no longer used automatically)
+  // This was causing unnecessary API calls before every registration.
+  // Keep for manual testing if needed.
   async testConnection(): Promise<boolean> {
+    console.log(
+      '[API WARNING] testConnection called - this creates an extra API call. Should only be used for manual testing.',
+    );
     try {
-      console.log('🔍 Testing connection to backend...');
-      console.log('🌐 Testing URL:', `${this.baseURL}/Auth/register`);
-
-      // Create a timeout promise with shorter timeout for connection test
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Connection timeout')), 3000);
       });
 
-      // Try a simple GET request to test connectivity (more reliable than OPTIONS)
       const fetchPromise = fetch(`${this.baseURL}/Auth/register`, {
         method: 'GET',
         headers: {
@@ -50,27 +45,9 @@ class ApiService {
         },
       });
 
-      const response = (await Promise.race([
-        fetchPromise,
-        timeoutPromise,
-      ])) as Response;
-
-      // Accept any response status (even 404/405) as long as we get a response
-      console.log('✅ Backend is reachable!', response.status);
+      await Promise.race([fetchPromise, timeoutPromise]);
       return true;
     } catch (error: any) {
-      console.error('❌ Backend connection failed:', error.message);
-      console.log('🔧 Troubleshooting steps:');
-      console.log(
-        '1. Make sure your .NET backend is running on localhost:5065',
-      );
-      console.log(
-        '2. Check if the backend is configured to accept external connections',
-      );
-      console.log('3. Verify CORS settings allow requests from the emulator');
-      console.log(
-        '4. Try running: dotnet run in your backend project directory',
-      );
       return false;
     }
   }
@@ -79,9 +56,29 @@ class ApiService {
     endpoint: string,
     options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
+    const url = `${this.baseURL}${endpoint}`;
+    const method = options.method || 'GET';
+    const requestId = `${method} ${endpoint} - ${Date.now()}`;
+
     try {
-      const url = `${this.baseURL}${endpoint}`;
-      console.log('🌐 Making HTTP request to:', url);
+      // Log request details
+      const requestPayload: any = {};
+      if (options.body) {
+        try {
+          requestPayload.body = JSON.parse(options.body as string);
+        } catch {
+          requestPayload.body = options.body;
+        }
+      }
+
+      console.log(`[API REQUEST] ${requestId}`);
+      console.log(`URL: ${url}`);
+      console.log(`Method: ${method}`);
+      console.log(
+        `Payload:`,
+        JSON.stringify(requestPayload.body || {}, null, 2),
+      );
+      console.log(`Headers:`, JSON.stringify(options.headers || {}, null, 2));
 
       const defaultHeaders = {
         'Content-Type': 'application/json',
@@ -95,64 +92,34 @@ class ApiService {
         },
       };
 
-      console.log('📤 Request config:', {
-        method: config.method,
-        headers: config.headers,
-        body: config.body,
-        timeout: this.timeout,
-      });
-
-      // Create a timeout promise with better error handling
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          console.log(`⏰ Request timeout after ${this.timeout}ms`);
+          console.log(`[API TIMEOUT] ${requestId}`);
           reject(new Error('Request timeout'));
         }, this.timeout);
       });
 
-      // Make the fetch request
       const fetchPromise = fetch(url, config);
-
       const response = await Promise.race([fetchPromise, timeoutPromise]);
-      console.log(
-        '📡 HTTP Response status:',
-        response.status,
-        response.statusText,
-      );
-
-      // Log response headers for debugging
-      console.log(
-        '📋 Response headers:',
-        Object.fromEntries(response.headers.entries()),
-      );
 
       let data;
       try {
         data = await response.json();
-        console.log('📥 Response data:', data);
       } catch (jsonError) {
-        console.error('❌ Failed to parse JSON response:', jsonError);
-        // Try to get text response instead
         const textResponse = await response.text();
-        console.log('📄 Raw response text:', textResponse);
+        console.log(`[API RESPONSE - TEXT] ${requestId}`);
+        console.log(`Status: ${response.status} ${response.statusText}`);
+        console.log(`Response:`, textResponse);
         throw new Error(`Invalid JSON response: ${textResponse}`);
       }
 
+      // Log response details
+      console.log(`[API RESPONSE] ${requestId}`);
+      console.log(`Status: ${response.status} ${response.statusText}`);
+      console.log(`Response:`, JSON.stringify(data, null, 2));
+
       if (!response.ok) {
-        console.log('❌ HTTP Error - Status:', response.status);
-        console.log('📋 Error Response Details:', {
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-          url: url,
-        });
-
-        // Show detailed validation errors if available
-        if (data.errors) {
-          console.log('🔍 Validation Errors:', data.errors);
-        }
-
-        // Create an error with the full response data
+        console.log(`[API ERROR] ${requestId} - Request failed`);
         const error = new Error(
           data.MessageEnglish ||
             data.messageEnglish ||
@@ -161,23 +128,29 @@ class ApiService {
             data.title ||
             `HTTP error! status: ${response.status}`,
         );
-        // Attach the full response data to the error for proper handling
         (error as any).response = { data };
         throw error;
       }
 
-      console.log('✅ HTTP Request successful');
+      console.log(
+        `[API SUCCESS] ${requestId} - Request completed successfully`,
+      );
       return data;
     } catch (error: any) {
-      console.error('💥 API Request Error:', error);
-
-      if (error.message === 'Request timeout') {
-        console.log('⏰ Request timeout');
-        throw new Error(
-          'Request timeout. Please check your internet connection.',
+      console.log(`[API FAILED] ${requestId}`);
+      console.log(`Error:`, error.message || error);
+      if (error.response?.data) {
+        console.log(
+          `Error Response Data:`,
+          JSON.stringify(error.response.data, null, 2),
         );
       }
-
+      if (error.message === 'Request timeout') {
+        const timeoutError = new Error(
+          'Request timeout. Please check your internet connection.',
+        );
+        throw timeoutError;
+      }
       throw error;
     }
   }
@@ -186,18 +159,6 @@ class ApiService {
   async register(
     userData: RegisterRequest,
   ): Promise<ApiResponse<AuthResponse>> {
-    console.log('🌐 apiService.register called');
-    console.log('🔗 API Config:', {
-      baseURL: this.baseURL,
-      endpoint: API_CONFIG.ENDPOINTS.REGISTER,
-      fullURL: `${this.baseURL}${API_CONFIG.ENDPOINTS.REGISTER}`,
-    });
-    console.log('📤 Request data:', {
-      userName: userData.userName,
-      email: userData.email,
-      password: userData.password ? '***' : 'empty',
-    });
-
     try {
       const response = await this.makeRequest<AuthResponse>(
         API_CONFIG.ENDPOINTS.REGISTER,
@@ -207,52 +168,16 @@ class ApiService {
         },
       );
 
-      console.log('📥 API Response received:', response);
-      console.log('📋 Full response details:', {
-        success: response.success,
-        message: response.message,
-        data: response.data,
-        errors: response.errors,
-      });
-
-      if (response.success) {
-        console.log('✅ Registration API call successful');
-        showCustomFlash(
-          response.message || 'Success! Your account has been created.',
-          'success',
-        );
-      } else {
-        console.log('❌ Registration API call failed:', response.message);
-        showCustomFlash(
-          response.message || 'Registration failed. Please try again.',
-          'danger',
-        );
-      }
-
+      // Flash message will be shown by the UI after loader completes
       return response;
     } catch (error: any) {
-      console.error('💥 apiService.register error:', error);
-      showCustomFlash(
-        error.message || 'Registration failed. Please try again.',
-        'danger',
-      );
+      // Flash message will be shown by the UI after loader completes
       throw error;
     }
   }
 
   // Login user
   async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponse>> {
-    console.log('🌐 apiService.login called');
-    console.log('🔗 API Config:', {
-      baseURL: this.baseURL,
-      endpoint: API_CONFIG.ENDPOINTS.LOGIN,
-      fullURL: `${this.baseURL}${API_CONFIG.ENDPOINTS.LOGIN}`,
-    });
-    console.log('📤 Request data:', {
-      email: credentials.email,
-      password: credentials.password ? '***' : 'empty',
-    });
-
     try {
       const response = await this.makeRequest<AuthResponse>(
         API_CONFIG.ENDPOINTS.LOGIN,
@@ -262,35 +187,14 @@ class ApiService {
         },
       );
 
-      console.log('📥 Login API Response received:', response);
-      console.log('📋 Full login response details:', {
-        success: response.success,
-        message: response.message,
-        data: response.data,
-        errors: response.errors,
-      });
-
-      if (response.success && response.data) {
-        console.log('✅ Login API call successful');
-        // Don't show flash message here - let the signin screen handle it
-      } else {
-        console.log('❌ Login API call failed:', response.message);
-        // Don't show flash message here - let the signin screen handle it
-      }
-
       return response;
     } catch (error: any) {
-      console.error('💥 apiService.login error:', error);
-      // Don't show flash message here - let the signin screen handle the specific error
       throw error;
     }
   }
 
   // Forgot password
   async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse> {
-    console.log('🌐 apiService.forgotPassword called');
-    console.log('📤 Request data:', { email: data.email });
-
     try {
       const response = await this.makeRequest(
         API_CONFIG.ENDPOINTS.FORGOT_PASSWORD,
@@ -300,22 +204,12 @@ class ApiService {
         },
       );
 
-      console.log('📥 Forgot Password API Response received:', response);
-      console.log('📋 Full forgot password response details:', {
-        success: response.success,
-        message: response.message,
-        data: response.data,
-        errors: response.errors,
-      });
-
       if (response.success) {
-        console.log('✅ Forgot Password API call successful');
         showCustomFlash(
           response.message || 'Password reset instructions sent to your email.',
           'success',
         );
       } else {
-        console.log('❌ Forgot Password API call failed:', response.message);
         showCustomFlash(
           response.message || 'Failed to send reset instructions.',
           'danger',
@@ -324,7 +218,6 @@ class ApiService {
 
       return response;
     } catch (error: any) {
-      console.error('💥 apiService.forgotPassword error:', error);
       showCustomFlash(
         error.message || 'Failed to send reset instructions.',
         'danger',
@@ -335,12 +228,6 @@ class ApiService {
 
   // Reset password
   async resetPassword(data: ResetPasswordRequest): Promise<ApiResponse> {
-    console.log('🌐 apiService.resetPassword called');
-    console.log('📤 Request data:', {
-      email: data.email,
-      newPassword: data.newPassword ? '***' : 'empty',
-    });
-
     try {
       const response = await this.makeRequest(
         API_CONFIG.ENDPOINTS.RESET_PASSWORD,
@@ -350,22 +237,12 @@ class ApiService {
         },
       );
 
-      console.log('📥 Reset Password API Response received:', response);
-      console.log('📋 Full reset password response details:', {
-        success: response.success,
-        message: response.message,
-        data: response.data,
-        errors: response.errors,
-      });
-
       if (response.success) {
-        console.log('✅ Reset Password API call successful');
         showCustomFlash(
           response.message || 'Password updated successfully!',
           'success',
         );
       } else {
-        console.log('❌ Reset Password API call failed:', response.message);
         showCustomFlash(
           response.message || 'Failed to reset password.',
           'danger',
@@ -374,7 +251,6 @@ class ApiService {
 
       return response;
     } catch (error: any) {
-      console.error('💥 apiService.resetPassword error:', error);
       showCustomFlash(error.message || 'Failed to reset password.', 'danger');
       throw error;
     }
@@ -397,7 +273,6 @@ class ApiService {
         },
       });
     } catch (error: any) {
-      console.error('💥 apiService.getUserProfile error:', error);
       throw error;
     }
   }
@@ -420,7 +295,6 @@ class ApiService {
         },
       );
     } catch (error: any) {
-      console.error('💥 apiService.getTodayTasks error:', error);
       throw error;
     }
   }
@@ -440,7 +314,6 @@ class ApiService {
         },
       });
     } catch (error: any) {
-      console.error('💥 apiService.getWeather error:', error);
       throw error;
     }
   }
@@ -465,7 +338,6 @@ class ApiService {
         },
       );
     } catch (error: any) {
-      console.error('💥 apiService.getMyIrrigationPlans error:', error);
       throw error;
     }
   }
@@ -488,7 +360,6 @@ class ApiService {
         },
       );
     } catch (error: any) {
-      console.error('💥 apiService.getAnalysisHistory error:', error);
       throw error;
     }
   }
@@ -515,7 +386,6 @@ class ApiService {
 
       return response;
     } catch (error: any) {
-      console.error('💥 apiService.completeTask error:', error);
       showCustomFlash('Failed to complete task', 'danger');
       throw error;
     }

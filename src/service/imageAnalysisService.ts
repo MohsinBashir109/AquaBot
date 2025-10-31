@@ -21,14 +21,8 @@ class ImageAnalysisService {
   }
 
   async analyzeAndPlan(formData: FormData): Promise<AnalyzeAndPlanResponse> {
-    // Test connection first
-    const isConnected = await this.testConnection();
-    if (!isConnected) {
-      throw new Error(
-        'Cannot connect to the server. Please check your internet connection and try again.',
-      );
-    }
-
+    // Removed testConnection call - it was causing automatic API calls
+    // The actual API call will handle connectivity issues properly
     try {
       const token = await authService.getAuthToken();
 

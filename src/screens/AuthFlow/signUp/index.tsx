@@ -1,14 +1,12 @@
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import React, { useState } from 'react';
 import { email, eyes, padlock, userName } from '../../../assets/icons/icons';
-import {
-  fontPixel,
-  gmailOnly,
-  heightPixel,
-  regexPass,
-  username,
-  widthPixel,
-} from '../../../utils/constants';
+import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 import { register } from '../../../service/signUp';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';
@@ -20,9 +18,13 @@ import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useThemeContext } from '../../../theme/ThemeContext';
+import { colors } from '../../../utils/colors';
 
 const Index = ({ navigation }: any) => {
   const { t } = useLanguage();
+  const { isDark } = useThemeContext();
+  const themeColors = colors[isDark ? 'dark' : 'light'];
   const handleLogin = () => {
     navigation.navigate(routes.signin);
   };
@@ -32,6 +34,7 @@ const Index = ({ navigation }: any) => {
     password: '',
     confirmPassword: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (
@@ -65,26 +68,122 @@ const Index = ({ navigation }: any) => {
       return;
     }
 
+    if (isLoading) {
+      return;
+    }
+
+    // Set loading state immediately to show loader
+    setIsLoading(true);
+    console.log('[SIGNUP] Starting registration process...');
+    console.log('[SIGNUP] isLoading set to:', true);
+    console.log('[SIGNUP] Loader should be visible now');
+
+    // Track start time to ensure loader is visible for minimum duration
+    const startTime = Date.now();
+    const minLoadingTime = 2500; // 2.5 seconds to see the loader and flash message
+
     try {
       const result = await register(details);
 
+      console.log('[SIGNUP] Registration response received, result:', result);
+
+      // Calculate elapsed time and ensure minimum display time
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
       if (result === false) {
         // Registration successful
+        console.log(
+          '[SIGNUP] Registration successful, clearing form and navigating...',
+        );
         setDetails({
           userName: '',
           email: '',
           password: '',
           confirmPassword: '',
         });
-        navigation.replace(routes.signin);
+
+        // Wait for loader timeout to complete, then show flash message and navigate
+        setTimeout(() => {
+          setIsLoading(false);
+          // Show success message after loader hides
+          showCustomFlash('Registration successful!', 'success');
+          // Navigate after a brief moment to show the flash message
+          setTimeout(() => {
+            navigation.replace(routes.signin);
+          }, 500); // Small delay to show flash message before navigating
+        }, remainingTime);
       } else {
         // Registration failed - this shouldn't happen as errors should be thrown
-        showCustomFlash('Registration failed. Please try again.', 'danger');
+        console.log('[SIGNUP] Registration returned true (error state)');
+        setTimeout(() => {
+          setIsLoading(false);
+          // Show error message after loader hides
+          showCustomFlash('Registration failed. Please try again.', 'danger');
+        }, remainingTime);
       }
     } catch (error: any) {
-      // Do not show a flash message here! signUp.ts handles all registration errors
-      // Optionally log the error for debugging:
-      // console.error('Registration error:', error);
+      console.log('[SIGNUP] Registration error caught:', error);
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+      // Extract error message with detailed handling
+      let errorMessage = 'Registration failed. Please try again.';
+
+      if (error?.response?.data) {
+        const d = error.response.data;
+        const message = String(d.message || d.Message || '').toLowerCase();
+        const code = d.errorCode || d.ErrorCode || '';
+
+        // Priority: Check errors array for meaningful detail
+        if (
+          Array.isArray(d.errors) &&
+          d.errors.length > 0 &&
+          typeof d.errors[0] === 'string'
+        ) {
+          const err = d.errors[0];
+          // Try to extract username if it's a 'Username ... is already taken' message
+          const match = err.match(/username '([^']+)' is already taken/i);
+          if (match) {
+            errorMessage = `User with the username '${match[1]}' already exists.`;
+          } else {
+            errorMessage = err;
+          }
+        } else if (message.includes('already exists')) {
+          errorMessage = 'User with this email already exists.';
+        } else if (
+          message.includes('username') &&
+          message.includes('already taken')
+        ) {
+          // Extract username from the message if possible
+          const match = (d.message || d.Message || '').match(
+            /username '([^']+)' is already taken/i,
+          );
+          if (match) {
+            errorMessage = `User with the username '${match[1]}' already exists.`;
+          } else {
+            errorMessage = 'Username is already taken.';
+          }
+        } else if (code === 'USER_EXISTS') {
+          errorMessage = 'User with this email already exists.';
+        } else if (d.message) {
+          errorMessage = d.message;
+        } else if (typeof d === 'string') {
+          errorMessage = d;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      if (!errorMessage || errorMessage.trim() === '') {
+        errorMessage = 'Registration failed. Please try again.';
+      }
+
+      // Wait for loader timeout to complete, then show flash message
+      setTimeout(() => {
+        setIsLoading(false);
+        showCustomFlash(errorMessage, 'danger');
+      }, remainingTime);
     }
   };
 
@@ -95,10 +194,7 @@ const Index = ({ navigation }: any) => {
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <AuthWrapper
-        text={t('auth.signupTitle')}
-        desText={t('auth.signupDesc')}
-      >
+      <AuthWrapper text={t('auth.signupTitle')} desText={t('auth.signupDesc')}>
         <ThemeInput
           title={t('auth.username')}
           value={details.userName}
@@ -151,11 +247,29 @@ const Index = ({ navigation }: any) => {
           }
         />
         <Button
-          title={t('auth.signup')}
+          title={
+            isLoading
+              ? t('auth.signingUp') || 'Signing up...'
+              : t('auth.signup')
+          }
           bgColor="primary"
           buttonStyle={styles.buttonStyle}
           onPress={handleSignUp}
+          disabled={isLoading}
         />
+
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={themeColors.primary || '#2E7CF6'}
+              animating={true}
+            />
+            <ThemeText color="primary" style={styles.loadingText}>
+              {t('auth.signingUpMessage') || 'Creating your account...'}
+            </ThemeText>
+          </View>
+        ) : null}
 
         <View
           style={{
@@ -214,5 +328,19 @@ const styles = StyleSheet.create({
   forgotText: {
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(14),
+  },
+  loadingContainer: {
+    marginTop: heightPixel(20),
+    marginBottom: heightPixel(10),
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: heightPixel(30),
+    width: '100%',
+    minHeight: heightPixel(120),
+  },
+  loadingText: {
+    marginTop: heightPixel(15),
+    fontFamily: fontFamilies.medium,
+    fontSize: fontPixel(15),
   },
 });

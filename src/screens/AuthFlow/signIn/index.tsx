@@ -1,4 +1,9 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import React, { useState } from 'react';
 import { email, eyes, padlock } from './../../../assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
@@ -15,11 +20,15 @@ import { showCustomFlash } from '../../../utils/flash';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../../context/AuthContext';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useThemeContext } from '../../../theme/ThemeContext';
+import { colors } from '../../../utils/colors';
 
 const SignIn = () => {
   const navigation = useNavigation<any>();
   const { login } = useAuth();
   const { t, locale, setLocale } = useLanguage();
+  const { isDark } = useThemeContext();
+  const themeColors = colors[isDark ? 'dark' : 'light'];
 
   const handleSignUp = () => {
     navigation.navigate(routes.signup);
@@ -30,6 +39,7 @@ const SignIn = () => {
   });
   const [isHidden, setIsHidden] = useState(true);
   const [showSignupSuggestion, setShowSignupSuggestion] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const handleHide = () => {
     setIsHidden(!isHidden);
   };
@@ -43,9 +53,23 @@ const SignIn = () => {
   const handleSignIn = async () => {
     if (!details.email || !details.password) {
       showCustomFlash(t('auth.allFieldsRequired'), 'danger');
-
       return;
     }
+
+    if (isLoading) {
+      return;
+    }
+
+    // Set loading state immediately to show loader
+    setIsLoading(true);
+    console.log('[LOGIN] Starting login process...');
+    console.log('[LOGIN] isLoading set to:', true);
+    console.log('[LOGIN] Loader should be visible now');
+
+    // Track start time to ensure loader is visible for minimum duration
+    const startTime = Date.now();
+    const minLoadingTime = 2500; // 2.5 seconds to see the loader and flash message
+
     // Commented out for testing - uncomment when ready for production
     // if (!gmailOnly.test(details.email)) {
     //   showCustomFlash('Please enter a valid Email', 'danger');
@@ -57,11 +81,23 @@ const SignIn = () => {
     // }
     try {
       const success = await login(details);
-      if (success) {
-        showCustomFlash(t('auth.loginSuccessful'), 'success');
-      } else {
-        showCustomFlash(t('auth.loginFailed'), 'danger');
-      }
+
+      // Calculate elapsed time and ensure minimum display time
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+      // Wait for loader timeout to complete, then show flash message
+      setTimeout(() => {
+        setIsLoading(false);
+
+        if (success) {
+          // Show success message after loader hides
+          showCustomFlash(t('auth.loginSuccessful'), 'success');
+        } else {
+          // Show error message after loader hides
+          showCustomFlash(t('auth.loginFailed'), 'danger');
+        }
+      }, remainingTime);
     } catch (error: any) {
       // Handle backend error response
       let errorMessage = t('auth.loginFailed');
@@ -111,7 +147,15 @@ const SignIn = () => {
         errorMessage = error.message;
       }
 
-      showCustomFlash(errorMessage, errorType);
+      // Calculate elapsed time and ensure minimum display time
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+      // Wait for loader timeout to complete, then show flash message
+      setTimeout(() => {
+        setIsLoading(false);
+        showCustomFlash(errorMessage, errorType);
+      }, remainingTime);
     }
   };
   const handleForgotPass = () => {
@@ -126,27 +170,80 @@ const SignIn = () => {
       enableAutomaticScroll={false}
       contentContainerStyle={{ flexGrow: 1 }}
     >
-      <AuthWrapper
-        text={t('auth.login')}
-        desText={t('auth.loginDesc')}
-      >
+      <AuthWrapper text={t('auth.login')} desText={t('auth.loginDesc')}>
         {/* Language Radio */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: heightPixel(6) }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: heightPixel(6),
+          }}
+        >
           <ThemeText color="text" style={{ marginRight: widthPixel(8) }}>
             {t('onboarding.chooseLanguage')}
           </ThemeText>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: widthPixel(12) }}>
-              <View onTouchEnd={() => setLocale('en')} style={{ width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10), borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6) }}>
-                <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'en' ? '#2E7CF6' : 'transparent' }} />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginRight: widthPixel(12),
+              }}
+            >
+              <View
+                onTouchEnd={() => setLocale('en')}
+                style={{
+                  width: widthPixel(20),
+                  height: widthPixel(20),
+                  borderRadius: widthPixel(10),
+                  borderWidth: 1,
+                  borderColor: '#2E7CF6',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: widthPixel(6),
+                }}
+              >
+                <View
+                  style={{
+                    width: widthPixel(10),
+                    height: widthPixel(10),
+                    borderRadius: widthPixel(5),
+                    backgroundColor:
+                      locale === 'en' ? '#2E7CF6' : 'transparent',
+                  }}
+                />
               </View>
-              <ThemeText color="text" onPress={() => setLocale('en')}>EN</ThemeText>
+              <ThemeText color="text" onPress={() => setLocale('en')}>
+                EN
+              </ThemeText>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View onTouchEnd={() => setLocale('ur')} style={{ width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10), borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6) }}>
-                <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'ur' ? '#2E7CF6' : 'transparent' }} />
+              <View
+                onTouchEnd={() => setLocale('ur')}
+                style={{
+                  width: widthPixel(20),
+                  height: widthPixel(20),
+                  borderRadius: widthPixel(10),
+                  borderWidth: 1,
+                  borderColor: '#2E7CF6',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: widthPixel(6),
+                }}
+              >
+                <View
+                  style={{
+                    width: widthPixel(10),
+                    height: widthPixel(10),
+                    borderRadius: widthPixel(5),
+                    backgroundColor:
+                      locale === 'ur' ? '#2E7CF6' : 'transparent',
+                  }}
+                />
               </View>
-              <ThemeText color="text" onPress={() => setLocale('ur')}>اردو</ThemeText>
+              <ThemeText color="text" onPress={() => setLocale('ur')}>
+                اردو
+              </ThemeText>
             </View>
           </View>
         </View>
@@ -192,11 +289,27 @@ const SignIn = () => {
           </TouchableOpacity>
         </View>
         <Button
-          title={t('auth.login')}
+          title={
+            isLoading ? t('auth.loggingIn') || 'Logging in...' : t('auth.login')
+          }
           bgColor="buttonBackGround"
           buttonStyle={styles.buttonStyle}
           onPress={handleSignIn}
+          disabled={isLoading}
         />
+
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={themeColors.primary || '#2E7CF6'}
+              animating={true}
+            />
+            <ThemeText color="primary" style={styles.loadingText}>
+              {t('auth.loggingInMessage') || 'Logging in...'}
+            </ThemeText>
+          </View>
+        ) : null}
 
         {showSignupSuggestion && (
           <View style={styles.signupSuggestion}>
@@ -282,5 +395,19 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.semibold,
     fontSize: fontPixel(13),
     textDecorationLine: 'underline',
+  },
+  loadingContainer: {
+    marginTop: heightPixel(20),
+    marginBottom: heightPixel(10),
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: heightPixel(30),
+    width: '100%',
+    minHeight: heightPixel(120),
+  },
+  loadingText: {
+    marginTop: heightPixel(15),
+    fontFamily: fontFamilies.medium,
+    fontSize: fontPixel(15),
   },
 });
