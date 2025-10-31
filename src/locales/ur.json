@@ -61,7 +61,21 @@
     "signingUp": "رجسٹریشن ہو رہی ہے...",
     "signingUpMessage": "آپ کا اکاؤنٹ بنایا جا رہا ہے...",
     "sendingCodeMessage": "تصدیقی کوڈ بھیجا جا رہا ہے...",
-    "resettingPasswordMessage": "آپ کا پاس ورڈ ری سیٹ ہو رہا ہے..."
+    "resettingPasswordMessage": "آپ کا پاس ورڈ ری سیٹ ہو رہا ہے...",
+    "changePasswordTitle": "پاس ورڈ تبدیل کریں",
+    "oldPassword": "موجودہ پاس ورڈ",
+    "oldPasswordPlaceholder": "موجودہ پاس ورڈ درج کریں",
+    "confirmNewPassword": "نیا پاس ورڈ تصدیق کریں",
+    "confirmNewPasswordPlaceholder": "نیا پاس ورڈ تصدیق کریں",
+    "changePasswordButton": "پاس ورڈ تبدیل کریں",
+    "changingPassword": "پاس ورڈ تبدیل ہو رہا ہے...",
+    "changingPasswordMessage": "پاس ورڈ تبدیل ہو رہا ہے...",
+    "passwordChangedSuccess": "آپ کا پاس ورڈ کامیابی سے تبدیل ہو گیا",
+    "failedToChangePassword": "پاس ورڈ تبدیل کرنا ناکام۔ براہ کرم اپنا موجودہ پاس ورڈ چیک کریں",
+    "incorrectCurrentPassword": "غلط پاس ورڈ۔",
+    "userNotAuthenticated": "صارف تصدیق شدہ نہیں",
+    "fillAllFields": "براہ کرم تمام خانے بھریں",
+    "newPasswordMustBeDifferent": "نیا پاس ورڈ موجودہ پاس ورڈ سے مختلف ہونا چاہیے"
   },
   "onboarding": {
     "welcome": "خوش آمدید",

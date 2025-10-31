@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import HomeWrapper from '../../../../Wrappers/HomeWrapper';
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { showCustomFlash } from '../../../utils/flash';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
@@ -20,6 +20,7 @@ import SettingsRow from '../../../components/Settings/SettingsRow';
 import { useNavigation } from '@react-navigation/native';
 import { useThemeContext } from '../../../theme/ThemeContext';
 import { useLanguage } from '../../../context/LanguageContext';
+import ChangePasswordModal from '../../../components/ChangePasswordModal';
 
 const Index = () => {
   const { logout } = useAuth();
@@ -27,6 +28,7 @@ const Index = () => {
   const { isDark, toggleTheme } = useThemeContext();
   const themeColors = colors[isDark ? 'dark' : 'light'];
   const { t, locale, setLocale } = useLanguage();
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   // No notifications toggle in settings
 
@@ -114,7 +116,7 @@ const Index = () => {
             <SettingsRow
               icon="🔒"
               label={t('settings.updatePassword')}
-              onPress={() => handleNavigate(t('settings.updatePassword'))}
+              onPress={() => setShowChangePasswordModal(true)}
             />
 
             <SettingsRow
@@ -143,7 +145,7 @@ const Index = () => {
 
           {/* Logout (styled like other tiles) */}
           <TouchableOpacity
-            style={[styles.item, { backgroundColor: themeColors.gray6 }]}
+            style={[styles.item, { backgroundColor: themeColors.background }]}
             onPress={handleLogout}
             activeOpacity={0.8}
           >
@@ -155,6 +157,15 @@ const Index = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isVisible={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        onPasswordChanged={() => {
+          setShowChangePasswordModal(false);
+        }}
+      />
     </HomeWrapper>
   );
 };

@@ -13,8 +13,8 @@ export const API_CONFIG = {
     LOGIN: '/auth/login',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    CHANGE_PASSWORD: '/auth/change-password',
     VERIFY_EMAIL: '/auth/verify-email',
-    RESEND_VERIFICATION: '/auth/resend-verification',
 
     // Image Analysis
     IMAGE_ANALYSIS: '/ImageAnalysis/analyze-and-plan',
@@ -82,6 +82,12 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   email: string;
   code: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
