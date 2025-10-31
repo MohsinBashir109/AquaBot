@@ -6,6 +6,7 @@ import {
   LoginRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  ChangePasswordRequest,
 } from './apiConfig';
 import { showCustomFlash } from '../utils/flash';
 import { authService } from './authService';
@@ -172,6 +173,35 @@ class ApiService {
       return response;
     } catch (error: any) {
       // Flash message will be shown by the UI after loader completes
+      throw error;
+    }
+  }
+
+  // Change password
+  async changePassword(data: ChangePasswordRequest): Promise<ApiResponse> {
+    try {
+      // Get auth token for authorization header
+      const token = await authService.getAuthToken();
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await this.makeRequest(
+        API_CONFIG.ENDPOINTS.CHANGE_PASSWORD,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(data),
+        },
+      );
+
+      // Flash message will be shown by the UI
+      return response;
+    } catch (error: any) {
+      // Flash message will be shown by the UI
       throw error;
     }
   }

@@ -38,7 +38,7 @@ const SettingsRow: React.FC<Props> = ({
       onPress={onPress}
       style={[
         styles.item,
-        { backgroundColor: themeColors.gray6 },
+        { backgroundColor: themeColors.background },
         containerStyle,
       ]}
     >
@@ -65,6 +65,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: widthPixel(14),
     borderRadius: widthPixel(10),
     marginBottom: heightPixel(8),
+    elevation: 1,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 4,
   },
   itemIcon: {
     width: widthPixel(24),

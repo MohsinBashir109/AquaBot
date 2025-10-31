@@ -61,7 +61,21 @@
     "signingUp": "Signing up...",
     "signingUpMessage": "Creating your account...",
     "sendingCodeMessage": "Sending verification code...",
-    "resettingPasswordMessage": "Resetting your password..."
+    "resettingPasswordMessage": "Resetting your password...",
+    "changePasswordTitle": "Change Password",
+    "oldPassword": "Current Password",
+    "oldPasswordPlaceholder": "Enter current password",
+    "confirmNewPassword": "Confirm New Password",
+    "confirmNewPasswordPlaceholder": "Confirm new password",
+    "changePasswordButton": "Change Password",
+    "changingPassword": "Changing Password...",
+    "changingPasswordMessage": "Changing password...",
+    "passwordChangedSuccess": "Your password has been changed successfully",
+    "failedToChangePassword": "Failed to change password. Please check your current password",
+    "incorrectCurrentPassword": "Incorrect password.",
+    "userNotAuthenticated": "User not authenticated",
+    "fillAllFields": "Please fill in all fields",
+    "newPasswordMustBeDifferent": "New password must be different from current password"
   },
   "onboarding": {
     "welcome": "Welcome",

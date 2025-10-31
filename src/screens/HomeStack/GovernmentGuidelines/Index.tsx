@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     fontSize: fontPixel(14),
     fontFamily: fontFamilies.medium,
     marginBottom: heightPixel(8),
-    elevation: 5,
+    elevation: 1,
   },
   input: {
     height: heightPixel(45),
