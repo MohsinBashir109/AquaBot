@@ -1,9 +1,24 @@
 // API Configuration for .NET Backend
+// const BASE_URL = 'http://172.17.254.226:5065/api'; // Office network IP (PHYSICAL DEVICE)
+// const BASE_URL = 'http://192.168.2.11:5065/api'; // Home network IP (PHYSICAL DEVICE)
+// const BASE_URL = 'http://localhost:5065/api'; // For iOS Simulator
+const BASE_URL = 'http://10.0.2.2:5065/api'; // For Android Emulator - THIS IS CURRENT
+// const BASE_URL = 'http://DESKTOP-0DDVPED:5065/api'; // Physical device with hostname
+
+// Log the configured URL when module loads
+console.log('🔧 [API Config] Base URL configured:', BASE_URL);
+console.log('⚠️ [API Config] Make sure:');
+console.log('   1. API server is running on localhost:5065');
+console.log(
+  '   2. You are using Android Emulator (10.0.2.2 points to host machine localhost)',
+);
+console.log('   3. For physical device, change to your computer IP address');
+console.log(
+  '   4. API should be accessible at http://localhost:5065/api on your computer',
+);
+
 export const API_CONFIG = {
-  // BASE_URL: 'http://localhost:5065/api',
-  // BASE_URL: 'http://192.168.2.11:5065/api', // Physical device with host IP
-  // BASE_URL: 'http://DESKTOP-0DDVPED:5065/api', // Physical device with hostname
-  BASE_URL: 'http://10.0.2.2:5065/api', // Android emulator
+  BASE_URL,
   TIMEOUT: 10000, // 10 seconds timeout
   // Enable verbose logging for debugging (set to false in production)
   ENABLE_VERBOSE_LOGGING: __DEV__, // Automatically true in development, false in production
@@ -28,9 +43,8 @@ export const API_CONFIG = {
     // CREATE_IRRIGATION_PLAN: '/IrrigationPlan/create',
     // GET_IRRIGATION_PLANS: '/IrrigationPlan/user-plans',
 
-    // // Assistant
-    // CHAT_ASSISTANT: '/Assistant/chat',
-    // VOICE_ASSISTANT: '/Assistant/voice',
+    // Assistant
+    CHAT_ASSISTANT: '/Assistant/chat',
   },
 };
 

@@ -5,7 +5,8 @@
     "urdu": "Urdu",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
-    "comingSoon": "{feature} is coming soon"
+    "comingSoon": "{feature} is coming soon",
+    "cancel": "Cancel"
   },
   "auth": {
     "login": "Login",
@@ -110,7 +111,11 @@
     "language": "Language",
     "updatePassword": "Update Password",
     "helpCenter": "Help Center",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "logoutConfirmation": "Are you sure you want to logout?",
+    "logoutSuccess": "Logged out successfully!",
+    "logoutFailed": "Logout failed. Please try again.",
+    "loggingOut": "Logging out..."
   },
   "profile": {
     "title": "Profile",
@@ -160,5 +165,21 @@
     "selectImageFirst": "Please select an image first",
     "analyzing": "Analyzing your field...",
     "analysisFailed": "Analysis failed. Please try again."
+  },
+  "chatbot": {
+    "title": "AI Chat Assistant",
+    "subtitle": "Ask me anything about irrigation, farming, or water management!",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "listening": "Listening...",
+    "tapToSpeak": "Tap to speak",
+    "speaking": "Speaking...",
+    "sendMessage": "Send message",
+    "stopSpeaking": "Stop speaking",
+    "errorSending": "Failed to send message. Please try again.",
+    "errorListening": "Failed to start listening. Please check microphone permissions.",
+    "noPermission": "Microphone permission is required for voice input.",
+    "processing": "Processing...",
+    "speakingResponse": "Speaking response..."
   }
 }

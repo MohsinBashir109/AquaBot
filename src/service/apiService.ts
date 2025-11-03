@@ -1,3 +1,4 @@
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import {
   API_CONFIG,
   ApiResponse,
@@ -21,10 +22,74 @@ import {
 class ApiService {
   private baseURL: string;
   private timeout: number;
+  private axiosInstance;
 
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL;
     this.timeout = API_CONFIG.TIMEOUT;
+
+    // Create axios instance with default config
+    // Note: We'll use full URLs in requests, so baseURL is optional
+    this.axiosInstance = axios.create({
+      timeout: this.timeout,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+
+    // Add request interceptor to log all outgoing requests
+    this.axiosInstance.interceptors.request.use(
+      config => {
+        console.log('🔵 [AXIOS INTERCEPTOR] Request being sent:');
+        console.log('🔵 [AXIOS] URL:', config.url);
+        console.log('🔵 [AXIOS] Method:', config.method);
+        console.log(
+          '🔵 [AXIOS] Headers:',
+          JSON.stringify(config.headers, null, 2),
+        );
+        console.log(
+          '🔵 [AXIOS] Data:',
+          config.data ? JSON.stringify(config.data, null, 2) : 'No data',
+        );
+        return config;
+      },
+      error => {
+        console.error('🔴 [AXIOS INTERCEPTOR] Request error:', error);
+        return Promise.reject(error);
+      },
+    );
+
+    // Add response interceptor to log all responses
+    this.axiosInstance.interceptors.response.use(
+      response => {
+        console.log('🟢 [AXIOS INTERCEPTOR] Response received:');
+        console.log('🟢 [AXIOS] Status:', response.status);
+        console.log('🟢 [AXIOS] Data:', JSON.stringify(response.data, null, 2));
+        return response;
+      },
+      error => {
+        console.error('🔴 [AXIOS INTERCEPTOR] Response error:');
+        console.error('🔴 [AXIOS] Error message:', error.message);
+        console.error('🔴 [AXIOS] Error code:', error.code);
+        if (error.response) {
+          console.error('🔴 [AXIOS] Response status:', error.response.status);
+          console.error('🔴 [AXIOS] Response data:', error.response.data);
+        }
+        if (error.request) {
+          console.error('🔴 [AXIOS] Request was made but no response received');
+          console.error('🔴 [AXIOS] Request details:', error.request);
+        }
+        return Promise.reject(error);
+      },
+    );
+  }
+
+  /**
+   * Get current base URL
+   */
+  getBaseUrl(): string {
+    return this.baseURL;
   }
 
   // Test connectivity to backend (DEPRECATED - no longer used automatically)
@@ -35,18 +100,9 @@ class ApiService {
       '[API WARNING] testConnection called - this creates an extra API call. Should only be used for manual testing.',
     );
     try {
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Connection timeout')), 3000);
+      await this.axiosInstance.get('/Auth/register', {
+        timeout: 3000,
       });
-
-      const fetchPromise = fetch(`${this.baseURL}/Auth/register`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      await Promise.race([fetchPromise, timeoutPromise]);
       return true;
     } catch (error: any) {
       return false;
@@ -55,103 +111,194 @@ class ApiService {
 
   private async makeRequest<T>(
     endpoint: string,
-    options: RequestInit = {},
+    options: AxiosRequestConfig = {},
+    retryCount: number = 0,
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    const method = options.method || 'GET';
+    const method = (options.method || 'GET').toUpperCase();
     const requestId = `${method} ${endpoint} - ${Date.now()}`;
 
     try {
-      // Log request details
-      const requestPayload: any = {};
-      if (options.body) {
-        try {
-          requestPayload.body = JSON.parse(options.body as string);
-        } catch {
-          requestPayload.body = options.body;
-        }
-      }
+      // Always log the URL being called for debugging
+      console.log(`🌐 [API] Calling: ${method} ${url}`);
+      console.log(`🌐 [API] Base URL: ${this.baseURL}`);
+      console.log(`🌐 [API] Endpoint: ${endpoint}`);
+      console.log(`🌐 [API] Full URL will be: ${this.baseURL}${endpoint}`);
 
-      console.log(`[API REQUEST] ${requestId}`);
-      console.log(`URL: ${url}`);
-      console.log(`Method: ${method}`);
-      console.log(
-        `Payload:`,
-        JSON.stringify(requestPayload.body || {}, null, 2),
-      );
-      console.log(`Headers:`, JSON.stringify(options.headers || {}, null, 2));
-
-      const defaultHeaders = {
+      // Merge headers - ensure Content-Type is always set for JSON requests
+      const mergedHeaders = {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...(options.headers || {}),
       };
 
-      const config: RequestInit = {
-        ...options,
-        headers: {
-          ...defaultHeaders,
-          ...options.headers,
-        },
-      };
+      // Log request details (always log for debugging network issues)
+      console.log(`📤 [API REQUEST] ${requestId}`);
+      console.log(`📤 [API] URL: ${url}`);
+      console.log(`📤 [API] Method: ${method}`);
+      console.log(`📤 [API] Headers:`, JSON.stringify(mergedHeaders, null, 2));
+      if (options.data) {
+        console.log(`📤 [API] Payload:`, JSON.stringify(options.data, null, 2));
+      }
+      console.log(
+        `📤 [API] Axios instance baseURL:`,
+        this.axiosInstance.defaults.baseURL,
+      );
+      console.log(`📤 [API] Making request now...`);
 
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          console.log(`[API TIMEOUT] ${requestId}`);
-          reject(new Error('Request timeout'));
-        }, this.timeout);
+      // Make the request using axios
+      // Construct full URL
+      const fullUrl = `${this.baseURL}${endpoint}`;
+      console.log(`📤 [API] Final request URL: ${fullUrl}`);
+      console.log(`📤 [API] Request config before axios:`, {
+        url: fullUrl,
+        method: method,
+        hasData: !!options.data,
+        headers: mergedHeaders,
       });
 
-      const fetchPromise = fetch(url, config);
-      const response = await Promise.race([fetchPromise, timeoutPromise]);
+      // Use axios.post/get/put/delete directly based on method
+      let response;
+      const requestConfig: any = {
+        url: fullUrl,
+        method: method.toLowerCase(),
+        headers: mergedHeaders,
+        timeout: options.timeout || this.timeout,
+        validateStatus: (status: number) => status < 500, // Don't throw on 4xx
+      };
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        const textResponse = await response.text();
-        console.log(`[API RESPONSE - TEXT] ${requestId}`);
-        console.log(`Status: ${response.status} ${response.statusText}`);
-        console.log(`Response:`, textResponse);
-        throw new Error(`Invalid JSON response: ${textResponse}`);
+      if (options.data) {
+        requestConfig.data = options.data;
       }
-
-      // Log response details
-      console.log(`[API RESPONSE] ${requestId}`);
-      console.log(`Status: ${response.status} ${response.statusText}`);
-      console.log(`Response:`, JSON.stringify(data, null, 2));
-
-      if (!response.ok) {
-        console.log(`[API ERROR] ${requestId} - Request failed`);
-        const error = new Error(
-          data.MessageEnglish ||
-            data.messageEnglish ||
-            data.Message ||
-            data.message ||
-            data.title ||
-            `HTTP error! status: ${response.status}`,
-        );
-        (error as any).response = { data };
-        throw error;
+      if (options.params) {
+        requestConfig.params = options.params;
       }
 
       console.log(
-        `[API SUCCESS] ${requestId} - Request completed successfully`,
+        `📤 [API] Calling axios with config:`,
+        JSON.stringify(requestConfig, null, 2),
       );
-      return data;
-    } catch (error: any) {
-      console.log(`[API FAILED] ${requestId}`);
-      console.log(`Error:`, error.message || error);
-      if (error.response?.data) {
+
+      response = await this.axiosInstance.request<T>(requestConfig);
+
+      console.log(`✅ [API] Request completed! Status: ${response.status}`);
+
+      const data = response.data as ApiResponse<T>;
+
+      // Log response details only if verbose logging is enabled
+      if (API_CONFIG.ENABLE_VERBOSE_LOGGING) {
+        console.log(`[API RESPONSE] ${requestId}`);
+        console.log(`Status: ${response.status} ${response.statusText}`);
+        console.log(`Response:`, JSON.stringify(data, null, 2));
+      }
+
+      // If request failed with network/server error and we haven't retried yet, retry once
+      if (response.status >= 500 && retryCount === 0) {
         console.log(
-          `Error Response Data:`,
-          JSON.stringify(error.response.data, null, 2),
+          `🔄 [ApiService] Request failed with status ${response.status}, retrying...`,
+        );
+        // Retry the request once
+        return this.makeRequest<T>(endpoint, options, retryCount + 1);
+      }
+
+      // Only log success if verbose logging is enabled
+      if (API_CONFIG.ENABLE_VERBOSE_LOGGING) {
+        console.log(
+          `[API SUCCESS] ${requestId} - Request completed successfully`,
         );
       }
-      if (error.message === 'Request timeout') {
+      return data;
+    } catch (error: any) {
+      const axiosError = error as AxiosError<ApiResponse<T>>;
+      console.error(`❌ [API FAILED] ${requestId}`);
+      console.error(
+        `❌ [API] Error name:`,
+        error.name || axiosError.name || 'Unknown',
+      );
+      console.error(`❌ [API] Error message:`, error.message || error);
+      console.error(
+        `❌ [API] Error code:`,
+        axiosError.code || error.code || 'No code',
+      );
+      console.error(`❌ [API] URL was: ${url}`);
+      console.error(`❌ [API] Base URL: ${this.baseURL}`);
+      console.error(`❌ [API] Endpoint: ${endpoint}`);
+
+      // Log error details safely
+      try {
+        console.error(`❌ [API] Error stack:`, error.stack);
+        if (error.response) {
+          console.error(`❌ [API] Response status:`, error.response.status);
+          console.error(`❌ [API] Response data:`, error.response.data);
+        }
+        if (error.request) {
+          console.error(`❌ [API] Request was made but no response received`);
+          console.error(
+            `❌ [API] This usually means: Network error, CORS issue, or server not reachable`,
+          );
+        }
+      } catch (e) {
+        console.error(`❌ [API] Could not log full error details`);
+      }
+
+      // Check for common connection errors
+      const errorMsg = String(error.message || '').toLowerCase();
+      if (
+        errorMsg.includes('network request failed') ||
+        errorMsg.includes('fetch failed') ||
+        errorMsg.includes('networkerror') ||
+        errorMsg.includes('timeout') ||
+        errorMsg.includes('econnrefused') ||
+        axiosError.code === 'ECONNREFUSED' ||
+        axiosError.code === 'ETIMEDOUT'
+      ) {
+        console.error(`❌ [API] Network error - Is the API server running?`);
+        console.error(`❌ [API] Current API URL: ${this.baseURL}`);
+        console.error(
+          `❌ [API] For physical device, update BASE_URL in apiConfig.ts to your computer's IP`,
+        );
+      }
+
+      // Handle axios error response
+      if (axiosError.response) {
+        const responseData = axiosError.response.data;
+        console.error(
+          `Error Response Data:`,
+          JSON.stringify(responseData, null, 2),
+        );
+
+        // If request failed with server error and we haven't retried yet, retry once
+        if (axiosError.response.status >= 500 && retryCount === 0) {
+          console.log(
+            `🔄 [ApiService] Request failed with status ${axiosError.response.status}, retrying...`,
+          );
+          return this.makeRequest<T>(endpoint, options, retryCount + 1);
+        }
+
+        // Extract error message from response
+        const errorMessage =
+          (responseData as any)?.MessageEnglish ||
+          (responseData as any)?.messageEnglish ||
+          (responseData as any)?.Message ||
+          (responseData as any)?.message ||
+          (responseData as any)?.title ||
+          `HTTP error! status: ${axiosError.response.status}`;
+
+        const apiError = new Error(errorMessage);
+        (apiError as any).response = { data: responseData };
+        throw apiError;
+      }
+
+      if (
+        error.message?.includes('timeout') ||
+        axiosError.code === 'ETIMEDOUT'
+      ) {
         const timeoutError = new Error(
-          'Request timeout. Please check your internet connection.',
+          `Request timeout. API URL: ${this.baseURL} - Check if server is running and URL is correct.`,
         );
         throw timeoutError;
       }
+
       throw error;
     }
   }
@@ -165,7 +312,7 @@ class ApiService {
         API_CONFIG.ENDPOINTS.REGISTER,
         {
           method: 'POST',
-          body: JSON.stringify(userData),
+          data: userData,
         },
       );
 
@@ -182,9 +329,7 @@ class ApiService {
     try {
       // Get auth token for authorization header
       const token = await authService.getAuthToken();
-      const headers: any = {
-        'Content-Type': 'application/json',
-      };
+      const headers: any = {};
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
@@ -194,7 +339,7 @@ class ApiService {
         {
           method: 'POST',
           headers,
-          body: JSON.stringify(data),
+          data,
         },
       );
 
@@ -209,16 +354,59 @@ class ApiService {
   // Login user
   async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponse>> {
     try {
+      console.log('🔐 [API Login] Starting login request');
+      console.log('🔐 [API Login] Endpoint:', API_CONFIG.ENDPOINTS.LOGIN);
+      console.log(
+        '🔐 [API Login] Full URL:',
+        `${this.baseURL}${API_CONFIG.ENDPOINTS.LOGIN}`,
+      );
+      console.log('🔐 [API Login] Credentials email:', credentials.email);
+      console.log(
+        '🔐 [API Login] Credentials password length:',
+        credentials.password?.length || 0,
+      );
+
       const response = await this.makeRequest<AuthResponse>(
         API_CONFIG.ENDPOINTS.LOGIN,
         {
           method: 'POST',
-          body: JSON.stringify(credentials),
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          data: credentials,
         },
+      );
+
+      console.log('✅ [API Login] Login request successful');
+      console.log(
+        '✅ [API Login] Response success:',
+        response.success || response.Success,
+      );
+      console.log(
+        '✅ [API Login] Has token:',
+        !!(response.token || response.Token),
+      );
+      console.log(
+        '✅ [API Login] Has user data:',
+        !!(response.user || response.User || response.data || response.Data),
       );
 
       return response;
     } catch (error: any) {
+      console.error('❌ [API Login] Login request failed');
+      console.error('❌ [API Login] Error message:', error.message);
+      console.error('❌ [API Login] Error stack:', error.stack);
+      if (error.response) {
+        console.error(
+          '❌ [API Login] Error response status:',
+          error.response.status,
+        );
+        console.error(
+          '❌ [API Login] Error response data:',
+          JSON.stringify(error.response.data, null, 2),
+        );
+      }
       throw error;
     }
   }
@@ -230,7 +418,7 @@ class ApiService {
         API_CONFIG.ENDPOINTS.FORGOT_PASSWORD,
         {
           method: 'POST',
-          body: JSON.stringify(data),
+          data,
         },
       );
 
@@ -263,7 +451,7 @@ class ApiService {
         API_CONFIG.ENDPOINTS.RESET_PASSWORD,
         {
           method: 'POST',
-          body: JSON.stringify(data),
+          data,
         },
       );
 
@@ -334,16 +522,73 @@ class ApiService {
     try {
       const token = await authService.getAuthToken();
       if (!token) {
+        console.error('❌ [WeatherAPI] No authentication token found');
         throw new Error('Not authenticated');
       }
 
-      return await this.makeRequest<WeatherResponse>(`/weather/${city}`, {
+      const endpoint = `/weather/${city}`;
+      const fullUrl = `${this.baseURL}${endpoint}`;
+      console.log(`🌤️ [WeatherAPI] Fetching weather for city: ${city}`);
+      console.log(`🌤️ [WeatherAPI] URL: ${fullUrl}`);
+
+      const response = await this.makeRequest<WeatherResponse>(endpoint, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      console.log(
+        `🌤️ [WeatherAPI] Response received:`,
+        JSON.stringify(response, null, 2),
+      );
+
+      // Handle both direct weather data and wrapped response
+      // If response has main property, it's direct weather data
+      if (
+        response &&
+        typeof response === 'object' &&
+        'main' in response &&
+        !('success' in response)
+      ) {
+        // Direct weather data, wrap it
+        console.log(
+          '🌤️ [WeatherAPI] Direct weather data detected, wrapping response',
+        );
+        return {
+          success: true,
+          Success: true,
+          data: response as unknown as WeatherResponse,
+          Data: response as unknown as WeatherResponse,
+          message: 'Weather data retrieved successfully',
+          Message: 'Weather data retrieved successfully',
+        };
+      }
+
+      // Normal wrapped response
+      console.log('🌤️ [WeatherAPI] Wrapped response detected');
+      return response;
     } catch (error: any) {
+      console.error('❌ [WeatherAPI] Error fetching weather:', error);
+
+      // If error response contains weather-like structure, extract it
+      if (
+        error.response?.data &&
+        typeof error.response.data === 'object' &&
+        'main' in error.response.data
+      ) {
+        console.log(
+          '🌤️ [WeatherAPI] Weather data found in error response, extracting',
+        );
+        return {
+          success: true,
+          Success: true,
+          data: error.response.data as WeatherResponse,
+          Data: error.response.data as WeatherResponse,
+          message: 'Weather data retrieved successfully',
+          Message: 'Weather data retrieved successfully',
+        };
+      }
       throw error;
     }
   }
@@ -355,11 +600,17 @@ class ApiService {
     try {
       const token = await authService.getAuthToken();
       if (!token) {
+        console.error('❌ [PlansAPI] No authentication token found');
         throw new Error('Not authenticated');
       }
 
-      return await this.makeRequest<IrrigationPlanDetailsDto[]>(
-        '/irrigationplan/my-plans',
+      const endpoint = '/irrigationplan/my-plans';
+      const fullUrl = `${this.baseURL}${endpoint}`;
+      console.log(`📋 [PlansAPI] Fetching irrigation plans`);
+      console.log(`📋 [PlansAPI] URL: ${fullUrl}`);
+
+      const response = await this.makeRequest<IrrigationPlanDetailsDto[]>(
+        endpoint,
         {
           method: 'GET',
           headers: {
@@ -367,7 +618,46 @@ class ApiService {
           },
         },
       );
+
+      console.log(
+        `📋 [PlansAPI] Response received:`,
+        JSON.stringify(response, null, 2),
+      );
+
+      // Handle both direct array response and wrapped response
+      if (Array.isArray(response)) {
+        // Direct array response
+        console.log('📋 [PlansAPI] Direct array response detected, wrapping');
+        return {
+          success: true,
+          Success: true,
+          data: response,
+          Data: response,
+          message: 'Irrigation plans retrieved successfully',
+          Message: 'Irrigation plans retrieved successfully',
+        };
+      }
+
+      // Normal wrapped response
+      console.log('📋 [PlansAPI] Wrapped response detected');
+      return response;
     } catch (error: any) {
+      console.error('❌ [PlansAPI] Error fetching irrigation plans:', error);
+
+      // If error response contains plans data, extract it
+      if (error.response?.data && Array.isArray(error.response.data)) {
+        console.log(
+          '📋 [PlansAPI] Plans data found in error response, extracting',
+        );
+        return {
+          success: true,
+          Success: true,
+          data: error.response.data,
+          Data: error.response.data,
+          message: 'Irrigation plans retrieved successfully',
+          Message: 'Irrigation plans retrieved successfully',
+        };
+      }
       throw error;
     }
   }
@@ -407,7 +697,7 @@ class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        data,
       });
 
       if (response.success) {

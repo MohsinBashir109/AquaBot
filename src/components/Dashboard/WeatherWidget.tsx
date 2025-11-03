@@ -120,8 +120,8 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
               {t('home.humidity')}: {data.main.humidity}%
             </Text>
             <Text style={styles.tempRange}>
-              {Math.round(data.main.tempMin)}°C -{' '}
-              {Math.round(data.main.tempMax)}
+              {Math.round(data.main.temp_min || data.main.tempMin || 0)}°C -{' '}
+              {Math.round(data.main.temp_max || data.main.tempMax || 0)}
               °C
             </Text>
           </View>
