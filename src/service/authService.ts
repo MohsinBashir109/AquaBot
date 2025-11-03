@@ -1,11 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService } from './apiService';
-import {
-  RegisterRequest,
-  LoginRequest,
-  AuthResponse,
-  ChangePasswordRequest,
-} from './apiConfig';
+import { RegisterRequest, LoginRequest, AuthResponse } from './apiConfig';
 
 // Key used for AsyncStorage
 const USER_KEY = 'user_session';
@@ -26,9 +21,9 @@ class AuthService {
         (response.data || response.Data);
 
       if (isSuccess) {
-        const userData = response.data || response.Data;
-        if (userData) {
-          await this.storeUserSession(userData);
+        const registeredUserData = response.data || response.Data;
+        if (registeredUserData) {
+          await this.storeUserSession(registeredUserData);
           console.log('✅ Registration successful');
         }
         return false; // No error
@@ -47,18 +42,50 @@ class AuthService {
     credentials: LoginRequest,
   ): Promise<{ flag: boolean; user: string | null }> {
     try {
+      console.log(
+        '🔐 [AuthService] Login called with email:',
+        credentials.email,
+      );
       const response = await apiService.login(credentials);
+
+      console.log('🔐 [AuthService] Login response received');
+      console.log('🔐 [AuthService] Response keys:', Object.keys(response));
+      console.log('🔐 [AuthService] Response.success:', response.success);
+      console.log('🔐 [AuthService] Response.Success:', response.Success);
+      console.log('🔐 [AuthService] Response.data:', response.data);
+      console.log('🔐 [AuthService] Response.Data:', response.Data);
+      console.log('🔐 [AuthService] Response.user:', response.user);
+      console.log('🔐 [AuthService] Response.User:', response.User);
+      console.log(
+        '🔐 [AuthService] Response.token:',
+        response.token ? 'Present' : 'Missing',
+      );
+      console.log(
+        '🔐 [AuthService] Response.Token:',
+        response.Token ? 'Present' : 'Missing',
+      );
 
       // Check for success and user data (your backend returns Success, User, Token)
       const isSuccess =
         (response.success || response.Success) &&
         (response.data || response.Data || response.user || response.User);
 
+      console.log('🔐 [AuthService] isSuccess:', isSuccess);
+
       if (isSuccess) {
         // Your backend returns User and Token directly
         let userData =
           response.data || response.Data || response.user || response.User;
         const token = response.token || response.Token;
+
+        console.log(
+          '🔐 [AuthService] Extracted userData:',
+          userData ? 'Present' : 'Missing',
+        );
+        console.log(
+          '🔐 [AuthService] Extracted token:',
+          token ? 'Present' : 'Missing',
+        );
 
         // If we have user data from backend, use it directly
         if (userData) {
@@ -67,57 +94,43 @@ class AuthService {
             token: token,
           };
         } else if (token) {
-          // Fallback: decode JWT if no user data
-          try {
-            const tokenParts = token.split('.');
-            if (tokenParts.length === 3) {
-              const payload = JSON.parse(
-                Buffer.from(tokenParts[1], 'base64').toString(),
-              );
-
-              userData = {
-                user: {
-                  userName:
-                    payload[
-                      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
-                    ] || 'User',
-                  email:
-                    payload[
-                      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
-                    ] || 'user@example.com',
-                  id:
-                    payload[
-                      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
-                    ] || '1',
-                },
-                token: token,
-              };
-            } else {
-              throw new Error('Invalid JWT format');
-            }
-          } catch (error) {
-            console.error('Error decoding JWT:', error);
-            // Fallback to basic user data
-            userData = {
-              user: {
-                userName: 'User',
-                email: 'user@example.com',
-                id: '1',
-              },
-              token: token,
-            };
-          }
+          // Fallback: create basic user data if we only have token
+          // The backend should provide user data, but if it doesn't, we'll use a basic structure
+          console.warn(
+            '⚠️ [AuthService] No user data in response, only token. Creating basic user object.',
+          );
+          userData = {
+            user: {
+              userName: 'User',
+              email: credentials.email || 'user@example.com',
+              id: '1',
+            },
+            token: token,
+          };
         }
 
         // Store user session data
         await this.storeUserSession(userData);
+        console.log('✅ [AuthService] Login successful, user stored');
         return { flag: false, user: userData.user.userName };
       }
 
-      console.log('❌ Login failed');
+      console.log('❌ [AuthService] Login failed - response indicates failure');
+      console.log(
+        '❌ [AuthService] Full response:',
+        JSON.stringify(response, null, 2),
+      );
       return { flag: true, user: null };
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      console.error('❌ [AuthService] Login error caught');
+      console.error('❌ [AuthService] Error message:', error.message);
+      console.error('❌ [AuthService] Error stack:', error.stack);
+      if (error.response) {
+        console.error(
+          '❌ [AuthService] Error response:',
+          JSON.stringify(error.response.data, null, 2),
+        );
+      }
       throw error;
     }
   }

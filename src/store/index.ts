@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
+import irrigationPlansReducer from './irrigationPlansSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    irrigationPlans: irrigationPlansReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

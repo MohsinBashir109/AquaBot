@@ -74,6 +74,7 @@ const Button = (props: ButtonProps) => {
                 ],
           },
         ]}
+        allowFontScaling={true}
       >
         {title}
       </Text>
@@ -108,8 +109,10 @@ const styles = StyleSheet.create({
   buttonTitle: {
     textAlign: 'center',
     fontSize: fontPixel(16),
-
     fontFamily: fontFamilies.semibold,
+    textShadowColor: 'transparent',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 0,
   },
   icon: {
     width: widthPixel(20),

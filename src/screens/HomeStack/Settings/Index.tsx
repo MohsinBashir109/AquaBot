@@ -3,7 +3,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Switch,
 } from 'react-native';
@@ -11,7 +10,6 @@ import {
 import HomeWrapper from '../../../../Wrappers/HomeWrapper';
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-import { showCustomFlash } from '../../../utils/flash';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { colors } from '../../../utils/colors';
@@ -21,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useThemeContext } from '../../../theme/ThemeContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import ChangePasswordModal from '../../../components/ChangePasswordModal';
+import LogoutConfirmationModal from '../../../components/LogoutConfirmationModal';
 
 const Index = () => {
   const { logout } = useAuth();
@@ -29,29 +28,16 @@ const Index = () => {
   const themeColors = colors[isDark ? 'dark' : 'light'];
   const { t, locale, setLocale } = useLanguage();
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // No notifications toggle in settings
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await logout();
-            showCustomFlash('Logged out successfully!', 'success');
-          } catch (error) {
-            console.error('Logout error:', error);
-            showCustomFlash('Logout failed. Please try again.', 'danger');
-          }
-        },
-      },
-    ]);
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    await logout();
   };
 
   const handleNavigate = (feature: string) => {
@@ -165,6 +151,13 @@ const Index = () => {
         onPasswordChanged={() => {
           setShowChangePasswordModal(false);
         }}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmationModal
+        isVisible={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
       />
     </HomeWrapper>
   );

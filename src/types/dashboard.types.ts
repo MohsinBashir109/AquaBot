@@ -43,8 +43,8 @@ export interface WeatherResponse {
   name: string;
   main: {
     temp: number;
-    tempMin: number;
-    tempMax: number;
+    temp_min: number; // API returns snake_case
+    temp_max: number; // API returns snake_case
     humidity: number;
   };
   weather: Array<{
