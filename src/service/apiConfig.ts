@@ -1,9 +1,12 @@
 // API Configuration for .NET Backend
-// const BASE_URL = 'http://172.17.254.226:5065/api'; // Office network IP (PHYSICAL DEVICE)
+// const BASE_URL = 'http://172.27.168.240:5065/api'; // Hotspot/WiFi network IP (PHYSICAL DEVICE) - CURRENT
+// const BASE_URL = 'http://172.17.254.58:5065/api'; // Office network IP (PHYSICAL DEVICE)
 // const BASE_URL = 'http://192.168.2.11:5065/api'; // Home network IP (PHYSICAL DEVICE)
 // const BASE_URL = 'http://localhost:5065/api'; // For iOS Simulator
-const BASE_URL = 'http://10.0.2.2:5065/api'; // For Android Emulator - THIS IS CURRENT
+// const BASE_URL = 'http://10.0.2.2:5065/api'; // For Android Emulator
 // const BASE_URL = 'http://DESKTOP-0DDVPED:5065/api'; // Physical device with hostname
+// const BASE_URL = 'https://conflictedly-vigorly-katia.ngrok-free.dev/api';
+const BASE_URL = 'https://conflictedly-vigorless-katia.ngrok-free.dev/api';
 
 // Log the configured URL when module loads
 console.log('🔧 [API Config] Base URL configured:', BASE_URL);

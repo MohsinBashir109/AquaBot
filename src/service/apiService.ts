@@ -23,6 +23,8 @@ class ApiService {
   private baseURL: string;
   private timeout: number;
   private axiosInstance;
+  private workingURL: string | null = null; // Cache the working URL
+  private urlAttemptIndex: number = 0; // Track which URL we're trying
 
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL;
@@ -92,6 +94,48 @@ class ApiService {
     return this.baseURL;
   }
 
+  /**
+   * Try to find a working URL by testing all configured URLs
+   * This enables automatic network detection across different networks
+   */
+  private async findWorkingURL(): Promise<string | null> {
+    // If using ngrok, just return it
+    if ((API_CONFIG as any).USE_NGROK && (API_CONFIG as any).NGROK_URL) {
+      return (API_CONFIG as any).NGROK_URL;
+    }
+
+    // If we already found a working URL, use it
+    if (this.workingURL) {
+      return this.workingURL;
+    }
+
+    // If NETWORK_URLS doesn't exist, just use BASE_URL (no connectivity test needed)
+    if (
+      !(API_CONFIG as any).NETWORK_URLS ||
+      !Array.isArray((API_CONFIG as any).NETWORK_URLS)
+    ) {
+      console.log(`✅ [API] Using configured BASE_URL: ${API_CONFIG.BASE_URL}`);
+      return API_CONFIG.BASE_URL;
+    }
+
+    // Try all URLs in order (skip connectivity test to avoid 405 errors)
+    const primaryUrl = (API_CONFIG as any).PRIMARY_URL || API_CONFIG.BASE_URL;
+    const networkUrls = ((API_CONFIG as any).NETWORK_URLS as string[]) || [];
+    const urlsToTry = [
+      primaryUrl,
+      ...networkUrls.filter((url: string) => url !== primaryUrl),
+    ];
+
+    console.log('🔍 [API] Available URLs:', urlsToTry);
+
+    // Just return the primary URL without testing (testing causes 405 errors on POST-only endpoints)
+    // The actual request will fail if the URL is wrong, and we'll handle that in makeRequest
+    console.log(`✅ [API] Using primary URL: ${primaryUrl}`);
+    this.workingURL = primaryUrl;
+    this.baseURL = primaryUrl;
+    return primaryUrl;
+  }
+
   // Test connectivity to backend (DEPRECATED - no longer used automatically)
   // This was causing unnecessary API calls before every registration.
   // Keep for manual testing if needed.
@@ -113,17 +157,61 @@ class ApiService {
     endpoint: string,
     options: AxiosRequestConfig = {},
     retryCount: number = 0,
+    urlIndex: number = 0,
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    // If this is the first attempt and we don't have a working URL, try to find one
+    if (
+      retryCount === 0 &&
+      urlIndex === 0 &&
+      !this.workingURL &&
+      !(API_CONFIG as any).USE_NGROK
+    ) {
+      const workingUrl = await this.findWorkingURL();
+      if (workingUrl) {
+        this.baseURL = workingUrl;
+      }
+    }
+
+    // Determine which URL to use
+    let currentBaseURL = this.baseURL;
+    if (!(API_CONFIG as any).USE_NGROK && !this.workingURL) {
+      // If NETWORK_URLS doesn't exist, just use BASE_URL
+      if (
+        !(API_CONFIG as any).NETWORK_URLS ||
+        !Array.isArray((API_CONFIG as any).NETWORK_URLS)
+      ) {
+        currentBaseURL = API_CONFIG.BASE_URL;
+      } else {
+        // Try URLs in order if we haven't found a working one
+        const primaryUrl =
+          (API_CONFIG as any).PRIMARY_URL || API_CONFIG.BASE_URL;
+        const networkUrls =
+          ((API_CONFIG as any).NETWORK_URLS as string[]) || [];
+        const urlsToTry = [
+          primaryUrl,
+          ...networkUrls.filter((url: string) => url !== primaryUrl),
+        ];
+        if (urlIndex < urlsToTry.length) {
+          currentBaseURL = urlsToTry[urlIndex];
+          console.log(
+            `🔄 [API] Attempting URL ${urlIndex + 1}/${
+              urlsToTry.length
+            }: ${currentBaseURL}`,
+          );
+        }
+      }
+    }
+
+    const url = `${currentBaseURL}${endpoint}`;
     const method = (options.method || 'GET').toUpperCase();
     const requestId = `${method} ${endpoint} - ${Date.now()}`;
 
     try {
       // Always log the URL being called for debugging
       console.log(`🌐 [API] Calling: ${method} ${url}`);
-      console.log(`🌐 [API] Base URL: ${this.baseURL}`);
+      console.log(`🌐 [API] Base URL: ${currentBaseURL}`);
       console.log(`🌐 [API] Endpoint: ${endpoint}`);
-      console.log(`🌐 [API] Full URL will be: ${this.baseURL}${endpoint}`);
+      console.log(`🌐 [API] Full URL will be: ${currentBaseURL}${endpoint}`);
 
       // Merge headers - ensure Content-Type is always set for JSON requests
       const mergedHeaders = {
@@ -147,8 +235,8 @@ class ApiService {
       console.log(`📤 [API] Making request now...`);
 
       // Make the request using axios
-      // Construct full URL
-      const fullUrl = `${this.baseURL}${endpoint}`;
+      // Construct full URL using currentBaseURL (not this.baseURL which might be outdated)
+      const fullUrl = `${currentBaseURL}${endpoint}`.trim();
       console.log(`📤 [API] Final request URL: ${fullUrl}`);
       console.log(`📤 [API] Request config before axios:`, {
         url: fullUrl,
@@ -182,6 +270,13 @@ class ApiService {
       response = await this.axiosInstance.request<T>(requestConfig);
 
       console.log(`✅ [API] Request completed! Status: ${response.status}`);
+
+      // Cache the working URL for future requests
+      if (!this.workingURL && currentBaseURL) {
+        this.workingURL = currentBaseURL;
+        this.baseURL = currentBaseURL;
+        console.log(`✅ [API] Cached working URL: ${currentBaseURL}`);
+      }
 
       const data = response.data as ApiResponse<T>;
 
@@ -221,7 +316,7 @@ class ApiService {
         axiosError.code || error.code || 'No code',
       );
       console.error(`❌ [API] URL was: ${url}`);
-      console.error(`❌ [API] Base URL: ${this.baseURL}`);
+      console.error(`❌ [API] Base URL: ${currentBaseURL}`);
       console.error(`❌ [API] Endpoint: ${endpoint}`);
 
       // Log error details safely
@@ -241,22 +336,93 @@ class ApiService {
         console.error(`❌ [API] Could not log full error details`);
       }
 
-      // Check for common connection errors
+      // Check for common connection errors and try fallback URLs
       const errorMsg = String(error.message || '').toLowerCase();
-      if (
+      const isNetworkError =
         errorMsg.includes('network request failed') ||
         errorMsg.includes('fetch failed') ||
         errorMsg.includes('networkerror') ||
         errorMsg.includes('timeout') ||
         errorMsg.includes('econnrefused') ||
         axiosError.code === 'ECONNREFUSED' ||
-        axiosError.code === 'ETIMEDOUT'
-      ) {
-        console.error(`❌ [API] Network error - Is the API server running?`);
-        console.error(`❌ [API] Current API URL: ${this.baseURL}`);
-        console.error(
-          `❌ [API] For physical device, update BASE_URL in apiConfig.ts to your computer's IP`,
-        );
+        axiosError.code === 'ETIMEDOUT' ||
+        axiosError.code === 'ERR_NETWORK' ||
+        !error.response; // No response usually means network issue
+
+      if (isNetworkError) {
+        console.error(`❌ [API] Network error detected`);
+        console.error(`❌ [API] Failed URL: ${currentBaseURL}`);
+
+        // Try fallback URLs if not using ngrok and we haven't exhausted all URLs
+        if (!(API_CONFIG as any).USE_NGROK) {
+          // If NETWORK_URLS doesn't exist, can't try fallback URLs
+          if (
+            !(API_CONFIG as any).NETWORK_URLS ||
+            !Array.isArray((API_CONFIG as any).NETWORK_URLS)
+          ) {
+            console.error(
+              `❌ [API] Network error - using BASE_URL: ${API_CONFIG.BASE_URL}`,
+            );
+            console.error(`❌ [API] ⚠️ TROUBLESHOOTING STEPS:`);
+            console.error(
+              `   1. Verify phone and laptop are on the SAME WiFi network`,
+            );
+            console.error(
+              `   2. Check if API server is running: netstat -an | findstr 5065`,
+            );
+            console.error(
+              `   3. Test from phone browser: Open http://${API_CONFIG.BASE_URL.replace(
+                'http://',
+                '',
+              ).replace('/api', '')} in phone browser`,
+            );
+            console.error(
+              `   4. Verify Windows Firewall allows port 5065 (already configured ✅)`,
+            );
+            console.error(
+              `   5. Check if IP address changed: Run ipconfig to get current IP`,
+            );
+            console.error(`   6. If on different networks, use ngrok instead`);
+          } else {
+            const primaryUrl =
+              (API_CONFIG as any).PRIMARY_URL || API_CONFIG.BASE_URL;
+            const networkUrls =
+              ((API_CONFIG as any).NETWORK_URLS as string[]) || [];
+            const urlsToTry = [
+              primaryUrl,
+              ...networkUrls.filter(
+                (networkUrl: string) => networkUrl !== primaryUrl,
+              ),
+            ];
+
+            if (urlIndex < urlsToTry.length - 1) {
+              console.log(
+                `🔄 [API] Trying next URL (${urlIndex + 2}/${
+                  urlsToTry.length
+                })...`,
+              );
+              // Try next URL
+              return this.makeRequest<T>(
+                endpoint,
+                options,
+                retryCount,
+                urlIndex + 1,
+              );
+            } else {
+              console.error(
+                `❌ [API] All URLs exhausted. Tried: ${urlsToTry.join(', ')}`,
+              );
+              console.error(`❌ [API] Is the API server running?`);
+              console.error(
+                `❌ [API] For ngrok (works from any network), set USE_NGROK = true in apiConfig.ts`,
+              );
+            }
+          }
+        } else {
+          console.error(
+            `❌ [API] Network error with ngrok - check if ngrok is running`,
+          );
+        }
       }
 
       // Handle axios error response
