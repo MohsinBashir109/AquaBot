@@ -305,13 +305,23 @@ const Index = () => {
         showCustomFlash('Analysis failed. Please try again.', 'danger');
       }
     } catch (error: any) {
-      // Only show user-friendly error message, detailed logging is handled in service layer
-      console.log('❌ [ImageAnalysis] Analysis failed:', error.message);
+      // Enhanced error logging for debugging
+      console.error('❌ [ImageAnalysis] Analysis failed in UI:');
+      console.error('❌ [ImageAnalysis] Error message:', error.message);
+      console.error('❌ [ImageAnalysis] Error name:', error.name);
+      console.error('❌ [ImageAnalysis] Error code:', error.code);
+      console.error('❌ [ImageAnalysis] Full error object:', error);
+      
+      if (error.originalError) {
+        console.error('❌ [ImageAnalysis] Original error:', error.originalError);
+      }
+      if (error.attemptedUrl) {
+        console.error('❌ [ImageAnalysis] Attempted URL:', error.attemptedUrl);
+      }
 
-      showCustomFlash(
-        error.message || 'Failed to analyze image. Please try again.',
-        'danger',
-      );
+      // Show user-friendly error message
+      const errorMessage = error.message || 'Failed to analyze image. Please try again.';
+      showCustomFlash(errorMessage, 'danger');
     } finally {
       console.log(
         '🏁 [ImageAnalysis] Analysis process completed, setting loading to false',
