@@ -5,7 +5,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import React, { useState } from 'react';
-import { email, eyes, padlock, userName } from '../../../assets/icons/icons';
+import {
+  email,
+  eyes,
+  padlock,
+  userName,
+} from '../../../components/assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 import { register } from '../../../service/signUp';
 

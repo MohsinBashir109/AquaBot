@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import React, { useState } from 'react';
-import { email, eyes, padlock } from './../../../assets/icons/icons';
+import { email, eyes, padlock } from '../../../components/assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../../../utils/constants';
 
 import AuthWrapper from '../../../../Wrappers/AuthWrapper';

@@ -7,7 +7,7 @@ import Button from '../../../components/ThemeComponents/ThemeButton';
 import ThemeInput from '../../../components/ThemeComponents/ThemeInput';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import { authService } from '../../../service/authService';
-import { email } from '../../../assets/icons/icons';
+import { email } from '../../../components/assets/icons/icons';
 import { fontFamilies } from '../../../utils/fontfamilies';
 import { routes } from '../../../utils/routes';
 import { showCustomFlash } from '../../../utils/flash';

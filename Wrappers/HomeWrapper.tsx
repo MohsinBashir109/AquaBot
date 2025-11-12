@@ -1,9 +1,8 @@
 import { Image, ImageBackground, StatusBar, StyleSheet } from 'react-native';
 import {
-  aquaLogo,
   authBackGround,
   droplets,
-} from '../src/assets/images/images';
+} from '../src/components/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import React from 'react';

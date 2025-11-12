@@ -8,7 +8,10 @@ import {
   View,
   Animated,
 } from 'react-native';
-import { aquaLogo, authBackGround } from '../../../assets/images/images';
+import {
+  aquaLogo,
+  authBackGround,
+} from '../../../components/assets/images/images';
 import React, { useEffect, useRef } from 'react';
 import { heightPixel, widthPixel } from '../../../utils/constants';
 
@@ -66,7 +69,7 @@ const Splash = ({ navigation }: any) => {
 
     // Navigate after 4 seconds
     const timeout = setTimeout(async () => {
-      const USER_KEY = 'Exists';
+      const USER_KEY = 'user_session';
       const token = await AsyncStorage.getItem(USER_KEY);
       console.log(token);
       if (token) {

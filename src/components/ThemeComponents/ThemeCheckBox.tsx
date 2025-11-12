@@ -5,7 +5,7 @@ import { fontPixel, heightPixel, widthPixel } from '../../utils/constants';
 import React from 'react';
 import ThemeText from './ThemeText';
 import { fontFamilies } from '../../utils/fontfamilies';
-import { tickCircle } from '../../assets/icons/icons';
+import { tickCircle } from '../assets/icons/icons';
 import { useThemeContext } from '../../theme/ThemeContext';
 
 const ThemedCheckbox = ({

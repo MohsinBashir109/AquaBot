@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Logo, authBackGround } from '../../../assets/images/images';
+import { Logo, authBackGround } from '../../../components/assets/images/images';
 import {
   dataOnboarding,
   fontPixel,
@@ -52,34 +52,76 @@ const OnBoarding = ({ navigation }: any) => {
       </ThemeText>
 
       {/* Language Radio */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: heightPixel(6) }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginVertical: heightPixel(6),
+        }}
+      >
         <ThemeText color="text" style={{ marginRight: widthPixel(8) }}>
           {t('onboarding.chooseLanguage')}
         </ThemeText>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: widthPixel(12) }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginRight: widthPixel(12),
+            }}
+          >
             <View
               onTouchEnd={() => setLocale('en')}
               style={{
-                width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10),
-                borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6)
+                width: widthPixel(20),
+                height: widthPixel(20),
+                borderRadius: widthPixel(10),
+                borderWidth: 1,
+                borderColor: '#2E7CF6',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: widthPixel(6),
               }}
             >
-              <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'en' ? '#2E7CF6' : 'transparent' }} />
+              <View
+                style={{
+                  width: widthPixel(10),
+                  height: widthPixel(10),
+                  borderRadius: widthPixel(5),
+                  backgroundColor: locale === 'en' ? '#2E7CF6' : 'transparent',
+                }}
+              />
             </View>
-            <ThemeText color="text" onPress={() => setLocale('en')}>EN</ThemeText>
+            <ThemeText color="text" onPress={() => setLocale('en')}>
+              EN
+            </ThemeText>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               onTouchEnd={() => setLocale('ur')}
               style={{
-                width: widthPixel(20), height: widthPixel(20), borderRadius: widthPixel(10),
-                borderWidth: 1, borderColor: '#2E7CF6', alignItems: 'center', justifyContent: 'center', marginRight: widthPixel(6)
+                width: widthPixel(20),
+                height: widthPixel(20),
+                borderRadius: widthPixel(10),
+                borderWidth: 1,
+                borderColor: '#2E7CF6',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: widthPixel(6),
               }}
             >
-              <View style={{ width: widthPixel(10), height: widthPixel(10), borderRadius: widthPixel(5), backgroundColor: locale === 'ur' ? '#2E7CF6' : 'transparent' }} />
+              <View
+                style={{
+                  width: widthPixel(10),
+                  height: widthPixel(10),
+                  borderRadius: widthPixel(5),
+                  backgroundColor: locale === 'ur' ? '#2E7CF6' : 'transparent',
+                }}
+              />
             </View>
-            <ThemeText color="text" onPress={() => setLocale('ur')}>اردو</ThemeText>
+            <ThemeText color="text" onPress={() => setLocale('ur')}>
+              اردو
+            </ThemeText>
           </View>
         </View>
       </View>

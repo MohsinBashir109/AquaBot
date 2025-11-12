@@ -9,7 +9,7 @@ import {
   aquaLogo,
   authBackGround,
   droplets,
-} from '../src/assets/images/images';
+} from '../src/components/assets/images/images';
 import { fontPixel, heightPixel, widthPixel } from '../src/utils/constants';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';

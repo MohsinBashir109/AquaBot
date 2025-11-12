@@ -5,7 +5,7 @@ import {
   flower,
   mind,
   money,
-} from '../assets/images/images';
+} from '../components/assets/images/images';
 
 // import { ob1, ob2, ob3, ob4, ob5 } from '../assets/images/images';
 

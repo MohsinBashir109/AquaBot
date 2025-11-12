@@ -1,7 +1,7 @@
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import React, { useState, useRef } from 'react';
 import { resetPassword } from '../../../service/signUp';
-import { eyes, padlock } from '../../../assets/icons/icons';
+import { eyes, padlock } from '../../../components/assets/icons/icons';
 import { fontPixel, heightPixel } from '../../../utils/constants';
 import { useNavigation, useRoute } from '@react-navigation/native';
 

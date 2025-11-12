@@ -8,7 +8,7 @@ import {
 import Modal from 'react-native-modal';
 import React, { useCallback, useState } from 'react';
 import { authService } from '../service/authService';
-import { eyes, padlock } from '../assets/icons/icons';
+import { eyes, padlock } from './assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from '../utils/constants';
 import { showCustomFlash } from '../utils/flash';
 import { useLanguage } from '../context/LanguageContext';

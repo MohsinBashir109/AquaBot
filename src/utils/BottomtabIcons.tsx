@@ -1,5 +1,11 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { chatbot, guide, home, profile, settings } from '../assets/icons/icons';
+import {
+  chatbot,
+  guide,
+  home,
+  profile,
+  settings,
+} from '../components/assets/icons/icons';
 import { fontPixel, heightPixel, widthPixel } from './constants';
 
 import { colors } from './colors';

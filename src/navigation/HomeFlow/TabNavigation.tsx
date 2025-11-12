@@ -16,7 +16,7 @@ import {
   home,
   profile,
   settings,
-} from '../../assets/icons/icons';
+} from '../../components/assets/icons/icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeContext } from '../../theme/ThemeContext';
 import LinearGradient from 'react-native-linear-gradient';
