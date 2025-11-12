@@ -25,6 +25,7 @@ import { showCustomFlash } from '../../../utils/flash';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useThemeContext } from '../../../theme/ThemeContext';
 import { colors } from '../../../utils/colors';
+import EmailVerificationModal from '../../../components/EmailVerificationModal';
 
 const Index = ({ navigation }: any) => {
   const { t } = useLanguage();
@@ -40,6 +41,7 @@ const Index = ({ navigation }: any) => {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   const handleSignUp = async () => {
     if (
@@ -99,24 +101,14 @@ const Index = ({ navigation }: any) => {
       if (result === false) {
         // Registration successful
         console.log(
-          '[SIGNUP] Registration successful, clearing form and navigating...',
+          '[SIGNUP] Registration successful, showing verification modal...',
         );
-        setDetails({
-          userName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-        });
 
-        // Wait for loader timeout to complete, then show flash message and navigate
+        // Wait for loader timeout to complete, then show verification modal
         setTimeout(() => {
           setIsLoading(false);
-          // Show success message after loader hides
-          showCustomFlash('Registration successful!', 'success');
-          // Navigate after a brief moment to show the flash message
-          setTimeout(() => {
-            navigation.replace(routes.signin);
-          }, 500); // Small delay to show flash message before navigating
+          // Show verification modal instead of navigating
+          setShowVerificationModal(true);
         }, remainingTime);
       } else {
         // Registration failed - this shouldn't happen as errors should be thrown
@@ -295,6 +287,35 @@ const Index = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
       </AuthWrapper>
+
+      {/* Email Verification Modal */}
+      <EmailVerificationModal
+        isVisible={showVerificationModal}
+        onClose={() => {
+          setShowVerificationModal(false);
+          // Clear form when modal is closed
+          setDetails({
+            userName: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+          });
+        }}
+        onVerificationSuccess={() => {
+          // After successful verification, navigate to sign in
+          setShowVerificationModal(false);
+          setDetails({
+            userName: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+          });
+          setTimeout(() => {
+            navigation.replace(routes.signin);
+          }, 500);
+        }}
+        email={details.email}
+      />
     </KeyboardAwareScrollView>
   );
 };

@@ -108,3 +108,8 @@ export interface ChangePasswordRequest {
   newPassword: string;
   confirmPassword: string;
 }
+
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}

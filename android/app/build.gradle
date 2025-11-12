@@ -107,13 +107,32 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            // Enable code shrinking for debug builds to reduce size
+            // Note: This may make debugging slightly harder, but significantly reduces APK size
+            // If you encounter issues, set minifyEnabled false and keep shrinkResources true
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            // Keep debug symbols but optimize code
+            debuggable true
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
+            shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+
+    // Split APKs by architecture to reduce individual APK size
+    splits {
+        abi {
+            enable true
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            universalApk false
         }
     }
 }

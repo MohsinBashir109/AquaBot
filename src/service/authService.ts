@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService } from './apiService';
-import { RegisterRequest, LoginRequest, AuthResponse } from './apiConfig';
+import {
+  RegisterRequest,
+  LoginRequest,
+  AuthResponse,
+  VerifyEmailRequest,
+} from './apiConfig';
 
 // Key used for AsyncStorage
 const USER_KEY = 'user_session';
@@ -182,6 +187,17 @@ class AuthService {
       return response.success || response.Success || false;
     } catch (error) {
       console.error('Change password error:', error);
+      throw error; // Re-throw so UI can handle error messages
+    }
+  }
+
+  // Verify email
+  async verifyEmail(email: string, code: string): Promise<boolean> {
+    try {
+      const response = await apiService.verifyEmail({ email, code });
+      return response.success || response.Success || false;
+    } catch (error) {
+      console.error('Verify email error:', error);
       throw error; // Re-throw so UI can handle error messages
     }
   }
