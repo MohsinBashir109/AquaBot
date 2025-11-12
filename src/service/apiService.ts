@@ -8,6 +8,7 @@ import {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   ChangePasswordRequest,
+  VerifyEmailRequest,
 } from './apiConfig';
 import { showCustomFlash } from '../utils/flash';
 import { authService } from './authService';
@@ -636,6 +637,23 @@ class ApiService {
       return response;
     } catch (error: any) {
       showCustomFlash(error.message || 'Failed to reset password.', 'danger');
+      throw error;
+    }
+  }
+
+  // Verify email
+  async verifyEmail(data: VerifyEmailRequest): Promise<ApiResponse> {
+    try {
+      const response = await this.makeRequest(
+        API_CONFIG.ENDPOINTS.VERIFY_EMAIL,
+        {
+          method: 'POST',
+          data,
+        },
+      );
+
+      return response;
+    } catch (error: any) {
       throw error;
     }
   }
