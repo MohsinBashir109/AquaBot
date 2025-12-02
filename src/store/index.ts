@@ -1,11 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
 import irrigationPlansReducer from './irrigationPlansSlice';
+import chatReducer from './chatSlice';
+import irrigationScheduleReducer from './irrigationScheduleSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     irrigationPlans: irrigationPlansReducer,
+    chat: chatReducer,
+    irrigationSchedule: irrigationScheduleReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

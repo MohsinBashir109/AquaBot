@@ -20,6 +20,7 @@ import { useThemeContext } from '../../../theme/ThemeContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import ChangePasswordModal from '../../../components/ChangePasswordModal';
 import LogoutConfirmationModal from '../../../components/LogoutConfirmationModal';
+import { showCustomFlash } from '../../../utils/flash';
 
 const Index = () => {
   const { logout } = useAuth();
@@ -49,7 +50,7 @@ const Index = () => {
       <UserHeader
         showDrawerButton={true}
         showBackButton={false}
-        screenTitle="Settings"
+        screenTitle={t('settings.title')}
       />
       <ScrollView
         style={styles.content}

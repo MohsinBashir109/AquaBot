@@ -128,17 +128,25 @@ const UserHeader: React.FC<UserHeaderProps> = ({
           </View>
 
           <View style={styles.userDetails}>
-            <Text
-              style={[
-                styles.greetingText,
-                { color: themeColors.secondaryText },
-              ]}
-            >
-              {t('home.welcomeBack')}
-            </Text>
-            <Text style={[styles.userName, { color: themeColors.text }]}>
-              {user.userName}
-            </Text>
+            {_screenTitle ? (
+              <Text style={[styles.userName, { color: themeColors.text }]}>
+                {_screenTitle}
+              </Text>
+            ) : (
+              <>
+                <Text
+                  style={[
+                    styles.greetingText,
+                    { color: themeColors.secondaryText },
+                  ]}
+                >
+                  {t('home.welcomeBack')}
+                </Text>
+                <Text style={[styles.userName, { color: themeColors.text }]}>
+                  {user.userName}
+                </Text>
+              </>
+            )}
           </View>
         </View>
 

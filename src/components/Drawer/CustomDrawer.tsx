@@ -68,6 +68,7 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
       Profile: 'Profile',
       ChatBot: 'ChatBot',
       Settings: 'Settings',
+      Recommendations: 'Recommendations',
       GovernmentGuidelines: 'Analyze',
     };
 
@@ -122,6 +123,12 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
       screen: 'GovernmentGuidelines',
     },
     {
+      id: 'recommendations',
+      title: t('drawer.recommendations') || 'Recommendations',
+      icon: '📊',
+      screen: 'Recommendations',
+    },
+    {
       id: 'settings',
       title: t('drawer.settings'),
       icon: '⚙️',
@@ -174,6 +181,10 @@ const CustomDrawer: React.FC<DrawerContentComponentProps> = props => {
           case 'Settings':
             console.log('Navigating to Settings');
             props.navigation.navigate('MainTabs', { screen: 'Settings' });
+            break;
+          case 'Recommendations':
+            console.log('Navigating to Recommendations');
+            props.navigation.navigate('MainTabs', { screen: 'Recommendations' });
             break;
           case 'GovernmentGuidelines':
             console.log('Navigating to Analyze');

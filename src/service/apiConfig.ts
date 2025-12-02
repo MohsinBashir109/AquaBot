@@ -46,8 +46,8 @@ export const API_CONFIG = {
     // CREATE_IRRIGATION_PLAN: '/IrrigationPlan/create',
     // GET_IRRIGATION_PLANS: '/IrrigationPlan/user-plans',
 
-    // Assistant
-    CHAT_ASSISTANT: '/Assistant/chat',
+    // Chat Assistant
+    CHAT_SEND_TEXT: '/Aquachatbot',
   },
 };
 

@@ -12,6 +12,8 @@ export const routes = {
   home: 'Home',
   analyze: 'Analyze',
   chatbot: 'ChatBot',
+  chatList: 'ChatList',
   profile: 'Profile',
   settings: 'Settings',
+  recommendations: 'Recommendations',
 };

@@ -68,3 +68,57 @@ export interface CompleteTaskRequest {
   actualWaterUsed?: number;
   notes?: string;
 }
+
+// Recommendations Types
+export interface SeasonalRecommendation {
+  season: string;
+  description: string;
+  topCrops: string[];
+  keyInsights: string[];
+  sowingWindow: string;
+  harvestingWindow: string;
+}
+
+export interface RegionalHighlight {
+  region: string;
+  description: string;
+  bestCrops: string[];
+  specialNotes: string[];
+}
+
+export interface CropRequirement {
+  soilPH: string;
+  moisture: string;
+  nitrogen: string;
+}
+
+export interface TopCrop {
+  cropName: string;
+  suitabilityScore: number;
+  regions: string[];
+  seasons: string[];
+  keyBenefits: string[];
+  requirements: CropRequirement;
+}
+
+export interface FarmingCalendarMonth {
+  month: string;
+  activities: string[];
+  cropsToSow: string[];
+  cropsToHarvest: string[];
+}
+
+export interface RecommendationsResponse {
+  success: boolean;
+  message: string;
+  generatedAt: string;
+  totalCropsAnalyzed: number;
+  rawResponse: any | null;
+  seasonalRecommendations: SeasonalRecommendation[];
+  regionalHighlights: RegionalHighlight[];
+  topCrops: TopCrop[];
+  farmingCalendar: FarmingCalendarMonth[];
+  summary: string;
+  keyTakeaways: string[];
+  recommendations: any[];
+}

@@ -1,6 +1,6 @@
 import { API_CONFIG } from './apiConfig';
 import { authService } from './authService';
-import { AnalyzeAndPlanResponse } from '../types/imageAnalysis.types';
+import { AnalyzeAndPlanResponse, IrrigationScheduleItem } from '../types/imageAnalysis.types';
 
 class ImageAnalysisService {
   constructor() {
@@ -25,7 +25,7 @@ class ImageAnalysisService {
     }
   }
 
-  async analyzeAndPlan(formData: FormData): Promise<AnalyzeAndPlanResponse> {
+  async analyzeAndPlan(formData: FormData): Promise<AnalyzeAndPlanResponse | IrrigationScheduleItem[]> {
     try {
       const token = await authService.getAuthToken();
 
@@ -72,8 +72,16 @@ class ImageAnalysisService {
           );
         }
 
-        const result = (await fetchResponse.json()) as AnalyzeAndPlanResponse;
-        return result;
+        const result = await fetchResponse.json();
+        
+        // Handle both array response (new format) and object response (old format)
+        if (Array.isArray(result)) {
+          // New format: Direct array of irrigation schedule items
+          return result as IrrigationScheduleItem[];
+        } else {
+          // Old format: AnalyzeAndPlanResponse object
+          return result as AnalyzeAndPlanResponse;
+        }
       } catch (fetchError: any) {
         clearTimeout(timeoutId);
 

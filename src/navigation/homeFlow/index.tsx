@@ -37,6 +37,8 @@ export const HomeNavigation = () => {
       // initialRouteName={routes.splash}
     >
       <HomeStack.Screen name={routes.home} component={HomeDrawerNavigator} />
+      <HomeStack.Screen name={routes.chatbot} component={Home.chatBot} />
+      <HomeStack.Screen name={routes.chatList} component={Home.chatList} />
     </HomeStack.Navigator>
   );
 };

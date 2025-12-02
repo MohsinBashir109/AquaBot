@@ -18,6 +18,7 @@ import {
   WeatherResponse,
   AnalysisHistoryItem,
   CompleteTaskRequest,
+  RecommendationsResponse,
 } from '../types/dashboard.types';
 
 class ApiService {
@@ -892,6 +893,60 @@ class ApiService {
     } catch (error: any) {
       showCustomFlash('Failed to complete task', 'danger');
       throw error;
+    }
+  }
+
+  // Get recommendations
+  async getRecommendations(): Promise<ApiResponse<RecommendationsResponse>> {
+    try {
+      const token = await authService.getAuthToken();
+      if (!token) {
+        console.error('❌ [RecommendationsAPI] No authentication token found');
+        throw new Error('Not authenticated');
+      }
+
+      const endpoint = '/recommendations';
+      const fullUrl = `${this.baseURL}${endpoint}`;
+      console.log(`📊 [RecommendationsAPI] Fetching recommendations`);
+      console.log(`📊 [RecommendationsAPI] URL: ${fullUrl}`);
+
+      // Use longer timeout for recommendations API (30 seconds) as it may process large data
+      const response = await this.makeRequest<RecommendationsResponse>(
+        endpoint,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: 30000, // 30 seconds timeout for recommendations
+        },
+      );
+
+      console.log(
+        `📊 [RecommendationsAPI] Response received:`,
+        JSON.stringify(response, null, 2),
+      );
+
+      return response;
+    } catch (error: any) {
+      console.error('❌ [RecommendationsAPI] Error fetching recommendations:', error);
+      
+      // Provide more specific error messages
+      if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        console.error('❌ [RecommendationsAPI] Request timeout - API took too long to respond');
+        throw new Error('Request timeout. The server is taking too long to respond. Please try again.');
+      } else if (error.response) {
+        // Server responded with error status
+        console.error('❌ [RecommendationsAPI] Server error:', error.response.status, error.response.data);
+        throw new Error(error.response.data?.message || error.response.data?.Message || 'Server error occurred');
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error('❌ [RecommendationsAPI] No response received - Network error');
+        throw new Error('Network error. Please check your internet connection and try again.');
+      } else {
+        // Something else happened
+        throw error;
+      }
     }
   }
 }

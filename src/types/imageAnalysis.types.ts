@@ -58,3 +58,24 @@ export interface AnalyzeAndPlanResponse {
   confidence: number;
   analyzedAt: string;
 }
+
+// Irrigation Schedule Item from analyze-and-plan API
+export interface IrrigationScheduleItem {
+  planId: number;
+  day: string;
+  cropName: string;
+  status: 'inprogress' | 'expired' | 'locked' | 'complete';
+  isCompleted: boolean;
+  text: string;
+  waterAmountBuckets: number;
+  urgencyLevel: 'High' | 'Medium' | 'Low';
+  waterAmountLiters: number;
+  date: string;
+  dateDisplay: string;
+  instruction: string;
+  expectedWeather: string;
+  expectedTemperature: number;
+  statusMessage: string;
+  startTime: string;
+  endTime: string;
+}

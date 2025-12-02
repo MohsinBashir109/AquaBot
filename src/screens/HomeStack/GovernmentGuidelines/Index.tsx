@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -20,21 +20,25 @@ import { useThemeContext } from '../../../theme/ThemeContext';
 import Button from '../../../components/ThemeComponents/ThemeButton';
 import ThemeText from '../../../components/ThemeComponents/ThemeText';
 import { imageAnalysisService } from '../../../service/imageAnalysisService';
-import { AnalyzeAndPlanResponse } from '../../../types/imageAnalysis.types';
+import { AnalyzeAndPlanResponse, IrrigationScheduleItem } from '../../../types/imageAnalysis.types';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { showCustomFlash } from '../../../utils/flash';
 import { UserHeader } from '../../../components/Header';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
+import { useAppDispatch } from '../../../store/hooks';
+import { setScheduleItems, setLoading as setScheduleLoading } from '../../../store/irrigationScheduleSlice';
 
 const Index = () => {
   const { isDark } = useThemeContext();
   const { t } = useLanguage();
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeAndPlanResponse | null>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   // Form fields
   const [cropName, setCropName] = useState('');
@@ -47,12 +51,11 @@ const Index = () => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.CAMERA,
           {
-            title: 'Camera Permission',
-            message:
-              'AquaBot needs access to your camera to take photos of your field.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
+            title: t('analyze.cameraPermission'),
+            message: t('analyze.cameraPermissionMessage'),
+            buttonNeutral: t('analyze.askMeLater'),
+            buttonNegative: t('common.cancel'),
+            buttonPositive: t('analyze.ok'),
           },
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED;
@@ -74,12 +77,11 @@ const Index = () => {
           const granted = await PermissionsAndroid.request(
             'android.permission.READ_MEDIA_IMAGES' as any,
             {
-              title: 'Gallery Permission',
-              message:
-                'AquaBot needs access to your photos to analyze your field.',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
+              title: t('analyze.galleryPermission'),
+              message: t('analyze.galleryPermissionMessage'),
+              buttonNeutral: t('analyze.askMeLater'),
+              buttonNegative: t('common.cancel'),
+              buttonPositive: t('analyze.ok'),
             },
           );
           return granted === PermissionsAndroid.RESULTS.GRANTED;
@@ -88,12 +90,11 @@ const Index = () => {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
             {
-              title: 'Gallery Permission',
-              message:
-                'AquaBot needs access to your photos to analyze your field.',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
+              title: t('analyze.galleryPermission'),
+              message: t('analyze.galleryPermissionMessage'),
+              buttonNeutral: t('analyze.askMeLater'),
+              buttonNegative: t('common.cancel'),
+              buttonPositive: t('analyze.ok'),
             },
           );
           return granted === PermissionsAndroid.RESULTS.GRANTED;
@@ -106,32 +107,18 @@ const Index = () => {
     return true; // iOS handles permissions automatically
   };
 
-  const pickImage = () => {
-    Alert.alert('Select Image', 'Choose image source', [
-      {
-        text: 'Camera',
-        onPress: () => openCamera(),
-      },
-      {
-        text: 'Gallery',
-        onPress: () => openGallery(),
-      },
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-    ]);
-  };
-
-  const openCamera = async () => {
-    const hasPermission = await requestCameraPermission();
-
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Denied',
-        'Camera permission is required to take photos. Please enable it in your device settings.',
-      );
-      return;
+  const openCamera = useCallback(async () => {
+    // For Android 13+, react-native-image-picker handles permissions automatically
+    // Only manually request for older Android versions
+    if (Platform.OS === 'android' && Platform.Version < 33) {
+      const hasPermission = await requestCameraPermission();
+      if (!hasPermission) {
+        Alert.alert(
+          t('analyze.permissionDenied'),
+          t('analyze.cameraPermissionRequired'),
+        );
+        return;
+      }
     }
 
     launchCamera(
@@ -143,35 +130,37 @@ const Index = () => {
       },
       response => {
         if (response.didCancel) {
-          console.log('User cancelled camera');
+          // User cancelled - no action needed
+          return;
         } else if (response.errorCode) {
-          console.error(
-            'Camera Error:',
-            response.errorCode,
-            response.errorMessage,
-          );
-          Alert.alert(
-            'Error',
-            response.errorMessage || 'Failed to open camera',
-          );
+          // Handle specific error codes
+          let errorMessage = t('analyze.failedToOpenCamera');
+          if (response.errorCode === 'permission') {
+            errorMessage = t('analyze.cameraPermissionError');
+          } else if (response.errorMessage) {
+            errorMessage = response.errorMessage;
+          }
+          Alert.alert(t('analyze.error'), errorMessage);
         } else if (response.assets && response.assets[0]) {
-          console.log('Image selected:', response.assets[0]);
           setSelectedImage(response.assets[0]);
           setAnalysisResult(null);
         }
       },
     );
-  };
+  }, []);
 
-  const openGallery = async () => {
-    const hasPermission = await requestGalleryPermission();
-
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Denied',
-        'Gallery permission is required to select photos. Please enable it in your device settings.',
-      );
-      return;
+  const openGallery = useCallback(async () => {
+    // For Android 13+, react-native-image-picker handles permissions automatically
+    // Only manually request for older Android versions
+    if (Platform.OS === 'android' && Platform.Version < 33) {
+      const hasPermission = await requestGalleryPermission();
+      if (!hasPermission) {
+        Alert.alert(
+          t('analyze.permissionDenied'),
+          t('analyze.galleryPermissionRequired'),
+        );
+        return;
+      }
     }
 
     launchImageLibrary(
@@ -182,47 +171,77 @@ const Index = () => {
         selectionLimit: 1,
       },
       response => {
-        console.log('📱 [ImagePicker] Response received:', {
-          didCancel: response.didCancel,
-          errorCode: response.errorCode,
-          errorMessage: response.errorMessage,
-          hasAssets: response.assets && response.assets.length > 0,
-          assetCount: response.assets?.length || 0,
-        });
-
         if (response.didCancel) {
-          console.log('❌ [ImagePicker] User cancelled image picker');
+          // User cancelled - no action needed
+          return;
         } else if (response.errorCode) {
-          console.error('💥 [ImagePicker] Error occurred:', {
-            errorCode: response.errorCode,
-            errorMessage: response.errorMessage,
-          });
-          Alert.alert('Error', response.errorMessage || 'Failed to pick image');
+          // Handle specific error codes
+          let errorMessage = t('analyze.failedToPickImage');
+          if (response.errorCode === 'permission') {
+            errorMessage = t('analyze.galleryPermissionError');
+          } else if (response.errorMessage) {
+            errorMessage = response.errorMessage;
+          }
+          Alert.alert(t('analyze.error'), errorMessage);
         } else if (response.assets && response.assets[0]) {
-          const selectedAsset = response.assets[0];
-          console.log('✅ [ImagePicker] Image selected successfully:', {
-            uri: selectedAsset.uri,
-            type: selectedAsset.type,
-            fileName: selectedAsset.fileName,
-            fileSize: selectedAsset.fileSize,
-            width: selectedAsset.width,
-            height: selectedAsset.height,
-          });
-          setSelectedImage(selectedAsset);
+          setSelectedImage(response.assets[0]);
           setAnalysisResult(null);
-          console.log(
-            '🔄 [ImagePicker] UI state updated - analysis result cleared',
-          );
         } else {
-          console.log('⚠️ [ImagePicker] No assets in response');
+          // No assets but no error - might be a permission issue
+          Alert.alert(
+            t('analyze.error'),
+            t('analyze.noImageSelected'),
+          );
         }
       },
     );
-  };
+  }, []);
+
+  const pickImage = useCallback(() => {
+    // Prevent multiple simultaneous calls
+    if (isPickerOpen) {
+      return;
+    }
+
+    setIsPickerOpen(true);
+    Alert.alert(
+      t('analyze.selectImage'),
+      t('analyze.chooseImageSource'),
+      [
+        {
+          text: t('analyze.camera'),
+          onPress: () => {
+            setIsPickerOpen(false);
+            openCamera();
+          },
+        },
+        {
+          text: t('analyze.gallery'),
+          onPress: () => {
+            setIsPickerOpen(false);
+            openGallery();
+          },
+        },
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+          onPress: () => {
+            setIsPickerOpen(false);
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {
+          setIsPickerOpen(false);
+        },
+      },
+    );
+  }, [isPickerOpen, openCamera, openGallery]);
 
   const handleAnalyze = async () => {
     if (!selectedImage) {
-      showCustomFlash('Please select an image first', 'warning');
+      showCustomFlash(t('analyze.selectImageFirst'), 'warning');
       return;
     }
 
@@ -268,41 +287,63 @@ const Index = () => {
       );
 
       // Log the complete response received in UI
-      console.log('📱 [ImageAnalysis] UI received response:', {
-        success: result.success,
-        message: result.message,
-        analysisId: result.analysisId,
-        confidence: result.confidence,
-        hasImmediateAction: !!result.immediateAction,
-        hasFieldInfo: !!result.fieldInfo,
-        hasIrrigationSchedule: !!result.irrigationSchedule,
-      });
+      console.log('📱 [ImageAnalysis] UI received response:', result);
 
-      // Log detailed UI response data
-      console.log('🎯 [ImageAnalysis] UI Response Data:');
-      console.log('- Success:', result.success);
-      console.log('- Message:', result.message);
-      console.log('- Analysis ID:', result.analysisId);
-      console.log('- Confidence:', result.confidence);
+      // Check if result is an array (new format) or object (old format)
+      let scheduleItems: IrrigationScheduleItem[] = [];
+      
+      if (Array.isArray(result)) {
+        // New format: Direct array of irrigation schedule items
+        console.log('📋 [ImageAnalysis] Received array format, storing in Redux');
+        scheduleItems = result as IrrigationScheduleItem[];
+        dispatch(setScheduleItems(scheduleItems));
+        dispatch(setScheduleLoading(false));
+        showCustomFlash(t('analyze.irrigationScheduleLoaded'), 'success');
+        console.log('✅ [ImageAnalysis] Stored', scheduleItems.length, 'schedule items in Redux');
+      } else if (result && typeof result === 'object') {
+        // Old format: AnalyzeAndPlanResponse object
+        console.log('📋 [ImageAnalysis] Received object format');
+        
+        // Log the complete response received in UI
+        console.log('📱 [ImageAnalysis] UI received response:', {
+          success: result.success,
+          message: result.message,
+          analysisId: result.analysisId,
+          confidence: result.confidence,
+          hasImmediateAction: !!result.immediateAction,
+          hasFieldInfo: !!result.fieldInfo,
+          hasIrrigationSchedule: !!result.irrigationSchedule,
+        });
 
-      if (result.immediateAction) {
-        console.log('- Immediate Action Data:', result.immediateAction);
-      }
+        // Log detailed UI response data
+        console.log('🎯 [ImageAnalysis] UI Response Data:');
+        console.log('- Success:', result.success);
+        console.log('- Message:', result.message);
+        console.log('- Analysis ID:', result.analysisId);
+        console.log('- Confidence:', result.confidence);
 
-      if (result.fieldInfo) {
-        console.log('- Field Info Data:', result.fieldInfo);
-      }
+        if (result.immediateAction) {
+          console.log('- Immediate Action Data:', result.immediateAction);
+        }
 
-      if (result.irrigationSchedule) {
-        console.log('- Irrigation Schedule Data:', result.irrigationSchedule);
-      }
+        if (result.fieldInfo) {
+          console.log('- Field Info Data:', result.fieldInfo);
+        }
 
-      if (result.success) {
-        setAnalysisResult(result);
-        showCustomFlash(result.message, 'success');
-        console.log('✅ [ImageAnalysis] Analysis completed successfully');
+        if (result.irrigationSchedule) {
+          console.log('- Irrigation Schedule Data:', result.irrigationSchedule);
+        }
+
+        if (result.success) {
+          setAnalysisResult(result);
+          showCustomFlash(result.message, 'success');
+          console.log('✅ [ImageAnalysis] Analysis completed successfully');
+        } else {
+          showCustomFlash(t('analyze.analysisFailed'), 'danger');
+        }
       } else {
-        showCustomFlash('Analysis failed. Please try again.', 'danger');
+        console.error('❌ [ImageAnalysis] Unexpected response format:', typeof result);
+        showCustomFlash(t('analyze.unexpectedResponseFormat'), 'danger');
       }
     } catch (error: any) {
       // Enhanced error logging for debugging
@@ -320,7 +361,7 @@ const Index = () => {
       }
 
       // Show user-friendly error message
-      const errorMessage = error.message || 'Failed to analyze image. Please try again.';
+      const errorMessage = error.message || t('analyze.failedToAnalyzeImage');
       showCustomFlash(errorMessage, 'danger');
     } finally {
       console.log(
@@ -370,6 +411,8 @@ const Index = () => {
             { borderColor: colors[isDark ? 'dark' : 'light'].primary },
           ]}
           onPress={pickImage}
+          activeOpacity={0.7}
+          disabled={isPickerOpen || loading}
         >
           {selectedImage ? (
             <Image
@@ -454,7 +497,7 @@ const Index = () => {
 
         {/* Analyze Button */}
         <Button
-          title={loading ? 'Analyzing...' : t('analyze.analyzeButton')}
+          title={loading ? t('analyze.analyzingShort') : t('analyze.analyzeButton')}
           onPress={handleAnalyze}
           buttonStyle={styles.analyzeButton}
           bgColor="primary"
@@ -468,7 +511,7 @@ const Index = () => {
               color={colors[isDark ? 'dark' : 'light'].primary}
             />
             <ThemeText color="primary" style={styles.loadingText}>
-              Analyzing your field...
+              {t('analyze.analyzing')}
             </ThemeText>
           </View>
         )}
@@ -490,7 +533,7 @@ const Index = () => {
             >
               <View style={styles.cardHeader}>
                 <ThemeText color="text" style={styles.cardTitle}>
-                  Immediate Action
+                  {t('analyze.immediateAction')}
                 </ThemeText>
                 <View
                   style={[
@@ -515,7 +558,7 @@ const Index = () => {
               <View style={styles.waterInfoRow}>
                 <View style={styles.waterInfoItem}>
                   <ThemeText color="desText" style={styles.waterLabel}>
-                    Buckets (15L)
+                    {t('analyze.buckets')}
                   </ThemeText>
                   <ThemeText color="primary" style={styles.waterValue}>
                     {analysisResult.immediateAction.waterAmountBuckets}
@@ -523,7 +566,7 @@ const Index = () => {
                 </View>
                 <View style={styles.waterInfoItem}>
                   <ThemeText color="desText" style={styles.waterLabel}>
-                    Cans (10L)
+                    {t('analyze.cans')}
                   </ThemeText>
                   <ThemeText color="primary" style={styles.waterValue}>
                     {analysisResult.immediateAction.waterAmountCans}
@@ -531,7 +574,7 @@ const Index = () => {
                 </View>
                 <View style={styles.waterInfoItem}>
                   <ThemeText color="desText" style={styles.waterLabel}>
-                    Total Liters
+                    {t('analyze.totalLiters')}
                   </ThemeText>
                   <ThemeText color="primary" style={styles.waterValue}>
                     {analysisResult.immediateAction.waterAmountLiters.toFixed(
@@ -551,13 +594,13 @@ const Index = () => {
               ]}
             >
               <ThemeText color="text" style={styles.cardTitle}>
-                Field Information
+                {t('analyze.fieldInformation')}
               </ThemeText>
 
               <View style={styles.infoGrid}>
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Crop Type
+                    {t('analyze.cropType')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.cropType}
@@ -566,7 +609,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Soil Condition
+                    {t('analyze.soilCondition')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.soilCondition}
@@ -575,7 +618,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Soil Moisture
+                    {t('analyze.soilMoisture')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.soilMoisture}%
@@ -584,7 +627,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Crop Health
+                    {t('analyze.cropHealth')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.cropHealth}
@@ -593,7 +636,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Temperature
+                    {t('analyze.temperature')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.temperature.toFixed(1)}°C
@@ -602,7 +645,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Weather
+                    {t('analyze.weather')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.weather}
@@ -611,7 +654,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Location
+                    {t('analyze.location')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.location}
@@ -620,7 +663,7 @@ const Index = () => {
 
                 <View style={styles.infoItem}>
                   <ThemeText color="desText" style={styles.infoLabel}>
-                    Field Area
+                    {t('analyze.fieldArea')}
                   </ThemeText>
                   <ThemeText color="text" style={styles.infoValue}>
                     {analysisResult.fieldInfo.fieldAreaM2} m²
@@ -637,8 +680,8 @@ const Index = () => {
               ]}
             >
               <ThemeText color="text" style={styles.cardTitle}>
-                Irrigation Schedule (
-                {analysisResult.irrigationSchedule.totalDays} days)
+                {t('analyze.irrigationSchedule')} (
+                {analysisResult.irrigationSchedule.totalDays} {t('analyze.days')})
               </ThemeText>
 
               {analysisResult.irrigationSchedule.upcomingIrrigations.map(
@@ -692,7 +735,7 @@ const Index = () => {
             {/* Confidence Badge */}
             <View style={styles.confidenceContainer}>
               <ThemeText color="desText" style={styles.confidenceText}>
-                Analysis Confidence: {analysisResult.confidence.toFixed(1)}%
+                {t('analyze.analysisConfidence')} {analysisResult.confidence.toFixed(1)}%
               </ThemeText>
             </View>
           </View>
